@@ -1,0 +1,34 @@
+<!-- File: AtomMultiSelect.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type="module" src="../js/com/AtomMultiSelect.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AtomMultiSelect Component</title>
+</head>
+<body>
+  <script>
+    let atomInit = async () => {
+      let multiSelect = await atom.createInstance("AtomMultiSelect", {
+        'id': 'multiSelect1',
+        'caption': 'Caption',
+        'searcherPlaceHolder': 'Search...',
+        'options': [
+          { 'caption': 'Opt 1', 'value': '1' },
+          { 'caption': 'Opt 2', 'value': '2' },
+          { 'caption': 'Opt 3', 'value': '3' },
+          { 'caption': 'Opt 4', 'value': '4' }
+        ],
+        'events': { 'change': () => { alert('Selection changed') } },
+        'disabled': false
+      });
+      multiSelect.built = () => {
+        console.log('AtomMultiSelect Component built...');
+      }
+      multiSelect.addToBody();
+    };
+  </script>
+  <!-- <atom-multi-select></atom-multi-select> -->
+</body>
+</html>

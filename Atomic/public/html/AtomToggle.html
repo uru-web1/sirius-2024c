@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AtomToggle Example</title>
+    <script type="module" src="../js/com/Atom.js"></script>
+    <script type="module" src="../js/com/AtomToggle.js"></script>
+    <link rel="icon" href="../images/icons/favicon.png" sizes="32x32" type="image/png">
+    <style>
+        *{
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        let atomInit = async () => {
+            let b = await atom.createInstance("AtomToggle", {
+                id: 'b1',
+                events: {
+                    click: () => {
+                        console.log('Toggle clicked!');
+                    }
+                },
+                // style: {
+                //     '--circle-color-active': 'blue', // Color del círculo activo personalizable
+                //     '--circle-color-inactive': 'gray', // Color del círculo inactivo personalizable
+                //     '--container-color-active': 'lightblue', // Color del contenedor activo personalizable
+                //     '--container-color-inactive': 'lightgray', // Color del contenedor inactivo personalizable
+                // },
+                disabled: false
+            });
+            b.built = () => {
+                console.log('Componente construido...');
+            }
+            b.addToBody();
+        };
+    </script>
+    <atom-toggle></atom-toggle>
+</body>
+</html>
