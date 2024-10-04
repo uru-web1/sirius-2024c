@@ -1,0 +1,43 @@
+
+.square {
+    border-radius: 4px;
+    background-color: #b81466;
+    color: white;
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    text-align: center;
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.triangle {
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    background-color: #ff00ff;
+    color: white;
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.circle {
+    border-radius: 50%;
+    background-color: #e61980;
+    color: white;
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0;
+    margin: 10px;
+}

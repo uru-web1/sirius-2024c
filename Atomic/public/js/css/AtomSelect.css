@@ -1,0 +1,100 @@
+:host {
+    --AtomSelectTopLabel: -20px;
+    --AtomSelectDownLabel: 10px;
+    --AtomSelectLeftLabel: 0px;
+    --AtomSelectBgLabelDown: rgba(0, 0, 0, 0);
+    --AtomSelectBgLabelUp: rgba(0, 0, 0, 0);
+    --AtomSelectColorLabelDown: rgb(180, 180, 180);
+    --AtomSelectColorLabelUp: black;
+}
+
+.AtomSelectContainer {
+    display: flex;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(40, 120, 160, 1);
+    border-radius: 1em;
+    height: 40px;
+    width: 200px;
+    align-items: center;
+    justify-content: center;
+}
+
+.AtomSelect {
+    height: 100%;
+    width: 95%;
+    background-color: rgba(0, 0, 0, 0);
+    position: absolute;
+    border-width: 0px;
+    outline: none;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-family: Trebuchet MS;
+    font-size: 14px;
+    color: black;
+    border-radius: 1em;
+    overflow: hidden;
+}
+
+.AtomSelectLabel {
+    height: 16px;
+    position: absolute;
+    left: var(--AtomSelectLeftLabel);
+    top: var(--AtomSelectDownLabel);
+    display: inline-block;
+    color: var(--AtomSelectColorLabelDown);
+    font-family: Segoe UI;
+    font-size: 14px;
+    line-height: 16px;
+    margin-left: 10px;
+    border-radius: .25em;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.AtomOption {
+    font-size: 14px;
+    font-family: Segoe UI;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.AtomSelectContainer:hover {
+    cursor: pointer;
+    border-color: orange;
+}
+
+.AtomSelect:hover {
+    cursor: pointer;
+}
+
+.AtomSelectLabel:hover {
+    cursor: pointer;
+}
+
+@keyframes animationLabelUp {
+    from {
+        top: var(--AtomSelectDownLabel);
+        color: var(--AtomSelectColorLabelDown);
+        background-color: var(--EditBgLabelDown);
+    }
+    to {
+        top: var(--AtomSelectTopLabel);
+        color: var(--AtomSelectColorLabelUp);
+        background-color: var(--AtomSelectBgLabelUp);
+    }
+}
+
+@keyframes animationLabelDown {
+    from {
+        top: var(--AtomSelectTopLabel);
+        color: var(--AtomSelectColorLabelUp);
+        background-color: var(--AtomSelectBgLabelUp);
+    }
+    to {
+        top: var(--AtomSelectDownLabel);
+        color: var(--AtomSelectColorLabelDown);
+        background-color: var(--AtomSelectBgLabelDown);
+    }
+}

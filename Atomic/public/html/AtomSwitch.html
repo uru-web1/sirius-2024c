@@ -1,0 +1,31 @@
+<html>
+<head>
+    <script type="module" src="../js/com/Atom.js"></script>
+    <link rel="icon" href="../images/icons/favicon.png" sizes="32x32" type="image/png">
+</head>
+<body>
+<script>
+    let atomInit = async () => {
+        atom.fsw = () => {
+            let sw2 = atom.getInstance("MyAtomSw");
+            if (sw2.sts) console.log('Encendido');
+            else console.log('apagado');
+        }
+        let sw = await atom.createInstance("AtomSwitch", {
+            'id': 'sw1',
+            'events': {
+                'click': () => {
+                    if (sw.sts) console.log('on'); else console.log('off');
+                }
+            },
+            // 'disabled' : true
+        });
+        sw.built = () => {
+            console.log('Componente construido...');
+        }
+        sw.addToBody();
+    };
+</script>
+<atom-switch id="MyAtomSw" sts=true onclick='atom.fsw()'></atom-switch>
+</body>
+</html>

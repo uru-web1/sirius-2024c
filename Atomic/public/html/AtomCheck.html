@@ -1,27 +1,31 @@
 <html>
-    <head>
-        <script type="module" src="../js/com/Atom.js"></script>
-        <link rel="icon" href="../images/icons/favicon.png" sizes="32x32" type="image/png">
-    </head>
-    <body>
-        <script>
-            let atomInit = async () => {
-            let c = await atom.createInstance("AtomCheck", {
-                    'id':'AtomCheckJS', 
-                    'caption' : 'titulo de la opcion',
-                    'style' : {'left':'120px', 'top':'110px'},
-                    'events' : {'mouseup': (e)=>{ console.log('Hizo click...'); }},
-                    // 'disabled' : true
-                });
-                c.built = ()=>{
-                    c.checked = true;
-                    console.log('Componente construido...');
-                    // c.addEventListener('changeCaption', ()=>{console.log("cambio el caption a " + c.caption)});
-                    // c.caption="Nuevo Caption";
+<head>
+    <script type="module" src="../js/com/Atom.js"></script>
+    <link rel="icon" href="../images/icons/favicon.png" sizes="32x32" type="image/png">
+</head>
+<body>
+<script>
+    let atomInit = async () => {
+        let c = await atom.createInstance("AtomCheck", {
+            'id': 'AtomCheckJS',
+            'caption': 'titulo de la opcion',
+            'style': {'left': '120px', 'top': '110px'},
+            'events': {
+                'mouseup': (e) => {
+                    console.log('Hizo click...');
                 }
-                c.addToBody();
-            };
-        </script>
-        <atom-check id = "AtomCheckHTML"  caption="Aceptar" style="position:absolute; left:120px; top:140px"></atom-check>
-    </body>
+            },
+            // 'disabled' : true
+        });
+        c.built = () => {
+            c.checked = true;
+            console.log('Componente construido...');
+            // c.addEventListener('changeCaption', ()=>{console.log("cambio el caption a " + c.caption)});
+            // c.caption="Nuevo Caption";
+        }
+        c.addToBody();
+    };
+</script>
+<atom-check id="AtomCheckHTML" caption="Aceptar" style="position:absolute; left:120px; top:140px"></atom-check>
+</body>
 </html>

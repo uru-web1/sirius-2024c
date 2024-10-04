@@ -1,10 +1,11 @@
 export const AtomGauge = class extends Atom {
     constructor(props) {
-        super(props);  
+        super(props);
         this.name = "AtomGauge";
         this._percentaje = 0;
-        this.props = props;     
-        this.built = () => {}; 
+        this.props = props;
+        this.built = () => {
+        };
         this.attachShadow({mode: 'open'});
     }
 
@@ -17,72 +18,32 @@ export const AtomGauge = class extends Atom {
         `;
     }
 
-    #getCss(percentaje = 0) {
-        return `
-            .Container {
-                height: 20px;
-                width: 150px;
-                border: 1px solid rgba(100, 100, 100, 0.5);
-                border-radius: 1em;
-                margin: 50px;
-                position: relative;
-                overflow: hidden;
-            }
-
-            .Accumulator {
-                height: 100%;
-                width: 0;
-                border-radius: 1em 0 0 1em;
-                background-color: #8e44ad;
-                color: black;
-                text-align: center;
-                position: absolute;
-                top: 0;
-                left: 0;
-                animation: progressAnimation 2s ease-in-out forwards;
-            }
-
-            .Percentaje {
-                height: 100%;
-                width: 100%;
-                background-color: rgba(0, 0, 0, 0);
-                color: white;
-                text-align: center;
-                position: absolute;
-                top: 0;
-                left: 0;
-                line-height: 20px;
-            }
-
-            @keyframes progressAnimation {
-                from { width: 0; }
-                to { width: ${percentaje}%; }
-            }
-        `;
+    async #getCss() {
+        return await atom.getCssFile("../js/css/", "AtomGauge");
     }
 
     async connectedCallback() {
         let sheet = new CSSStyleSheet();
-        sheet.replaceSync(this.#getCss(this._percentaje));
+        sheet.replaceSync(await this.#getCss());
         this.shadowRoot.adoptedStyleSheets = [sheet];
 
         this.template = document.createElement('template');
         this.template.innerHTML = this.#getTemplate();
         let tpc = this.template.content.cloneNode(true);
-        
+
         this.mainElement = tpc.querySelector('.Container');
         this.accumulatorElement = this.mainElement.querySelector('.Accumulator');
         this.percentajeElement = this.mainElement.querySelector('.Percentaje');
-        
+
         this.shadowRoot.appendChild(this.mainElement);
-        
+
         for (let attr of this.getAttributeNames()) {
             if (!attr.startsWith('on')) {
                 this.mainElement.setAttribute(attr, this.getAttribute(attr));
                 this[attr] = this.getAttribute(attr);
             }
             if (attr === 'id') {
-                atom.createInstance('AtomGauge', { 'id': this[attr] });
+                atom.createInstance('AtomGauge', {'id': this[attr]});
             }
             if (attr === 'percentaje') {
                 this.percentaje = this.getAttribute(attr);
@@ -113,7 +74,7 @@ export const AtomGauge = class extends Atom {
                         this.setAttribute(attr, this.props[attr]);
                         this[attr] = this.props[attr];
                         if (attr === 'id') {
-                            atom.createInstance('AtomGauge', { 'id': this[attr] });
+                            atom.createInstance('AtomGauge', {'id': this[attr]});
                         }
                         if (attr === 'container-style') {
                             this.applyStyles(this.mainElement, this.props[attr]);
@@ -161,7 +122,7 @@ export const AtomGauge = class extends Atom {
         if (this._percentaje > 100) this._percentaje = 100;
 
         let sheet = new CSSStyleSheet();
-        sheet.replaceSync(this.#getCss(this._percentaje));
+        sheet.replaceSync(this.#getCss());
         this.shadowRoot.adoptedStyleSheets = [sheet];
 
         let start = 0;
@@ -179,9 +140,11 @@ export const AtomGauge = class extends Atom {
         //         clearInterval(timer);
         //     }
         // }, stepTime);
-             this.percentajeElement.innerText = `${this._percentaje}%`;
+        this.percentajeElement.innerText = `${this._percentaje}%`;
         this.accumulatorElement.style.width = `${this._percentaje}%`;
     }
 }
 
-customElements.define('atom-gauge', AtomGauge);
+if (!customElements.get('atom-gauge')) {
+    customElements.define('atom-gauge', AtomGauge);
+}
