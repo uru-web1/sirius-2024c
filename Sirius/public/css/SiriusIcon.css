@@ -1,14 +1,14 @@
-.custom-svg {
+.icon {
     display: block;
     width: 100%;
     height: 100%;
 }
 
-.svg-mask.check {
+.icon.check>svg {
     animation: draw 1s forwards;
 }
 
-.svg-mask.uncheck {
+.icon.uncheck>svg {
     animation: erase 1s forwards;
 }
 

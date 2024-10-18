@@ -110,12 +110,12 @@ class Sirius {
 
         // Store the CSS promise
         this.#pendingCSSPromises.set(fileName, cssPromise);
-
         this.logger.log(`Loading CSS file '${fileName}'`);
 
         // Load the CSS file
         const response = await cssPromise
         const css = await response.text()
+        this.logger.log(`CSS file '${fileName}' loaded`);
 
         // Store the CSS file
         this.#cssFiles.set(fileName, css);

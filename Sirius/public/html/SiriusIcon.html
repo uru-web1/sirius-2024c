@@ -27,7 +27,7 @@
 <body>
 
 <div class="svg-container">
-    <sirius-icon fill="blue" height="48" icon="check" id="icon-3" width="48"></sirius-icon>
+    <sirius-icon fill="blue" height="48" icon="check" id="icon-1" width="48"></sirius-icon>
 </div>
 
 <button class="button" id="animateButton">
@@ -41,17 +41,15 @@
     // Wait for the DOM to be fully loaded
     sirius.init = async () => {
         // Create the icon
-        const siriusIcon1 = await sirius.createInstance(SIRIUS_ICON.NAME, SIRIUS_ICON.NAME, {
-            'id': 'icon-1',
+        const siriusIcon3 = await sirius.createInstance(SIRIUS_ICON.NAME, SIRIUS_ICON.NAME, {
+            'id': 'icon-3',
         });
 
-        console.log(siriusIcon1)
-
         // Add the icon to the DOM
-        sirius.addToBody(siriusIcon1)
+        sirius.addToBody(siriusIcon3)
 
         // Link the button to the icon
-        let icon = document.getElementById('icon3');
+        let icon = document.getElementById('icon-1');
         let click = document.getElementById('animateButton');
 
         click.addEventListener("click", () => {

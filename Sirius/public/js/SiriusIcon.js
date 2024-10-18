@@ -27,9 +27,6 @@ export const SIRIUS_ICON = deepFreeze({
         CHECK: 'check',
         UNCHECK: 'uncheck',
         DISABLED: 'disabled'
-    },
-    IDS: {
-        SVG_MASK: '.svg_mask'
     }
 })
 
@@ -84,13 +81,6 @@ export class SiriusIcon extends SiriusElement {
         this.attachShadow({mode: "open"});
     }
 
-    /** Get the mask element
-     * @returns {HTMLElement} - Mask element
-     * */
-    get maskElement() {
-        return this.shadowRoot.querySelector(SIRIUS_ICON.IDS.SVG_MASK);
-    }
-
     /** Get current icon attribute value
      * @returns {string} - Icon name
      * */
@@ -135,28 +125,35 @@ export class SiriusIcon extends SiriusElement {
      * @returns {string} - Template
      * */
     #getTemplate() {
-        return `<span class=${SIRIUS_ICON.CLASSES.ICON}>
+        // Get the icon classes
+        let classes = [SIRIUS_ICON.CLASSES.ICON];
+
+        // Check if the icon is a check icon
+        if (this.icon === SIRIUS_ICON.ICONS.CHECK)
+            classes.push(SIRIUS_ICON.CLASSES.UNCHECK);
+
+        return `<span class='${classes.join(' ')}'>
                 ${this.#getIcon()}
             </span>`;
     }
 
     /** Set the check icon as disabled */
     setDisabled() {
-        this.maskElement.classList.add(SIRIUS_ICON.CLASSES.DISABLED);
+        this.iconElement.classList.add(SIRIUS_ICON.CLASSES.DISABLED);
     }
 
     /** Toggle check and uncheck classes */
     toggleCheck() {
         // Check if the icon is not a check icon
-        if (this.icon !== SIRIUS_ICON.ICON.CHECK) return;
+        if (this.icon !== SIRIUS_ICON.ICONS.CHECK) return;
 
-        const maskElement = this.maskElement;
+        this.logger.log('Toggling check icon');
 
         // Remove disabled classes, if exists
-        maskElement.classList.remove(SIRIUS_ICON.CLASSES.DISABLED);
+        this.iconElement.classList.remove(SIRIUS_ICON.CLASSES.DISABLED);
 
         // Toggle check and uncheck classes
-        ([SIRIUS_ICON.CLASSES.CHECK, SIRIUS_ICON.CLASSES.UNCHECK].forEach(cls => maskElement.classList.toggle(cls)));
+        [SIRIUS_ICON.CLASSES.CHECK, SIRIUS_ICON.CLASSES.UNCHECK].forEach(cls => this.iconElement.classList.toggle(cls));
     }
 
     /** Load dynamic properties and HTML attributes */
