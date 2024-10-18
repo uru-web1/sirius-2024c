@@ -1,25 +1,27 @@
-import {SiriusElement} from "./SiriusElement";
-import deepFreeze from "./utils/deep-freeze";
+import {SIRIUS_ELEMENT, SIRIUS_TYPES, SiriusElement} from "./SiriusElement.js";
+import deepFreeze from "./utils/deep-freeze.js";
 
 /** Sirius icon constants */
 export const SIRIUS_ICON = deepFreeze({
     NAME: "SiriusIcon",
-    ICONS: {STAR: 'start', CHECK: "check", DEFAULT: "default"},
-    PROPERTIES: {STYLE: 'style', EVENTS: 'events'},
-    BOOLEAN_ATTRIBUTES: {
-        CHECKED: 'checked',
-        UNCHECKED: 'unchecked',
-        DISABLED: 'disabled',
+    TAG: "sirius-icon",
+    ICONS: {
+        CHEVRON: 'chevron',
+        STAR: 'star',
+        INDETERMINATE: "indeterminate",
+        CHECK: "check",
+        WARNING: 'warning',
+        DEFAULT: "warning"
+    },
+    ICON_ATTRIBUTES:{
+        ICON: {NAME: "icon", DEFAULT: "default", TYPE: SIRIUS_TYPES.STRING},
+        WIDTH: {NAME: "width", DEFAULT: 24, TYPE: [SIRIUS_TYPES.NUMBER, SIRIUS_TYPES.STRING]},
+        HEIGHT: {NAME: "height", DEFAULT: 24, TYPE: [SIRIUS_TYPES.NUMBER, SIRIUS_TYPES.STRING]},
+        FILL: {NAME: "fill", DEFAULT: "none", TYPE: SIRIUS_TYPES.STRING},
     },
     ATTRIBUTES: {
-        ICON: {NAME: "icon", DEFAULT: "default"},
-        WIDTH: {NAME: "width", DEFAULT: 24},
-        HEIGHT: {NAME: "height", DEFAULT: 24},
-        STROKE: {NAME: "stroke", DEFAULT: "white"},
-        STROKE_WIDTH: {NAME: "strokeWidth", DEFAULT: 1.5},
-        FILL: {NAME: "fill", DEFAULT: "none"},
-        LEFT: {NAME: "left", DEFAULT: 0},
-        RIGHT: {NAME: "right", DEFAULT: 0}
+        CHECKED: {NAME: 'checked', DEFAULT: null, TYPE: SIRIUS_TYPES.BOOLEAN},
+        DISABLED: {NAME: 'disabled', DEFAULT: null, TYPE: SIRIUS_TYPES.BOOLEAN},
     },
     CLASSES: {
         ICON: 'icon',
@@ -34,52 +36,53 @@ export const SIRIUS_ICON = deepFreeze({
 
 /** Sirius SVG Icons */
 const SIRIUS_SVGS = {
-    // 'heart'
-    [SIRIUS_ICON.ICONS.STAR]: ({width, height, fill, stroke, strokeWidth}) => `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 24 24" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-        </svg>`,
-    [SIRIUS_ICON.ICONS.CHECK]: ({width, height, fill, stroke, strokeWidth, left, right}) => `
-        <svg class="custom-svg" width="${width}" height="${height}" viewBox="${left} ${right} ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-             <defs>
-                  <clipPath id="reveal">
-                       <rect class="svg-mask" x="0" y="0" width="32" height="24" fill="white"/>
-                  </clipPath>
-             </defs>
-             <path class="svg-check" d="M9 16.2l-4.2-4.2-1.4 1.4 5.6 5.6 12-12-1.4-1.4L9 16.2z" stroke="${stroke}" stroke-width="${strokeWidth}" fill="${fill}" clip-path="url(#reveal)"/>
-        </svg>`,
-    [SIRIUS_ICON.ICONS.DEFAULT]: ({width, height, fill, stroke, strokeWidth}) => `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 24 24" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round">
-             <circle cx="12" cy="12" r="10"></circle>
-        </svg>`
+    // Chevron icon
+    [SIRIUS_ICON.ICONS.CHEVRON]: ({height, width, fill}) => `
+        <svg xmlns="http://www.w3.org/2000/svg" height=${height} viewBox="0 -960 960 960" width=${width} fill=${fill}><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
+        `,
+
+    // Indeterminate icon
+    [SIRIUS_ICON.ICONS.INDETERMINATE]: ({width, height, fill}) => `
+    <svg xmlns="http://www.w3.org/2000/svg" height={height} viewBox="0 -960 960 960" width={width} fill={fill}><path d="M240-440v-80h480v80H240Z"/></svg>`,
+
+    // Star icon
+    [SIRIUS_ICON.ICONS.STAR]: ({width, height, fill}) =>
+        `<svg xmlns="http://www.w3.org/2000/svg" height=${height} viewBox="0 -960 960 960" width=${width} fill=${fill}><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z"/></svg>`,
+
+    // Check icon
+    [SIRIUS_ICON.ICONS.CHECK]: ({width, height, fill}) =>
+        `<svg xmlns="http://www.w3.org/2000/svg" height=${height} viewBox="0 -960 960 960" width=${width} fill=${fill}><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`,
+
+    // Warning icon
+    [SIRIUS_ICON.ICONS.WARNING]: ({width, height, fill}) => `
+        <svg xmlns="http://www.w3.org/2000/svg" height=${height} viewBox="0 -960 960 960" width=${width} fill=${fill}><path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z"/></svg>`
 }
 
 /** Sirius class that represents an icon component */
 export class SiriusIcon extends SiriusElement {
+    #icon
+
     /**
      * Create a Sirius icon element
-     * @param props - Element properties
+     * @param {object} props - Element properties
      */
     constructor(props) {
         super(props, SIRIUS_ICON.NAME);
 
+        // Load Sirius Icon HTML general attributes
+        this._loadAttributes({
+            htmlAttributes: SIRIUS_ICON.ATTRIBUTES,
+            properties: props
+        });
+
+        // Load Sirius Icon HTML attributes icon-specific attributes
+        this._loadAttributes({
+            htmlAttributes: SIRIUS_ICON.ICON_ATTRIBUTES,
+            properties: props
+        });
+
         // Attach shadow DOM
         this.attachShadow({mode: "open"});
-    }
-
-    /** Get attributes */
-    get attributes() {
-        const attributes = {}
-
-        // Iterate over the attributes
-        Object.keys(SIRIUS_ICON.ATTRIBUTES).forEach(key => {
-            // Get the attribute name and default value
-            const {NAME, DEFAULT} = SIRIUS_ICON.ATTRIBUTES[key]
-
-            // Set the attribute value
-            attributes[NAME] = this.getAttribute(NAME) || DEFAULT
-        })
-        return attributes
     }
 
     /** Get the mask element */
@@ -89,123 +92,133 @@ export class SiriusIcon extends SiriusElement {
 
     /** Get current icon attribute value */
     get icon() {
-        return this.getAttribute(SIRIUS_ICON.ATTRIBUTES.ICON)
+        if (this.#icon)
+            return this.#icon;
+
+        // Get the icon name
+        this.#icon = this._attributes(SIRIUS_ICON.ATTRIBUTES.ICON.NAME) || SIRIUS_ICON.ICONS.DEFAULT;
+
+        return this.#icon;
     }
 
-    /** Lifecycle method called when the component is connected to the DOM
-     */
-    async connectedCallback() {
-        // Create the CSS stylesheet and add it to the shadow DOM
-        await this.getCss(SIRIUS_ICON.NAME);
-        this.shadowRoot.adoptedStyleSheets = [this.sheet];
+    /** Get the icon attributes */
+    get iconAttributes() {
+        const iconAttributes = {};
 
-        // Get HTML inner content
-        const innerHTML = this.#getTemplate();
+        // Get the icon attributes
+        Object.keys(SIRIUS_ICON.ICON_ATTRIBUTES).forEach(attributeName => {
+            iconAttributes[attributeName] = this._attributes[attributeName]
+        })
 
-        // Create the HTML template
-        await this.createTemplate(innerHTML);
+        return iconAttributes
+    }
 
-        // Add icon to the shadow DOM
-        this.iconElement = this.templateContent.firstChild;
-        this.shadowRoot.appendChild(this.iconElement);
+    /** Get the icon SVG
+     * @returns {string} - Icon SVG
+     * */
+    #getIcon() {
+        // Get the icon SVG function
+        const iconFn = SIRIUS_SVGS[this.icon];
 
-        // Load attributes and properties
-        this.#getAttributes();
-        this.#getProperties();
-
-        this.built();
+        // Return the icon SVG with the given attributes
+        return iconFn({...this.iconAttributes});
     }
 
     /** Get the template for the Sirius icon */
     #getTemplate() {
         return `<span class=${SIRIUS_ICON.CLASSES.ICON}>
-                ${this.#getIcon(this.attributes)}
+                ${this.#getIcon()}
             </span>`;
+    }
+
+    /** Set the check icon as disabled */
+    setDisabled() {
+        this.maskElement.classList.add(SIRIUS_ICON.CLASSES.DISABLED);
     }
 
     /** Toggle check and uncheck classes */
     toggleCheck() {
-        // Check the current icon
-        if (this.icon === SIRIUS_ICON.ICON.CHECK) {
-            const maskElement = this.maskElement;
+        // Check if the icon is not a check icon
+        if (this.icon !== SIRIUS_ICON.ICON.CHECK) return;
 
-            // Toggle check and uncheck classes
-            ([SIRIUS_ICON.CLASSES.CHECK, SIRIUS_ICON.CLASSES.UNCHECK].forEach(cls => maskElement.classList.toggle(cls)));
-        }
+        const maskElement = this.maskElement;
+
+        // Remove disabled classes, if exists
+        maskElement.classList.remove(SIRIUS_ICON.CLASSES.DISABLED);
+
+        // Toggle check and uncheck classes
+        ([SIRIUS_ICON.CLASSES.CHECK, SIRIUS_ICON.CLASSES.UNCHECK].forEach(cls => maskElement.classList.toggle(cls)));
     }
 
-    /** Get the icon SVG
-     * @param attributes - Icon attributes (icon, width, height, stroke, strokeWidth, fill, right, left)
-     * @returns {string} - Icon SVG
-     * */
-    #getIcon(attributes) {
-        // Get the icon name
-        const icon = attributes[SIRIUS_ICON.ATTRIBUTES.ICON.NAME] || SIRIUS_ICON.ICONS.DEFAULT;
+    /** Load dynamic properties and HTML attributes */
+    #loadAttributes() {
+        if (!this._attributes)
+            this.logger.log("No attributes");
 
-        // Get the icon SVG function
-        const iconFn = SIRIUS_SVGS[icon];
+        // Get mask element
+        const maskElement = this.maskElement;
 
-        // Return the icon SVG with the given attributes
-        return iconFn({...attributes});
-    }
+        Object.keys(this._attributes).forEach(attributeName => {
+            // Get the attribute value
+            const attributeValue = this._attributes[attributeName]
 
-    /** Get the HTML attributes and assign it to the component */
-    #getAttributes() {
-        if (!this.getAttributeNames())
-            this._log("No attributes");
-
-        // NOT USED
-        // const attributesToHandle = ['name', 'color', 'size'];
-
-        for (const attributeName of this.getAttributeNames())
             switch (attributeName) {
-                case SIRIUS_ICON.BOOLEAN_ATTRIBUTES.CHECKED:
-                    this.maskElement.classList.add(SIRIUS_ICON.CLASSES.CHECK);
+                case SIRIUS_ELEMENT.ATTRIBUTES.STYLE:
+                    // Set the style attributes to the icon element
+                    attributeValue.forEach(styleName =>
+                        this.iconElement.style[styleName] = attributeValue[styleName]);
                     break;
 
-                case SIRIUS_ICON.BOOLEAN_ATTRIBUTES.UNCHECKED:
-                    this.maskElement.classList.add(SIRIUS_ICON.CLASSES.UNCHECK);
-                    break;
-
-                case SIRIUS_ICON.BOOLEAN_ATTRIBUTES.DISABLED:
-                    this.maskElement.classList.add(SIRIUS_ICON.CLASSES.DISABLED);
-                    break;
-
-                default:
-                    this._log(`Unregistered attribute: ${attributeName}`);
-                    break;
-            }
-    }
-
-    /** Dynamic properties management (like style or events) */
-    #getProperties() {
-        if (!this.props)
-            this._log("No additional properties");
-
-        for (const attributeName in this.props) {
-            switch (attributeName) {
-                case SIRIUS_ICON.PROPERTIES.STYLE:
-                    // Set the style properties to the main element
-                    for (const cssAttribute in this.props.style)
-                        this.mainElement.style[cssAttribute] = this.props.style[cssAttribute];
-                    break;
-                case SIRIUS_ICON.PROPERTIES.EVENTS:
+                case SIRIUS_ELEMENT.EVENTS:
                     // TO BE IMPLEMENTED
-                    // for (const evt in this.props.events) {}
                     break;
+
+                case SIRIUS_ICON.ATTRIBUTES.DISABLED:
+                    // Add disabled class
+                    if (attributeValue)
+                        maskElement.classList.add(SIRIUS_ICON.CLASSES.DISABLED);
+                    break;
+
+                case SIRIUS_ICON.ATTRIBUTES.CHECKED:
+                    // Add check or uncheck class
+                    if (attributeValue)
+                        maskElement.classList.add(SIRIUS_ICON.CLASSES.CHECK);
+                    else if (attributeValue!==null)
+                        maskElement.classList.add(SIRIUS_ICON.CLASSES.UNCHECK);
+                    break;
+
                 default:
-                    this._log(`Unregistered property: ${attributeName}`);
+                    this.logger.log(`Unregistered attribute: ${attributeName}`);
                     break;
             }
-            this.setAttribute(attributeName, this.props[attributeName]);
+        })
+    }
 
-            // I think this can potentially overwrite class members
-            // this[attributeName] = this.props[attributeName];
+    /** Lifecycle method called when the component is connected to the DOM
+     */
+    async connectedCallback() {
+        // Load attributes
+        this.#loadAttributes();
 
-            this._log(`${attributeName}: ${this[attributeName]}`);
+        // Create the CSS stylesheet and add it to the shadow DOM
+        await this.getCss(SIRIUS_ICON.NAME);
+        this.shadowRoot.adoptedStyleSheets = [this._sheet];
+
+        // Get HTML inner content
+        const innerHTML = this.#getTemplate();
+        if (!innerHTML) {
+            this.logger.error('Failed to create template')
+            return
         }
+
+        // Create the HTML template
+        await this.createTemplate(innerHTML);
+
+        // Add icon to the shadow DOM
+        this.iconElement = this._templateContent.firstChild;
+        this.shadowRoot.appendChild(this.iconElement);
     }
 }
 
 // Register custom element
-customElements.define("sirius-icon", SiriusIcon);
+customElements.define(SIRIUS_ICON.TAG, SiriusIcon);
