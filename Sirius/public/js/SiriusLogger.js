@@ -62,7 +62,7 @@ export class SiriusLogger {
      * @param {string} message - Message to log
      * @param {number} width - Padding width
      * @param {string} fillChar - Padding character
-     * @returns {string}
+     * @returns {string} - Padded message
      */
     addPadding(message, {WIDTH: width, FILL_CHAR: fillChar}) {
         const diff = width - String(message).length - 1;
@@ -93,7 +93,7 @@ export class SiriusLogger {
     /** Get color CSS
      * @param {string} bgColor - Background color
      * @param {string} color - Text color
-     * @returns {string}
+     * @returns {string} - CSS style
      * */
     #getColorCSS({bgColor, color}) {
         return `background-color: ${bgColor}; color: ${color};`

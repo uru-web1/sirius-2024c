@@ -42,7 +42,7 @@ export class SiriusElement extends HTMLElement {
         this.#elementName = elementName;
 
         // Load Sirius element HTML attributes
-        this._loadAttributes({htmlAttributes:SIRIUS_ELEMENT.ATTRIBUTES,properties: props});
+        this._loadAttributes({htmlAttributes: SIRIUS_ELEMENT.ATTRIBUTES, properties: props});
 
         // Check if the element has an ID
         if (this._attributes?.id === null)
@@ -75,7 +75,7 @@ export class SiriusElement extends HTMLElement {
      */
     _validateAttribute({attributeName, attributeValue, attribute}) {
         // Get the attribute valid types
-        let {TYPE: types, DEFAULT: def } = attribute
+        let {TYPE: types, DEFAULT: def} = attribute
 
         // Check if the valid types are an array
         types = Array.isArray(types) ? types : [types]
@@ -105,7 +105,7 @@ export class SiriusElement extends HTMLElement {
             const {NAME, DEFAULT} = htmlAttribute
 
             // Get the attribute value
-            const attributeValue = this.getAttribute(NAME) || properties[NAME] || DEFAULT
+            const attributeValue = this.getAttribute(NAME) || properties?.[NAME] || DEFAULT
 
             // Validate the attribute
             this._validateAttribute({

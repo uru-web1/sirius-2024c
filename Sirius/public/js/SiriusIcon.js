@@ -11,13 +11,12 @@ export const SIRIUS_ICON = deepFreeze({
         INDETERMINATE: "indeterminate",
         CHECK: "check",
         WARNING: 'warning',
-        DEFAULT: "warning"
     },
-    ICON_ATTRIBUTES:{
-        ICON: {NAME: "icon", DEFAULT: "default", TYPE: SIRIUS_TYPES.STRING},
+    ICON_ATTRIBUTES: {
+        ICON: {NAME: "icon", DEFAULT: "warning", TYPE: SIRIUS_TYPES.STRING},
         WIDTH: {NAME: "width", DEFAULT: 24, TYPE: [SIRIUS_TYPES.NUMBER, SIRIUS_TYPES.STRING]},
         HEIGHT: {NAME: "height", DEFAULT: 24, TYPE: [SIRIUS_TYPES.NUMBER, SIRIUS_TYPES.STRING]},
-        FILL: {NAME: "fill", DEFAULT: "none", TYPE: SIRIUS_TYPES.STRING},
+        FILL: {NAME: "fill", DEFAULT: "red", TYPE: SIRIUS_TYPES.STRING},
     },
     ATTRIBUTES: {
         CHECKED: {NAME: 'checked', DEFAULT: null, TYPE: SIRIUS_TYPES.BOOLEAN},
@@ -85,28 +84,36 @@ export class SiriusIcon extends SiriusElement {
         this.attachShadow({mode: "open"});
     }
 
-    /** Get the mask element */
+    /** Get the mask element
+     * @returns {HTMLElement} - Mask element
+     * */
     get maskElement() {
         return this.shadowRoot.querySelector(SIRIUS_ICON.IDS.SVG_MASK);
     }
 
-    /** Get current icon attribute value */
+    /** Get current icon attribute value
+     * @returns {string} - Icon name
+     * */
     get icon() {
         if (this.#icon)
             return this.#icon;
 
         // Get the icon name
-        this.#icon = this._attributes(SIRIUS_ICON.ATTRIBUTES.ICON.NAME) || SIRIUS_ICON.ICONS.DEFAULT;
+        const iconKey = SIRIUS_ICON.ICON_ATTRIBUTES.ICON.NAME
+        this.#icon = this._attributes[iconKey] || SIRIUS_ICON.ICONS.DEFAULT;
 
         return this.#icon;
     }
 
-    /** Get the icon attributes */
+    /** Get the icon attributes
+     * @returns {object} - Icon attributes
+     * */
     get iconAttributes() {
         const iconAttributes = {};
 
         // Get the icon attributes
-        Object.keys(SIRIUS_ICON.ICON_ATTRIBUTES).forEach(attributeName => {
+        Object.keys(SIRIUS_ICON.ICON_ATTRIBUTES).forEach(attribute => {
+            const {NAME: attributeName} = SIRIUS_ICON.ICON_ATTRIBUTES[attribute]
             iconAttributes[attributeName] = this._attributes[attributeName]
         })
 
@@ -124,7 +131,9 @@ export class SiriusIcon extends SiriusElement {
         return iconFn({...this.iconAttributes});
     }
 
-    /** Get the template for the Sirius icon */
+    /** Get the template for the Sirius icon
+     * @returns {string} - Template
+     * */
     #getTemplate() {
         return `<span class=${SIRIUS_ICON.CLASSES.ICON}>
                 ${this.#getIcon()}
@@ -162,33 +171,36 @@ export class SiriusIcon extends SiriusElement {
             // Get the attribute value
             const attributeValue = this._attributes[attributeName]
 
+            // Check if the attribute value is null
+            if (!attributeValue) return
+
             switch (attributeName) {
-                case SIRIUS_ELEMENT.ATTRIBUTES.STYLE:
+                case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
                     // Set the style attributes to the icon element
                     attributeValue.forEach(styleName =>
                         this.iconElement.style[styleName] = attributeValue[styleName]);
                     break;
 
-                case SIRIUS_ELEMENT.EVENTS:
+                case SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME:
                     // TO BE IMPLEMENTED
                     break;
 
-                case SIRIUS_ICON.ATTRIBUTES.DISABLED:
+                case SIRIUS_ICON.ATTRIBUTES.DISABLED.NAME:
                     // Add disabled class
                     if (attributeValue)
                         maskElement.classList.add(SIRIUS_ICON.CLASSES.DISABLED);
                     break;
 
-                case SIRIUS_ICON.ATTRIBUTES.CHECKED:
+                case SIRIUS_ICON.ATTRIBUTES.CHECKED.NAME:
                     // Add check or uncheck class
                     if (attributeValue)
                         maskElement.classList.add(SIRIUS_ICON.CLASSES.CHECK);
-                    else if (attributeValue!==null)
+                    else
                         maskElement.classList.add(SIRIUS_ICON.CLASSES.UNCHECK);
                     break;
 
                 default:
-                    this.logger.log(`Unregistered attribute: ${attributeName}`);
+                    // this.logger.log(`Unregistered attribute: ${attributeName}`);
                     break;
             }
         })

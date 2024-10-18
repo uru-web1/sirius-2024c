@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Document</title>
-    <script defer type="module" src="../js/Sirius.js"></script>
-    <script defer type="module" src="../js/SiriusIcon.js"></script>
+    <script defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusIcon.js" type="module"></script>
 
     <style>
         .svg-container {
@@ -27,11 +27,11 @@
 <body>
 
 <div class="svg-container">
-    <sirius-icon icon="check" id="icon3" left="-10" right="-10" stroke="orange" width="48"></sirius-icon>
+    <sirius-icon fill="blue" height="48" icon="check" id="icon-3" width="48"></sirius-icon>
 </div>
 
 <button class="button" id="animateButton">
-    <sirius-icon height="24" icon="check" id="icon2" stroke="orange" width="24"></sirius-icon>
+    <sirius-icon fill="orange" height="24" icon="check" id="icon-2" width="24"></sirius-icon>
 </button>
 
 <script type="module">
@@ -39,11 +39,16 @@
     import {SIRIUS_ICON} from "../js/SiriusIcon.js";
 
     // Wait for the DOM to be fully loaded
-    sirius.init=async ()=>{
+    sirius.init = async () => {
         // Create the icon
-        await sirius.createInstance(SIRIUS_ICON.NAME, SIRIUS_ICON.NAME, {
-            'id': 'd1',
+        const siriusIcon1 = await sirius.createInstance(SIRIUS_ICON.NAME, SIRIUS_ICON.NAME, {
+            'id': 'icon-1',
         });
+
+        console.log(siriusIcon1)
+
+        // Add the icon to the DOM
+        sirius.addToBody(siriusIcon1)
 
         // Link the button to the icon
         let icon = document.getElementById('icon3');

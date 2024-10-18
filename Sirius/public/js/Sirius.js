@@ -48,7 +48,9 @@ class Sirius {
         this.#pendingCSSPromises = new Map();
     }
 
-    /** Get Sirius logger */
+    /** Get Sirius logger
+     * @returns {SiriusLogger} - Logger
+     * */
     get logger() {
         return this.#logger
     }
@@ -87,7 +89,7 @@ class Sirius {
 
     /** Get CSS file
      * @param fileName - File name
-     * @returns {Promise<any|string>}
+     * @returns {Promise<any|string>} - CSS file
      */
     async getCssFile(fileName) {
         // Check if the CSS file is already loaded
@@ -105,25 +107,27 @@ class Sirius {
         // Create CSS promise and store it
         const cssRoute = SIRIUS.ROUTES.CSS(fileName);
         const cssPromise = fetch(cssRoute)
-            .then(response => response.text())
-            .then(css => {
-                // Store the CSS file
-                this.#cssFiles.set(fileName, css);
 
-                // Remove the promise from the pending list
-                this.#pendingCSSPromises.delete(fileName);
-                return css;
-            });
-
+        // Store the CSS promise
         this.#pendingCSSPromises.set(fileName, cssPromise);
 
         this.logger.log(`Loading CSS file '${fileName}'`);
-        return await cssPromise;
+
+        // Load the CSS file
+        const response = await cssPromise
+        const css = await response.text()
+
+        // Store the CSS file
+        this.#cssFiles.set(fileName, css);
+
+        // Remove the promise from the pending list
+        this.#pendingCSSPromises.delete(fileName);
+        return css;
     }
 
     /** Get Sirius element by ID
      * @param id - Element ID
-     * @returns {HTMLElement | null}
+     * @returns {HTMLElement | null} - Element
      * */
     getInstance(id) {
         let e = document.getElementById(id);
@@ -133,9 +137,9 @@ class Sirius {
     }
 
     /** Get Sirius Script file
-     * @param jsFilename - JavaScript filename
-     * @param jsClass - JavaScript class
-     * @returns {Promise<*>}
+     * @param {string} jsFilename - JavaScript filename
+     * @param {string} jsClass - JavaScript class
+     * @returns {Promise<Class | null>} - JavaScript class
      * */
     async getClass(jsFilename, jsClass) {
         // Check if script has been loaded
@@ -177,7 +181,7 @@ class Sirius {
      * @param jsFilename - JavaScript filename
      * @param jsClass - JavaScript class
      * @param props - Properties
-     * @returns {Promise<*>}
+     * @returns {Promise<HTMLElement | null>} - Instance
      * */
     async createInstance(jsFilename, jsClass, props) {
         try {
@@ -198,6 +202,13 @@ class Sirius {
             this.logger.error(`An error occurred: ${err}`)
             return null;
         }
+    }
+
+    /** Add the element to the body
+     * @param {HTMLElement} element - Element to add
+     * */
+    addToBody(element) {
+        document.body.appendChild(element);
     }
 }
 
