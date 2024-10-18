@@ -1,0 +1,32 @@
+.custom-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.svg-mask.check {
+    animation: draw 1s forwards;
+}
+
+.svg-mask.uncheck {
+    animation: erase 1s forwards;
+}
+
+@keyframes draw {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 24px;
+    }
+}
+
+@keyframes erase {
+    0% {
+        width: 24px;
+    }
+    100% {
+        width: 0;
+    }
+}
+

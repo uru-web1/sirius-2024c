@@ -2,60 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Document</title>
-    <script type="module" src="../js/com/Sirius.js"></script>
+    <script type="module" defer src="../js/Sirius.js"></script>
 </head>
 <body>
 
-    <div class="svg-container">
-        <sirius-icon id="icon3" icon="check" left="-10" right="-10" width="48" stroke="orange"></sirius-icon>
-    </div>
+<div class="svg-container">
+    <sirius-icon icon="check" id="icon3" left="-10" right="-10" stroke="orange" width="48"></sirius-icon>
+</div>
 
-    <button id="animateButton" class="button">
-         <sirius-icon id="icon2" icon="check" width="24" height="24" stroke="orange"></sirius-icon>
-    </button>
+<button class="button" id="animateButton">
+    <sirius-icon height="24" icon="check" id="icon2" stroke="orange" width="24"></sirius-icon>
+</button>
 
-    <script>
-        // Inicializa el componente SiriusIcon
-        let siriusInit = async () => {
-            await sirius.createInstance("SiriusIcon", {
-                'id': 'd1',
-            });
-        }
+<script>
+    // Initialize Sirius
+    import {SIRIUS_ICON} from "../js/SiriusIcon";
 
-        // Espera a que el DOM esté listo y luego invoca siriusInit
-        document.addEventListener("DOMContentLoaded", () => {
-            siriusInit();
-
-            // Vincular el evento al botón después de que el componente se haya inicializado
-            let icon = document.getElementById('icon3');
-            let click = document.getElementById('animateButton');
-
-            click.addEventListener("click", () => {
-                
-                if (icon) {
-                    icon.toggleCheck();
-                }
-            });
+    let siriusInit = async () => {
+        await sirius.createInstance(SIRIUS_ICON.NAME, {
+            'id': 'd1',
         });
-    </script>
+    }
 
-    <style>
-        .svg-container {
-            width: 100px;
-            height: 100px;
-            overflow: hidden;
-        }
-        
-        div {
-            background-color: black;
-        }
-        button {
-            width: 100px;
-            height: 100px;
-        }
-    </style>
+    // Espera a que el DOM esté listo y luego invoca siriusInit
+    document.addEventListener("DOMContentLoaded", () => {
+        siriusInit();
+
+        // Vincular el evento al botón después de que el componente se haya inicializado
+        let icon = document.getElementById('icon3');
+        let click = document.getElementById('animateButton');
+
+        click.addEventListener("click", () => {
+
+            if (icon) {
+                icon.toggleCheck();
+            }
+        });
+    });
+</script>
+
+<style>
+    .svg-container {
+        width: 100px;
+        height: 100px;
+        overflow: hidden;
+    }
+
+    div {
+        background-color: black;
+    }
+
+    button {
+        width: 100px;
+        height: 100px;
+    }
+</style>
 
 </body>
 </html>
