@@ -151,6 +151,27 @@ export class SiriusElement extends HTMLElement {
         document.body.appendChild(this);
     }
 
+    // Hide the element
+    hide() {
+        this.style.display = 'none';
+    }
+
+    // Show the element
+    show() {
+        this.style.display = '';
+    }
+
+    // Center the element on the screen
+    centerScreen(object = {}) {
+        const element = object.id || this;
+        element.style.position = 'fixed';
+        element.style.top = '50%';
+        element.style.left = '50%';
+        element.style.transform = 'translate(-50%, -50%)';
+        
+        return this.style.transform;
+    }
+
     // TO IMPLEMENT
     // hide
     // show
