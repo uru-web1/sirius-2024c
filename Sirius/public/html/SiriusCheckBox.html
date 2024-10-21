@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Sirius CheckBox example</title>
+    <script  defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusCheckbox.js" type="module"  ></script>
+    
+</head>
+<body>
+    <script type="module">
+        import sirius from '../js/Sirius.js';
+        import { SIRIUS_CHECKBOX } from '../js/SiriusCheckbox.js';
+
+        sirius.init = async () => {
+            try{ 
+                const siriusCheckbox1= await sirius.createInstance(SIRIUS_CHECKBOX.NAME,SIRIUS_CHECKBOX.NAME, {
+                'id':'siriusCheckbox1',
+
+            })
+            console.log(siriusCheckbox1);
+
+            if (siriusCheckbox1 instanceof Node) {
+                sirius.addToBody(siriusCheckbox1);
+            }else{
+                console.error('sirius isnot a valid node');
+            }
+            }catch(error){
+                console.error('error creatin checkbox',error);
+            }
+    
+        };
+
+    </script>
+
+    <sirius-checkbox id="checkbox-2" checked></sirius-checkbox>
+    <sirius-checkbox id="checkbox-3" disabled></sirius-checkbox>
+    <sirius-checkbox id="checkbox-4" checked disabled></sirius-checkbox>
+    <sirius-checkbox id="checkbox-5"></sirius-checkbox>
+    
+</body>
+</html>
