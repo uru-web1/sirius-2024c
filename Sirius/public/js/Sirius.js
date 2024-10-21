@@ -24,7 +24,8 @@ class Sirius {
     #jsModules
     #instancesId
     #cssFiles
-    #pendingCSSPromises
+    #CSSFilesPromises
+    #lockedCSSFiles
     #init = []
 
     /** Create Sirius object */
@@ -45,7 +46,8 @@ class Sirius {
         })
 
         this.#cssFiles = new Map();
-        this.#pendingCSSPromises = new Map();
+        this.#lockedCSSFiles = new Set();
+        this.#CSSFilesPromises = new Map();
     }
 
     /** Get Sirius logger
@@ -97,13 +99,56 @@ class Sirius {
             this.logger.log(`CSS file '${fileName}' already loaded`);
             return this.#cssFiles.get(fileName);
         }
-    
+
         // Wait for the CSS file to be loaded
-        if (this.#pendingCSSPromises.has(fileName)) {
+        if (this.#lockedCSSFiles.has(fileName)) {
             this.logger.log(`Waiting for CSS file '${fileName}' to be loaded`);
-            return await this.#pendingCSSPromises.get(fileName);
+
+            // Wait for the CSS file to be loaded
+            if(this.#CSSFilesPromises.has(fileName))
+                return await this.#CSSFilesPromises.get(fileName);
+
+            // Throw an error if the CSS file is locked
+            throw new Error(`CSS file '${fileName}' is locked and cannot be loaded`);
         }
-    
+
+        // Lock the CSS file
+        this.#lockedCSSFiles.add(fileName);
+
+        // Create CSS promise and store it
+        const cssRoute = SIRIUS.ROUTES.CSS(fileName);
+        const cssPromise = (async ()=>{
+             // Load the CSS file
+            const response = await fetch(cssRoute)
+            const css = await response.text()
+            this.logger.log(`CSS file '${fileName}' loaded`);
+
+            // Store the CSS file
+            this.#cssFiles.set(fileName, css);
+            return css
+        })()
+
+        // Store the CSS promise
+        this.#CSSFilesPromises.set(fileName, cssPromise);
+        this.logger.log(`Loading CSS file '${fileName}'`);
+
+        return cssPromise;
+    }
+
+    /*
+    async getCssFile(fileName) {
+        // Check if the CSS file is already loaded
+        if (this.#cssFiles.has(fileName)) {
+            this.logger.log(`CSS file '${fileName}' already loaded`);
+            return this.#cssFiles.get(fileName);
+        }
+
+        // Wait for the CSS file to be loaded
+        if (this.#CSSFilesPromises.has(fileName)) {
+            this.logger.log(`Waiting for CSS file '${fileName}' to be loaded`);
+            return await this.#CSSFilesPromises.get(fileName);
+        }
+
         // Create CSS promise and store it
         const cssRoute = SIRIUS.ROUTES.CSS(fileName);
         const cssPromise = fetch(cssRoute)
@@ -115,48 +160,16 @@ class Sirius {
             })
             .finally(() => {
                 // Remove the promise from the pending list
-                this.#pendingCSSPromises.delete(fileName); 
+                this.#CSSFilesPromises.delete(fileName);
             });
-    
+
         // Store the CSS promise
-        this.#pendingCSSPromises.set(fileName, cssPromise);
+        this.#CSSFilesPromises.set(fileName, cssPromise);
         this.logger.log(`Loading CSS file '${fileName}'`);
 
         return cssPromise;
     }
-                    // async getCssFile(fileName) {
-                    //     // Check if the CSS file is already loaded
-                    //     if (this.#cssFiles.has(fileName)) {
-                    //         this.logger.log(`CSS file '${fileName}' already loaded`);
-                    //         return this.#cssFiles.get(fileName);
-                    //     }
-
-                    //     // Wait for the CSS file to be loaded
-                    //     if (this.#pendingCSSPromises.has(fileName)) {
-                    //         this.logger.log(`Waiting for CSS file '${fileName}' to be loaded`);
-                    //         return await this.#pendingCSSPromises.get(fileName);
-                    //     }
-
-                    //     // Create CSS promise and store it
-                    //     const cssRoute = SIRIUS.ROUTES.CSS(fileName);
-                    //     const cssPromise = fetch(cssRoute)
-
-                    //     // Store the CSS promise
-                    //     this.#pendingCSSPromises.set(fileName, cssPromise);
-                    //     this.logger.log(`Loading CSS file '${fileName}'`);
-
-                    //     // Load the CSS file
-                    //     const response = await cssPromise
-                    //     const css = await response.text()
-                    //     this.logger.log(`CSS file '${fileName}' loaded`);
-
-                    //     // Store the CSS file
-                    //     this.#cssFiles.set(fileName, css);
-
-                    //     // Remove the promise from the pending list
-                    //     this.#pendingCSSPromises.delete(fileName);
-                    //     return css;
-                    // }
+    */
 
     /** Get Sirius element by ID
      * @param id - Element ID
