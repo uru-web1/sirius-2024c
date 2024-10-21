@@ -5,6 +5,8 @@ import deepFreeze from "./utils/deep-freeze.js";
 export const SIRIUS_ICON = deepFreeze({
     NAME: "SiriusIcon",
     TAG: "sirius-icon",
+    HIDE:"hide",
+    SHOW:"show",
     ICONS: {
         CHEVRON: 'chevron',
         STAR: 'star',
@@ -34,7 +36,7 @@ export const SIRIUS_ICON = deepFreeze({
 const SIRIUS_SVGS = {
     // Chevron icon
     [SIRIUS_ICON.ICONS.CHEVRON]: ({height, width, fill}) => `
-        <svg xmlns="http://www.w3.org/2000/svg" height=${height} viewBox="0 -960 960 960" width=${width} fill=${fill}><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" height=${height} viewBox="0 -960 60 960" width=${width} fill=${fill}><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
         `,
 
     // Indeterminate icon
@@ -173,6 +175,8 @@ export class SiriusIcon extends SiriusElement {
 
             switch (attributeName) {
                 case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
+                    console.log(attributeName);
+                    
                     // Set the style attributes to the icon element
                     attributeValue.forEach(styleName =>
                         this.iconElement.style[styleName] = attributeValue[styleName]);
@@ -195,7 +199,12 @@ export class SiriusIcon extends SiriusElement {
                     else
                         maskElement.classList.add(SIRIUS_ICON.CLASSES.UNCHECK);
                     break;
-
+                case SIRIUS_ICON.ATTRIBUTES.HIDE:
+                    if(attributeValue)
+                        console.log('probando123');
+                        
+                        maskElement.classList.add(this.hide())
+                    break;
                 default:
                     // this.logger.log(`Unregistered attribute: ${attributeName}`);
                     break;

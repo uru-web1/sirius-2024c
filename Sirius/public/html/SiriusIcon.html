@@ -22,16 +22,19 @@
             width: 100px;
             height: 100px;
         }
+
     </style>
 </head>
 <body>
 
 <div class="svg-container">
+    <sirius-icon fill="red" height="50" icon="check" id="icon-2" width="24"></sirius-icon>
+</div>
+<div class="svg-container">
     <sirius-icon fill="blue" height="48" icon="check" id="icon-1" width="48"></sirius-icon>
 </div>
 
-<button class="button" id="animateButton">
-    <sirius-icon fill="orange" height="24" icon="check" id="icon-2" width="24"></sirius-icon>
+<button class="button" id="animateButton" title="Animar">
 </button>
 
 <script type="module">
@@ -49,11 +52,13 @@
         sirius.addToBody(siriusIcon3)
 
         // Link the button to the icon
-        let icon = document.getElementById('icon-1');
+        let icon = document.getElementById('icon-2');
         let click = document.getElementById('animateButton');
-
+        console.log(icon);
+        
         click.addEventListener("click", () => {
             if (icon)
+                icon.centerScreen();
                 icon.toggleCheck();
         });
     }
