@@ -201,8 +201,13 @@ class Sirius {
                 this.logger.error(`Class '${jsClass}' not found on loaded script '${jsFilename}'`);
                 return null;
             }
+        }else{
+            
+            // Store the class in a new Map if jsFilename is not already in the map
+            this.#jsModules.set(jsFilename, new Map());
         }
-
+        
+        
         // Load the script
         const importedScript = await import(SIRIUS.ROUTES.JS(jsFilename));
         if (!importedScript) {
@@ -216,10 +221,7 @@ class Sirius {
             this.logger.error(`Error loading class '${jsClass}'`);
             return null;
         }
-
-        // Store the class
-        this.#jsModules.set(jsClass, importedClass);
-
+    this.#jsModules.get(jsFilename).set(jsClass, importedClass);
         return importedClass;
     }
 
