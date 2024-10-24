@@ -1,4 +1,4 @@
-import { SIRIUS_TYPES, SiriusElement } from "./SiriusElement.js";
+import {SIRIUS_TYPES, SiriusElement} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 /** Sirius label constants */
@@ -6,8 +6,8 @@ export const SIRIUS_LABEL = deepFreeze({
     NAME: "SiriusLabel",
     TAG: "sirius-label",
     ATTRIBUTES: {
-        CAPTION: { NAME: "caption", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING },
-        TYPE: { NAME: "type", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING },
+        CAPTION: {NAME: "caption", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING},
+        TYPE: {NAME: "type", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING},
     },
     CLASSES: {
         LABEL: 'label-container',
@@ -30,7 +30,7 @@ export class SiriusLabel extends SiriusElement {
         });
 
         // Attach shadow DOM
-        this.attachShadow({ mode: "open" });
+        this.attachShadow({mode: "open"});
     }
 
     /** Get the template for the Sirius label
@@ -42,15 +42,17 @@ export class SiriusLabel extends SiriusElement {
                     <span class ="${SIRIUS_LABEL.CLASSES.CAPTION}">${this.#getCaption()}</span>
                 </div>`;
     }
-    #getCaption(){
+
+    #getCaption() {
         return this._attributes[SIRIUS_LABEL.ATTRIBUTES.CAPTION.NAME];
     }
+
     /** Lifecycle method called when the component is connected to the DOM
      */
     async connectedCallback() {
 
         // Create the CSS stylesheet and add it to the shadow DOM
-        await this.getCss(SIRIUS_LABEL.NAME);
+        await this._getStyles(SIRIUS_LABEL.NAME);
         this.shadowRoot.adoptedStyleSheets = [this._sheet];
 
         // Get HTML inner content
@@ -61,7 +63,7 @@ export class SiriusLabel extends SiriusElement {
         }
 
         // Create the HTML template
-        await this.createTemplate(innerHTML);
+        await this._createTemplate(innerHTML);
 
         // Add label to the shadow DOM
         this.labelElement = this._templateContent.firstChild;

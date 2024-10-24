@@ -1,15 +1,14 @@
 .icon {
-    display: block;
-    width: 100%;
-    height: 100%;
+    display: grid;
+    place-items: center;
 }
 
-.icon.check>svg {
-    animation: draw 1s forwards;
+.icon.check > span > svg {
+    animation: draw  var(--sirius-animation-duration) forwards;
 }
 
-.icon.uncheck>svg {
-    animation: erase 1s forwards;
+.icon.uncheck > span > svg {
+    animation: erase var(--sirius-animation-duration) forwards;
 }
 
 @keyframes draw {
@@ -17,13 +16,13 @@
         width: 0;
     }
     100% {
-        width: 24px;
+        width: 100%;
     }
 }
 
 @keyframes erase {
     0% {
-        width: 24px;
+        width: 100%;
     }
     100% {
         width: 0;

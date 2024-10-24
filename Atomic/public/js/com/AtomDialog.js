@@ -41,6 +41,98 @@ export const AtomDialog = class extends Atom {
         this.onCloseDialog = false;
     }
 
+    /**
+     * @property {boolean} modal - propiedad que define si el dialogo se mostrara o no en forma modal
+     */
+    get modal() {
+        return this._modal
+    }
+
+    set modal(val) {
+        this._modal = val;
+        if (val) {
+            this.draggable = false;
+            this.mainElement.showModal();
+        } else {
+            this.show();
+        }
+    }
+
+    /**
+     * @property {string} title - propiedad que define el titulo que mostrara el dialogo
+     */
+    get title() {
+        return this._title
+    }
+
+    set title(val) {
+        this._title = val;
+        this.titleDialog.innerText = val;
+    }
+
+    /**
+     * @property {boolean} showclosebutton - propiedad que define si el close button se mostrara o no
+     */
+    get showclosebutton() {
+        return this._showclosebutton;
+    }
+
+    set showclosebutton(val) {
+        this._showclosebutton = val;
+        if (val) {
+            this.closeButton.innerText = "X";
+            this.divButtonClose.appendChild(this.closeButton);
+            this.divButtonClose.setAttribute('innerText', "X");
+        } else {
+            this.divButtonClose.innerText = "";
+            this.divButtonClose.setAttribute('innerText', "");
+        }
+        this.closeButton.className = "CloseButton";
+    }
+
+    /**
+     * @property {boolean} centerscreen - propiedad que define si el dialogo se mostrara o no en el centro de la pantalla
+     */
+    get centerscreen() {
+        return this._centerScreen
+    }
+
+    set centerscreen(val) {
+        this._centerScreen = val;
+        if (val) {
+            this.mainElement.style.position = 'absolute';
+            this.mainElement.style.left = "0px";
+            this.mainElement.style.top = "0px";
+            let cx = parseInt((window.innerWidth) / 2, 10);
+            let cy = parseInt((window.innerHeight) / 2, 10);
+            this.mainElement.style.width = parseInt(window.getComputedStyle(this.mainElement).width, 10);
+            this.mainElement.style.height = parseInt(window.getComputedStyle(this.mainElement).height, 10);
+            this.mainElement.style.left = cx + "px";
+            this.mainElement.style.top = cy + "px";
+            this.mainElement.style.transform = `translate(-50%,-50%)`;
+            if (this.props) {
+                this.setPosition(0, 0);
+            } else {
+                this.style.width = parseInt(window.getComputedStyle(this.mainElement).width, 10);
+                this.style.height = parseInt(window.getComputedStyle(this.mainElement).height, 10);
+                this.setPosition(cx / 2, cy / 2);
+                this.style.transform = `translate(-50%,-50%)`;
+            }
+        }
+    }
+
+    /**
+     * @property {string} draggable Si es "true" permite arrastrar y soltar el diálogo, en "false" no lo permite, por defecto es "true"
+     */
+    get draggable() {
+        return this._draggable;
+    }
+
+    set draggable(val) {
+        this._draggable = val;
+        this.setAttribute('draggable', val);
+    }
+
     #getTemplate() {
         return `
             <dialog class='AtomDialog'>
@@ -373,98 +465,6 @@ export const AtomDialog = class extends Atom {
     show() {
         super.show();
         this.mainElement.style.animationName = "show";
-    }
-
-    /**
-     * @property {boolean} modal - propiedad que define si el dialogo se mostrara o no en forma modal
-     */
-    get modal() {
-        return this._modal
-    }
-
-    set modal(val) {
-        this._modal = val;
-        if (val) {
-            this.draggable = false;
-            this.mainElement.showModal();
-        } else {
-            this.show();
-        }
-    }
-
-    /**
-     * @property {string} title - propiedad que define el titulo que mostrara el dialogo
-     */
-    get title() {
-        return this._title
-    }
-
-    set title(val) {
-        this._title = val;
-        this.titleDialog.innerText = val;
-    }
-
-    /**
-     * @property {boolean} showclosebutton - propiedad que define si el close button se mostrara o no
-     */
-    get showclosebutton() {
-        return this._showclosebutton;
-    }
-
-    set showclosebutton(val) {
-        this._showclosebutton = val;
-        if (val) {
-            this.closeButton.innerText = "X";
-            this.divButtonClose.appendChild(this.closeButton);
-            this.divButtonClose.setAttribute('innerText', "X");
-        } else {
-            this.divButtonClose.innerText = "";
-            this.divButtonClose.setAttribute('innerText', "");
-        }
-        this.closeButton.className = "CloseButton";
-    }
-
-    /**
-     * @property {boolean} centerscreen - propiedad que define si el dialogo se mostrara o no en el centro de la pantalla
-     */
-    get centerscreen() {
-        return this._centerScreen
-    }
-
-    set centerscreen(val) {
-        this._centerScreen = val;
-        if (val) {
-            this.mainElement.style.position = 'absolute';
-            this.mainElement.style.left = "0px";
-            this.mainElement.style.top = "0px";
-            let cx = parseInt((window.innerWidth) / 2, 10);
-            let cy = parseInt((window.innerHeight) / 2, 10);
-            this.mainElement.style.width = parseInt(window.getComputedStyle(this.mainElement).width, 10);
-            this.mainElement.style.height = parseInt(window.getComputedStyle(this.mainElement).height, 10);
-            this.mainElement.style.left = cx + "px";
-            this.mainElement.style.top = cy + "px";
-            this.mainElement.style.transform = `translate(-50%,-50%)`;
-            if (this.props) {
-                this.setPosition(0, 0);
-            } else {
-                this.style.width = parseInt(window.getComputedStyle(this.mainElement).width, 10);
-                this.style.height = parseInt(window.getComputedStyle(this.mainElement).height, 10);
-                this.setPosition(cx / 2, cy / 2);
-                this.style.transform = `translate(-50%,-50%)`;
-            }
-        }
-    }
-
-    /**
-     * @property {string} draggable Si es "true" permite arrastrar y soltar el diálogo, en "false" no lo permite, por defecto es "true"
-     */
-    get draggable() {
-        return this._draggable;
-    }
-
-    set draggable(val) {
-        this._draggable = val;
-        this.setAttribute('draggable', val);
     }
 }
 

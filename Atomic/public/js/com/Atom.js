@@ -14,16 +14,35 @@ export const Atom = class extends HTMLElement {
         this.pendingCssPromises = new Map();
     }
 
+    get callback() {
+        return this.callback
+    }
+
+    set callback(val) {
+        this._callBack = val
+    }
+
+    get callbackids() {
+        return this.mapcallbackids
+    }
+
+    set callbackids(arr) {
+        for (let id of arr) {
+            this.mapcallbackids.set(id, {});
+        }
+        ;
+    }
+
     async getCssFile(fileName) {
-   
+
         if (!this.cssFiles.has(fileName)) {
-            // Si ya se está descargando, esperamos a la misma promesa 
+            // Si ya se está descargando, esperamos a la misma promesa
             if (this.pendingCssPromises.has(fileName)) {
                 console.log("retornado por promesa");
-                
+
                 return await this.pendingCssPromises.get(fileName);
             }
-            
+
             // Crear la promesa y almacenarla
             const cssPromise = fetch(atom.routes.css + fileName + ".css")
                 .then((response) => response.text())
@@ -32,17 +51,16 @@ export const Atom = class extends HTMLElement {
                     this.pendingCssPromises.delete(fileName); // Eliminar la promesa pendiente
                     return css;
                 });
-    
+
             this.pendingCssPromises.set(fileName, cssPromise);
-            
+
             console.log("retornado por primera construccion");
             return await cssPromise;
-        } else {    
+        } else {
             console.log("retornado por mapa");
             return this.cssFiles.get(fileName); // Retornar el archivo si ya está almacenado
         }
     }
-    
 
     getMaxZIndex() {
         atom.actZIdx++;
@@ -111,25 +129,6 @@ export const Atom = class extends HTMLElement {
             console.log('No se pudo crear la instancia');
             return null;
         }
-    }
-
-    set callback(val) {
-        this._callBack = val
-    }
-
-    get callback() {
-        return this.callback
-    }
-
-    get callbackids() {
-        return this.mapcallbackids
-    }
-
-    set callbackids(arr) {
-        for (let id of arr) {
-            this.mapcallbackids.set(id, {});
-        }
-        ;
     }
 }
 

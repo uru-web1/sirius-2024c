@@ -1,4 +1,4 @@
-import { SIRIUS_TYPES, SiriusElement } from "./SiriusElement.js";
+import {SIRIUS_TYPES, SiriusElement} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 /** Sirius checkbox constants */
@@ -6,9 +6,9 @@ export const SIRIUS_CHECKBOX = deepFreeze({
     NAME: "SiriusCheckbox",
     TAG: "sirius-checkbox",
     ATTRIBUTES: {
-        LABEL: { NAME: "label", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING },
-        CHECKED: { NAME: "checked", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN },
-        DISABLED: { NAME: "disabled", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN },
+        LABEL: {NAME: "label", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING},
+        CHECKED: {NAME: "checked", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
+        DISABLED: {NAME: "disabled", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
     },
     CLASSES: {
         CONTAINER: 'checkbox-container',
@@ -33,7 +33,7 @@ export class SiriusCheckbox extends SiriusElement {
         });
 
         // Attach shadow DOM
-        this.attachShadow({ mode: "open" });
+        this.attachShadow({mode: "open"});
     }
 
     /** Get the template for the Sirius checkbox
@@ -50,7 +50,7 @@ export class SiriusCheckbox extends SiriusElement {
      */
     async connectedCallback() {
         // Create the CSS stylesheet and add it to the shadow DOM
-        await this.getCss(SIRIUS_CHECKBOX.NAME);
+        await this._getStyles(SIRIUS_CHECKBOX.NAME);
         this.shadowRoot.adoptedStyleSheets = [this._sheet];
 
         // Get HTML inner content
@@ -61,7 +61,7 @@ export class SiriusCheckbox extends SiriusElement {
         }
 
         // Create the HTML template
-        await this.createTemplate(innerHTML);
+        await this._createTemplate(innerHTML);
 
         // Add checkbox to the shadow DOM
         this.checkboxElement = this._templateContent.firstChild;

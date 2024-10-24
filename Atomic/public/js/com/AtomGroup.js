@@ -10,6 +10,18 @@ export const AtomGroup = class extends Atom {
         this.attachShadow({mode: 'open'});
     }
 
+    get caption() {
+        return this.radioElement.value
+    }
+
+    set caption(val) {
+        this.setAttribute('caption', val);
+        this.divCaption.innerText = val;
+        let t = val.length * 12;
+        this.divCaption.style.width = t + 'px';
+        this.dispatchEvent(new CustomEvent("changeCaption", {bubbles: true}));
+    }
+
     #getTemplate() {
         return `
         <div class="AtomGroupContainer">
@@ -151,18 +163,6 @@ export const AtomGroup = class extends Atom {
         });
         if (this.bodyContainer) this.bodyContainer.appendChild(layer);
         return this;
-    }
-
-    get caption() {
-        return this.radioElement.value
-    }
-
-    set caption(val) {
-        this.setAttribute('caption', val);
-        this.divCaption.innerText = val;
-        let t = val.length * 12;
-        this.divCaption.style.width = t + 'px';
-        this.dispatchEvent(new CustomEvent("changeCaption", {bubbles: true}));
     }
 }
 

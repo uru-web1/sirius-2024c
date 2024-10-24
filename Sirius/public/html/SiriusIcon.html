@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Document</title>
+    <link rel="stylesheet" href="../css/Sirius.css">
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusIcon.js" type="module"></script>
 
@@ -39,27 +40,27 @@
 
 <script type="module">
     import sirius from '../js/Sirius.js'
-    import {SIRIUS_ICON} from "../js/SiriusIcon.js";
+    import {SiriusIcon} from "../js/SiriusIcon.js";
+    import {SIRIUS_ELEMENT} from "../js/SiriusElement.js";
 
     // Wait for the DOM to be fully loaded
-    sirius.init = async () => {
+    sirius.onLoaded = async () => {
         // Create the icon
-        const siriusIcon3 = await sirius.createInstance(SIRIUS_ICON.NAME, SIRIUS_ICON.NAME, {
-            'id': 'icon-3',
-        });
+        const siriusIcon3 = new SiriusIcon({[SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME]: 'icon-3'})
 
         // Add the icon to the DOM
-        sirius.addToBody(siriusIcon3)
+        siriusIcon3.addToBody()
 
         // Link the button to the icon
-        let icon = document.getElementById('icon-2');
-        let click = document.getElementById('animateButton');
-        console.log(icon);
-        
+        const icon = document.getElementById('icon-2');
+        icon.centerScreen();
+        const click = document.getElementById('animateButton');
+
         click.addEventListener("click", () => {
-            if (icon)
-                icon.centerScreen();
-                icon.toggleCheck();
+            if (!icon)
+                return
+
+            icon.toggleCheck();
         });
     }
 </script>

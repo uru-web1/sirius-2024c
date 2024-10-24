@@ -2,39 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Sirius Checkbox Example</title>
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusCheckbox.js" type="module"></script>
 </head>
 <body>
-    <script type="module">
-        import sirius from '../js/Sirius.js';
-        import { SIRIUS_CHECKBOX } from '../js/SiriusCheckbox.js';
+<script type="module">
+    import sirius from '../js/Sirius.js';
+    import {SIRIUS_CHECKBOX} from '../js/SiriusCheckbox.js';
 
-        sirius.init = async () => {
-            const siriusCheckbox1 = await sirius.createInstance(SIRIUS_CHECKBOX.NAME, SIRIUS_CHECKBOX.NAME, {
-                'id': 'checkbox-1',
-                'label': 'La hamburguesa es buena',
-                'checked': false
-            });
+    sirius.init = async () => {
+        const siriusCheckbox1 = await sirius.createInstance(SIRIUS_CHECKBOX.NAME, SIRIUS_CHECKBOX.NAME, {
+            'id': 'checkbox-1',
+            'label': 'La hamburguesa es buena',
+            'checked': false
+        });
 
-            //no está leyendo esto 
-            const siriusCheckbox2 = await sirius.createInstance(SIRIUS_CHECKBOX.NAME, SIRIUS_CHECKBOX.NAME, {
-                'id': 'checkbox-2',
-                'label': 'La pizza es buena',
-                'checked': true
-                
-            });
+        //no está leyendo esto
+        const siriusCheckbox2 = await sirius.createInstance(SIRIUS_CHECKBOX.NAME, SIRIUS_CHECKBOX.NAME, {
+            'id': 'checkbox-2',
+            'label': 'La pizza es buena',
+            'checked': true
 
-            sirius.addToBody(siriusCheckbox1);
-            sirius.addToBody(siriusCheckbox2);
-        };
+        });
 
-    </script>
+        sirius.addToBody(siriusCheckbox1);
+        sirius.addToBody(siriusCheckbox2);
+    };
 
-    <sirius-checkbox id="checkbox-3" label="Hola"></sirius-checkbox>
-    <sirius-checkbox id="checkbox-4" label="Soy"></sirius-checkbox>
-    <sirius-checkbox id="checkbox-5" label="Yo"></sirius-checkbox>
+</script>
+
+<sirius-checkbox id="checkbox-3" label="Hola"></sirius-checkbox>
+<sirius-checkbox id="checkbox-4" label="Soy"></sirius-checkbox>
+<sirius-checkbox id="checkbox-5" label="Yo"></sirius-checkbox>
 </body>
 </html>

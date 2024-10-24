@@ -11,7 +11,7 @@
 
 <script type="module">
     import sirius from '../js/Sirius.js';
-    import { SIRIUS_LABEL } from "../js/SiriusLabel.js";
+    import {SIRIUS_LABEL} from "../js/SiriusLabel.js";
 
     // Wait for the DOM to be fully loaded
     sirius.init = async () => {
@@ -19,7 +19,7 @@
         const siriusLabel2 = await sirius.createInstance(SIRIUS_LABEL.NAME, SIRIUS_LABEL.NAME, {
             'id': 'label-2',
             'caption': 'Hello world con HTML',
-    });
+        });
 
         // Add the label to the DOM
         sirius.addToBody(siriusLabel2);
@@ -27,11 +27,11 @@
     }
 </script>
 
-    <sirius-label id="label-1" caption="Hello world script1"></sirius-label>
-    <sirius-label id="label-3" caption="Hello world script2"></sirius-label>
-    <sirius-label id="label-4" caption="Hello world script2"></sirius-label> 
-    <sirius-label id="label-5" caption="Hello world script2"></sirius-label>  
-    
+<sirius-label caption="Hello world script1" id="label-1"></sirius-label>
+<sirius-label caption="Hello world script2" id="label-3"></sirius-label>
+<sirius-label caption="Hello world script2" id="label-4"></sirius-label>
+<sirius-label caption="Hello world script2" id="label-5"></sirius-label>
+
 
 </body>
 </html>
