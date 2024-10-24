@@ -12,6 +12,44 @@ export const AtomBadge = class extends Atom {
         this.attachShadow({mode: 'open'});
     }
 
+    set shape(val) {
+        switch (val) {
+            case "triangle": {
+                this.mainElement.className = "triangle";
+                break;
+            }
+                ;
+            case "circle": {
+                this.mainElement.className = "circle";
+                break;
+            }
+                ;
+            default : {
+                this.mainElement.className = "square";
+                break;
+            }
+        }
+    }
+
+    get caption() {
+        return this.mainElement.innerText
+    }
+
+    set caption(val) {
+        this.setAttribute('caption', val);
+        this.mainElement.innerText = val;
+        this.dispatchEvent(new CustomEvent("changeCaption", {bubbles: true}));
+    }
+
+    get disabled() {
+        return this.mainElement.disabled
+    }
+
+    set disabled(val) {
+        this.setAttribute('disabled', val);
+        this.mainElement.disabled = val;
+    }
+
     #getTemplate() {
         return `
             <div class="square"></div>
@@ -65,44 +103,6 @@ export const AtomBadge = class extends Atom {
 
     addToBody() {
         document.body.appendChild(this);
-    }
-
-    set shape(val) {
-        switch (val) {
-            case "triangle": {
-                this.mainElement.className = "triangle";
-                break;
-            }
-                ;
-            case "circle": {
-                this.mainElement.className = "circle";
-                break;
-            }
-                ;
-            default : {
-                this.mainElement.className = "square";
-                break;
-            }
-        }
-    }
-
-    get caption() {
-        return this.mainElement.innerText
-    }
-
-    set caption(val) {
-        this.setAttribute('caption', val);
-        this.mainElement.innerText = val;
-        this.dispatchEvent(new CustomEvent("changeCaption", {bubbles: true}));
-    }
-
-    get disabled() {
-        return this.mainElement.disabled
-    }
-
-    set disabled(val) {
-        this.setAttribute('disabled', val);
-        this.mainElement.disabled = val;
     }
 }
 

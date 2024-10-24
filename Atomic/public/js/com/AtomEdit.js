@@ -13,6 +13,135 @@ export const AtomEdit = class extends Atom {
         this._message = '';
     }
 
+    get caption() {
+        return this.labelElement.innerText
+    }
+
+    set caption(val) {
+        this.setAttribute('caption', val);
+        this.labelElement.innerText = val;
+        this.dispatchEvent(new CustomEvent("changeCaption", {bubbles: true}));
+    }
+
+    get value() {
+        return this.inputElement.value;
+    }
+
+    set value(val) {
+        this.setAttribute('value', val);
+        this.inputElement.value = val;
+        this.#animationUp();
+    }
+
+    get hiddenValue() {
+        return this._hiddenValue
+    }
+
+    set hiddenValue(val) {
+        this.setAttribute('hiddenValue', val);
+        this._hiddenValue = val;
+    }
+
+    get disabled() {
+        return this.inputElement.disabled
+    }
+
+    set disabled(val) {
+        this.setAttribute('disabled', val);
+        this.inputElement.disabled = val;
+    }
+
+    get reactive() {
+        return this._reactive
+    }
+
+    set reactive(val) {
+        this.setAttribute('reactive', val);
+        this._reactive = val;
+    }
+
+    get type() {
+        return this.inputElement.type
+    }
+
+    set type(val) {
+        this.setAttribute('type', val);
+        this.inputElement.type = val;
+    }
+
+    get required() {
+        return this.inputElement.required
+    }
+
+    set required(val) {
+        this.setAttribute('required', val);
+        this.inputElement.required = val;
+    }
+
+    get message() {
+        return this._message
+    }
+
+    set message(val) {
+        this.setAttribute('message', val);
+        this._message = val;
+    }
+
+    get max() {
+        return this.inputElement.max
+    }
+
+    set max(val) {
+        this.setAttribute('max', val);
+        this.inputElement.max = val;
+    }
+
+    get min() {
+        return this.inputElement.min
+    }
+
+    set min(val) {
+        this.setAttribute('min', val);
+        this.inputElement.min = val;
+    }
+
+    get maxlength() {
+        return this.inputElement.maxlength
+    }
+
+    set maxlength(val) {
+        this.setAttribute('maxlength', val);
+        this.inputElement.maxLength = val;
+    }
+
+    get minlength() {
+        return this.inputElement.minlength
+    }
+
+    set minlength(val) {
+        this.setAttribute('minlength', val);
+        this.inputElement.minLength = val;
+    }
+
+    get pattern() {
+        return this.inputElement.pattern
+    }
+
+    set pattern(val) {
+        this.setAttribute('pattern', val);
+        this.inputElement.pattern = val;
+    }
+
+    get readonly() {
+        return this.inputElement.readonly
+    }
+
+    set readonly(val) {
+        if (val) this.style.opacity = 0.4; else this.style.opacity = 1;
+        this.setAttribute('readonly', val);
+        this.inputElement.readOnly = val;
+    }
+
     #getTemplate() {
         return `
             <div class="AtomEditContainer">
@@ -168,135 +297,6 @@ export const AtomEdit = class extends Atom {
         } else {
             return v
         }
-    }
-
-    get caption() {
-        return this.labelElement.innerText
-    }
-
-    set caption(val) {
-        this.setAttribute('caption', val);
-        this.labelElement.innerText = val;
-        this.dispatchEvent(new CustomEvent("changeCaption", {bubbles: true}));
-    }
-
-    get value() {
-        return this.inputElement.value;
-    }
-
-    set value(val) {
-        this.setAttribute('value', val);
-        this.inputElement.value = val;
-        this.#animationUp();
-    }
-
-    get hiddenValue() {
-        return this._hiddenValue
-    }
-
-    set hiddenValue(val) {
-        this.setAttribute('hiddenValue', val);
-        this._hiddenValue = val;
-    }
-
-    get disabled() {
-        return this.inputElement.disabled
-    }
-
-    set disabled(val) {
-        this.setAttribute('disabled', val);
-        this.inputElement.disabled = val;
-    }
-
-    get reactive() {
-        return this._reactive
-    }
-
-    set reactive(val) {
-        this.setAttribute('reactive', val);
-        this._reactive = val;
-    }
-
-    get type() {
-        return this.inputElement.type
-    }
-
-    set type(val) {
-        this.setAttribute('type', val);
-        this.inputElement.type = val;
-    }
-
-    get required() {
-        return this.inputElement.required
-    }
-
-    set required(val) {
-        this.setAttribute('required', val);
-        this.inputElement.required = val;
-    }
-
-    get message() {
-        return this._message
-    }
-
-    set message(val) {
-        this.setAttribute('message', val);
-        this._message = val;
-    }
-
-    get max() {
-        return this.inputElement.max
-    }
-
-    set max(val) {
-        this.setAttribute('max', val);
-        this.inputElement.max = val;
-    }
-
-    get min() {
-        return this.inputElement.min
-    }
-
-    set min(val) {
-        this.setAttribute('min', val);
-        this.inputElement.min = val;
-    }
-
-    get maxlength() {
-        return this.inputElement.maxlength
-    }
-
-    set maxlength(val) {
-        this.setAttribute('maxlength', val);
-        this.inputElement.maxLength = val;
-    }
-
-    get minlength() {
-        return this.inputElement.minlength
-    }
-
-    set minlength(val) {
-        this.setAttribute('minlength', val);
-        this.inputElement.minLength = val;
-    }
-
-    get pattern() {
-        return this.inputElement.pattern
-    }
-
-    set pattern(val) {
-        this.setAttribute('pattern', val);
-        this.inputElement.pattern = val;
-    }
-
-    get readonly() {
-        return this.inputElement.readonly
-    }
-
-    set readonly(val) {
-        if (val) this.style.opacity = 0.4; else this.style.opacity = 1;
-        this.setAttribute('readonly', val);
-        this.inputElement.readOnly = val;
     }
 }
 

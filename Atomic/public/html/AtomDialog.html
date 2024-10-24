@@ -1,7 +1,7 @@
 <html>
 <head>
     <script src="../js/com/Atom.js" type="module"></script>
-    <link rel="icon" href="../images/icons/favicon.png" sizes="32x32" type="image/png">
+    <link href="../images/icons/favicon.png" rel="icon" sizes="32x32" type="image/png">
 </head>
 <body>
 <script>
@@ -59,8 +59,8 @@
         d.addToBody();
     };
 </script>
-<atom-dialog id="dialogHTML" showclosebutton=true title="My HTML Dialog" draggable=true centerscreen=true
-             style="width:40%; height:70%;">
+<atom-dialog centerscreen=true draggable=true id="dialogHTML" showclosebutton=true style="width:40%; height:70%;"
+             title="My HTML Dialog">
     <div slot="bodyDialogSlot"
          style="height: 70px; display:flex; align-items: center; justify-content: center; gap:10px">
         <input id="i1" style="height: 30px;">

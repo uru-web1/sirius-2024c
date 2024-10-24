@@ -1,0 +1,31 @@
+.icon {
+    display: grid;
+    place-items: center;
+}
+
+.icon.check > span > svg {
+    animation: draw  var(--sirius-animation-duration) forwards;
+}
+
+.icon.uncheck > span > svg {
+    animation: erase var(--sirius-animation-duration) forwards;
+}
+
+@keyframes draw {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+@keyframes erase {
+    0% {
+        width: 100%;
+    }
+    100% {
+        width: 0;
+    }
+}
+

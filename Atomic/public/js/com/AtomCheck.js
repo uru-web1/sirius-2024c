@@ -10,6 +10,33 @@ export const AtomCheck = class extends Atom {
         this.attachShadow({mode: 'open'});
     }
 
+    get caption() {
+        return this.mainElement.innerText
+    }
+
+    set caption(val) {
+        this.setAttribute('caption', val);
+        this.labelElement.innerText = val;
+        this.dispatchEvent(new CustomEvent("changeCaption", {bubbles: true}));
+    }
+
+    get checked() {
+        return this.checkElement.checked
+    }
+
+    set checked(val) {
+        this.checkElement.checked = val
+    }
+
+    get disabled() {
+        return this.checkElement.disabled
+    }
+
+    set disabled(val) {
+        this.setAttribute('disabled', val);
+        this.checkElement.disabled = val;
+    }
+
     #getTemplate() {
         return `
         <label class="AtomCheck">
@@ -85,33 +112,6 @@ export const AtomCheck = class extends Atom {
 
     addToBody() {
         document.body.appendChild(this);
-    }
-
-    get caption() {
-        return this.mainElement.innerText
-    }
-
-    set caption(val) {
-        this.setAttribute('caption', val);
-        this.labelElement.innerText = val;
-        this.dispatchEvent(new CustomEvent("changeCaption", {bubbles: true}));
-    }
-
-    get checked() {
-        return this.checkElement.checked
-    }
-
-    set checked(val) {
-        this.checkElement.checked = val
-    }
-
-    get disabled() {
-        return this.checkElement.disabled
-    }
-
-    set disabled(val) {
-        this.setAttribute('disabled', val);
-        this.checkElement.disabled = val;
     }
 }
 

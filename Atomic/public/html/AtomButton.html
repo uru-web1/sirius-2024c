@@ -1,7 +1,7 @@
 <html>
 <head>
-    <script type="module" src="../js/com/Atom.js"></script>
-    <link rel="icon" href="../images/icons/favicon.png" sizes="32x32" type="image/png">
+    <script src="../js/com/Atom.js" type="module"></script>
+    <link href="../images/icons/favicon.png" rel="icon" sizes="32x32" type="image/png">
 </head>
 <body>
 <script>
@@ -30,6 +30,6 @@
         b.addToBody();
     };
 </script>
-<atom-button id="MyAtomButton" onclick='atom.fCancel()' caption="Aceptar"></atom-button>
+<atom-button caption="Aceptar" id="MyAtomButton" onclick='atom.fCancel()'></atom-button>
 </body>
 </html>
