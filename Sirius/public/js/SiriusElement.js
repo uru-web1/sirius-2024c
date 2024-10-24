@@ -22,7 +22,7 @@ export const SIRIUS_ELEMENT = deepFreeze({
     },
     ATTRIBUTES: {
         ID: {NAME: "id", DEFAULT: null, TYPE: SIRIUS_TYPES.STRING},
-        STYLE: {NAME: 'style', DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
+        STYLE: {NAME: 'style', DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING]},
         EVENTS: {NAME: 'events', DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
     },
     CLASSES: {
@@ -69,7 +69,6 @@ export class SiriusElement extends HTMLElement {
 
         // Attach shadow DOM
         this.attachShadow({mode: "open"});
-        console.log(this.shadowRoot)
 
         // Built event listener
         this.addEventListener(SIRIUS_ELEMENT.EVENTS.BUILT, async () => {

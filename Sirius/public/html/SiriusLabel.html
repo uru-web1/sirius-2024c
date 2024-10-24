@@ -19,11 +19,15 @@
         // Get the attributes keys
         const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
         const captionKey = SIRIUS_LABEL.ATTRIBUTES.CAPTION.NAME;
+        const style = SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME;
+        const style2 = SIRIUS_LABEL.ATTRIBUTES.CAPTION_STYLE.NAME;
 
         // Create the label
         const siriusLabel2 = new SiriusLabel({
             [idKey]: 'label-2',
             [captionKey]: 'Hello world con HTML',
+            [style]: {'border': "1px solid red", 'padding': '10px'},
+            [style2]: {'color': 'red'}
         });
 
         // Add the label to the DOM
@@ -31,10 +35,7 @@
     }
 </script>
 
-<sirius-label caption="Hello world script1" id="label-1"></sirius-label>
-<sirius-label caption="Hello world script2" id="label-3"></sirius-label>
-<sirius-label caption="Hello world script2" id="label-4"></sirius-label>
-<sirius-label caption="Hello world script2" id="label-5"></sirius-label>
+<sirius-label caption="Hello world script1" id="label-1" style="border-radius: 5em;" caption-style="color:red;"></sirius-label>
 
 
 </body>
