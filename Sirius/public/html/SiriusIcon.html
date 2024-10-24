@@ -29,10 +29,15 @@
 <body>
 
 <div class="svg-container">
-    <sirius-icon fill="red" height="50" icon="check" id="icon-2" width="24"></sirius-icon>
+    <sirius-icon fill="red" height="50" icon="check" id="icon-1" width="24"></sirius-icon>
 </div>
+
 <div class="svg-container">
-    <sirius-icon fill="blue" height="48" icon="check" id="icon-1" width="48"></sirius-icon>
+    <sirius-icon fill="blue" height="48" icon="check" id="icon-2" width="48"></sirius-icon>
+</div>
+
+<div class="svg-container">
+    <sirius-icon rotate="up" fill="red" height="50" icon="double-arrow" id="icon-3" width="24"></sirius-icon>
 </div>
 
 <button class="button" id="animateButton" title="Animar">
@@ -46,13 +51,13 @@
     // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
         // Create the icon
-        const siriusIcon3 = new SiriusIcon({[SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME]: 'icon-3'})
+        const siriusIcon4 = new SiriusIcon({[SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME]: 'icon-4'})
 
         // Add the icon to the DOM
-        siriusIcon3.addToBody()
+        siriusIcon4.addToBody()
 
         // Link the button to the icon
-        const icon = document.getElementById('icon-2');
+        const icon = document.getElementById('icon-1');
         icon.centerScreen();
         const click = document.getElementById('animateButton');
 

@@ -6,7 +6,8 @@ export const SIRIUS_ICON = deepFreeze({
     NAME: "SiriusIcon",
     TAG: "sirius-icon",
     ICONS: {
-        CHEVRON: 'chevron',
+        ARROW: 'arrow',
+        DOUBLE_ARROW: 'double-arrow',
         STAR: 'star',
         INDETERMINATE: "indeterminate",
         CHECK: "check",
@@ -17,6 +18,7 @@ export const SIRIUS_ICON = deepFreeze({
         WIDTH: {NAME: "width", DEFAULT: 24, TYPE: [SIRIUS_TYPES.NUMBER, SIRIUS_TYPES.STRING]},
         HEIGHT: {NAME: "height", DEFAULT: 24, TYPE: [SIRIUS_TYPES.NUMBER, SIRIUS_TYPES.STRING]},
         FILL: {NAME: "fill", DEFAULT: "red", TYPE: SIRIUS_TYPES.STRING},
+        ROTATE: {NAME: "rotate", DEFAULT: "right", TYPE: SIRIUS_TYPES.STRING},
     },
     ATTRIBUTES: {
         CHECKED: {NAME: 'checked', DEFAULT: null, TYPE: SIRIUS_TYPES.BOOLEAN},
@@ -33,27 +35,40 @@ export const SIRIUS_ICON = deepFreeze({
 
 /** Sirius SVG Icons */
 const SIRIUS_SVGS = {
-    // Chevron icon
-    [SIRIUS_ICON.ICONS.CHEVRON]: ({height, width, fill}) => `
-        <svg xmlns="http://www.w3.org/2000/svg" height=${height} viewBox="0 -960 60 960" width=${width} fill=${fill}><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
+    // Arrow icon
+    [SIRIUS_ICON.ICONS.ARROW]: ({height, width, fill}) => `
+        <svg xmlns="http://www.w3.org/2000/svg" height="${height}" viewBox="0 -960 960 960" width="${width}" fill="${fill}"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
+        `,
+
+    // Double arrow icon
+    [SIRIUS_ICON.ICONS.DOUBLE_ARROW]: ({height, width, fill}) => `
+        <svg xmlns="http://www.w3.org/2000/svg" height="${height}" viewBox="0 -960 960 960" width="${width}" fill="${fill}"><path d="M383-480 200-664l56-56 240 240-240 240-56-56 183-184Zm264 0L464-664l56-56 240 240-240 240-56-56 183-184Z"/></svg>
         `,
 
     // Indeterminate icon
     [SIRIUS_ICON.ICONS.INDETERMINATE]: ({width, height, fill}) => `
-    <svg xmlns="http://www.w3.org/2000/svg" height={height} viewBox="0 -960 960 960" width={width} fill={fill}><path d="M240-440v-80h480v80H240Z"/></svg>`,
+    <svg xmlns="http://www.w3.org/2000/svg" height="${height}" viewBox="0 -960 960 960" width="${width}" fill="${fill}"><path d="M240-440v-80h480v80H240Z"/></svg>`,
 
     // Star icon
     [SIRIUS_ICON.ICONS.STAR]: ({width, height, fill}) =>
-        `<svg xmlns="http://www.w3.org/2000/svg" height=${height} viewBox="0 -960 960 960" width=${width} fill=${fill}><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z"/></svg>`,
+        `<svg xmlns="http://www.w3.org/2000/svg" height="${height}" viewBox="0 -960 960 960" width="${width}" fill="${fill}"><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z"/></svg>`,
 
     // Check icon
     [SIRIUS_ICON.ICONS.CHECK]: ({width, height, fill}) =>
-        `<svg xmlns="http://www.w3.org/2000/svg" height=${height} viewBox="0 -960 960 960" width=${width} fill=${fill}><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`,
+        `<svg xmlns="http://www.w3.org/2000/svg" height="${height}" viewBox="0 -960 960 960" width="${width}" fill="${fill}"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`,
 
     // Warning icon
     [SIRIUS_ICON.ICONS.WARNING]: ({width, height, fill}) => `
-        <svg xmlns="http://www.w3.org/2000/svg" height=${height} viewBox="0 -960 960 960" width=${width} fill=${fill}><path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z"/></svg>`
+        <svg xmlns="http://www.w3.org/2000/svg" height="${height}" viewBox="0 -960 960 960" width="${width}" fill="${fill}"><path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z"/></svg>`
 }
+
+/** Sirius rotation constants */
+export const SIRIUS_ROTATION = deepFreeze({
+    RIGHT: {NAME: 'right', DEG: 0},
+    DOWN: {NAME: 'down', DEG: 90},
+    LEFT: {NAME: 'left', DEG: 180},
+    UP: {NAME: 'up', DEG: 270},
+})
 
 /** Sirius class that represents an icon component */
 export class SiriusIcon extends SiriusElement {
@@ -177,6 +192,42 @@ export class SiriusIcon extends SiriusElement {
         this.setCheckClasses();
     }
 
+    /** Get rotation degrees
+     * @param {string} rotate - Rotation direction
+     * @returns {number} - Rotation degrees
+     * */
+    #getRotationDegrees(rotate) {
+        // Get the rotation degrees based on the rotation direction
+        for(let rotationKey of Object.keys(SIRIUS_ROTATION)) {
+            const rotation = SIRIUS_ROTATION[rotationKey];
+            if (rotation.NAME === rotate) return rotation.DEG;
+        }
+
+        // Try to parse the rotation as a number
+        const degrees = parseInt(rotate)
+        if (!isNaN(degrees)) return degrees
+
+        // Log an error if the rotation is invalid
+        this.logger.error(`Invalid rotation: ${rotate}`)
+
+        // Return the default rotation degrees
+        return this.#getRotationDegrees(SIRIUS_ICON.ICON_ATTRIBUTES.ROTATE.DEFAULT)
+    }
+
+    /** Set icon rotation
+     * @param {string} rotate - Rotation direction
+     * */
+    setRotation(rotate) {
+        // Get the icon
+        const degrees = this.#getRotationDegrees(rotate)
+
+        // Log the rotation
+        this.logger.log(`Setting rotation to ${degrees} degrees`)
+
+        // Set the icon direction
+        this.elementContainer.style.transform = `rotate(${degrees}deg)`
+    }
+
     /** Load dynamic properties and HTML attributes */
     #loadAttributes() {
         if (!this._attributes)
@@ -211,12 +262,24 @@ export class SiriusIcon extends SiriusElement {
                     this.#checked = attributeValue;
                     this.setCheckClasses();
                     break;
+
                 case SIRIUS_ICON.ATTRIBUTES.HIDE.NAME:
                     if (attributeValue)
                         this.hide()
                     else
                         this.show()
                     break;
+
+                case SIRIUS_ICON.ICON_ATTRIBUTES.ROTATE.NAME:
+                    // Check if the direction is the default value
+                    if (attributeValue === SIRIUS_ICON.ICON_ATTRIBUTES.ROTATE.DEFAULT) return;
+
+                    // Set the icon rotation
+                    this._onBuiltElementContainer(() =>{
+                        this.setRotation(attributeValue);
+                    })
+                    break;
+
                 default:
                     // this.logger.log(`Unregistered attribute: ${attributeName}`);
                     break;
