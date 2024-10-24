@@ -15,6 +15,7 @@ export const SIRIUS_LABEL = deepFreeze({
     }
 });
 
+/** Sirius class that represents a label component */
 export class SiriusLabel extends SiriusElement {
     /**
      * Create a Sirius label element
@@ -28,21 +29,20 @@ export class SiriusLabel extends SiriusElement {
             htmlAttributes: SIRIUS_LABEL.ATTRIBUTES,
             properties: props
         });
-
-        // Attach shadow DOM
-        this.attachShadow({mode: "open"});
     }
 
     /** Get the template for the Sirius label
      * @returns {string} - Template
      * */
     #getTemplate() {
-
         return `<div class="${SIRIUS_LABEL.CLASSES.LABEL}">
                     <span class ="${SIRIUS_LABEL.CLASSES.CAPTION}">${this.#getCaption()}</span>
                 </div>`;
     }
 
+    /** Get the caption of the label
+     * @returns {*} - Label caption
+     */
     #getCaption() {
         return this._attributes[SIRIUS_LABEL.ATTRIBUTES.CAPTION.NAME];
     }
@@ -50,26 +50,19 @@ export class SiriusLabel extends SiriusElement {
     /** Lifecycle method called when the component is connected to the DOM
      */
     async connectedCallback() {
-
         // Create the CSS stylesheet and add it to the shadow DOM
-        await this._getStyles(SIRIUS_LABEL.NAME);
-        this.shadowRoot.adoptedStyleSheets = [this._sheet];
+        await this._loadElementStyles()
 
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
-        if (!innerHTML) {
-            this.logger.error('Failed to create template');
-            return;
-        }
 
         // Create the HTML template
         await this._createTemplate(innerHTML);
 
         // Add label to the shadow DOM
-        this.labelElement = this._templateContent.firstChild;
-        this.shadowRoot.appendChild(this.labelElement);
+        this.elementContainer = this._templateContent.firstChild;
+        this.shadowRoot.appendChild(this.elementContainer);
     }
-
 }
 
 // Register custom element

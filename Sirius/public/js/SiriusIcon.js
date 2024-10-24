@@ -78,9 +78,6 @@ export class SiriusIcon extends SiriusElement {
             htmlAttributes: SIRIUS_ICON.ICON_ATTRIBUTES,
             properties: props
         });
-
-        // Attach shadow DOM
-        this.attachShadow({mode: "open"});
     }
 
     /** Get current icon attribute value
@@ -128,7 +125,7 @@ export class SiriusIcon extends SiriusElement {
      * */
     #getTemplate() {
         // Get the icon classes
-        let classes = [SIRIUS_ICON.CLASSES.ICON];
+        const classes = [SIRIUS_ICON.CLASSES.ICON];
 
         // Check if the icon is a check icon
         if (this.icon === SIRIUS_ICON.ICONS.CHECK)
@@ -137,7 +134,7 @@ export class SiriusIcon extends SiriusElement {
         // Get icon width and height
         const widthKey = SIRIUS_ICON.ICON_ATTRIBUTES.WIDTH.NAME
         const heightKey = SIRIUS_ICON.ICON_ATTRIBUTES.HEIGHT.NAME
-        const {[widthKey]:width, [heightKey]: height} = this.iconAttributes;
+        const {[widthKey]: width, [heightKey]: height} = this.iconAttributes;
 
         return `<div class='${classes.join(' ')}'>
                     <span width="${width}" height="${height}">
@@ -233,16 +230,11 @@ export class SiriusIcon extends SiriusElement {
         // Load attributes
         this.#loadAttributes();
 
-        // Create the CSS styleSheet and add it to the shadow DOM
-        const styleSheets = await this._getStyles(SIRIUS_ICON.NAME);
-        await this._loadStyles(styleSheets.element, styleSheets.general);
+        // Create the CSS style sheets and add them to the shadow DOM
+        await this._loadElementStyles();
 
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
-        if (!innerHTML) {
-            this.logger.error('Failed to create template')
-            return
-        }
 
         // Create the HTML template
         await this._createTemplate(innerHTML);

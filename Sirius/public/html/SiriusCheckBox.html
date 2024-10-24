@@ -10,25 +10,29 @@
 <body>
 <script type="module">
     import sirius from '../js/Sirius.js';
-    import {SIRIUS_CHECKBOX} from '../js/SiriusCheckbox.js';
+    import {SIRIUS_CHECKBOX, SiriusCheckbox} from '../js/SiriusCheckbox.js';
+    import {SIRIUS_ELEMENT} from "../js/SiriusElement.js";
 
-    sirius.init = async () => {
-        const siriusCheckbox1 = await sirius.createInstance(SIRIUS_CHECKBOX.NAME, SIRIUS_CHECKBOX.NAME, {
-            'id': 'checkbox-1',
-            'label': 'La hamburguesa es buena',
-            'checked': false
+    // Get the attributes keys
+    const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
+    const labelKey = SIRIUS_CHECKBOX.ATTRIBUTES.LABEL.NAME;
+    const checkedKey = SIRIUS_CHECKBOX.ATTRIBUTES.CHECKED.NAME;
+
+    sirius.onLoaded = async () => {
+        const siriusCheckbox1 = new SiriusCheckbox({
+            [idKey]: 'checkbox-1',
+            [labelKey]: 'La hamburguesa es buena',
+            [checkedKey]: false
         });
 
-        //no está leyendo esto
-        const siriusCheckbox2 = await sirius.createInstance(SIRIUS_CHECKBOX.NAME, SIRIUS_CHECKBOX.NAME, {
-            'id': 'checkbox-2',
-            'label': 'La pizza es buena',
-            'checked': true
-
+        // Doesn't work
+        const siriusCheckbox2 = new SiriusCheckbox({
+            [idKey]: 'checkbox-2',
+            [labelKey]: 'La pizza es buena',
+            [checkedKey]: true
         });
 
-        sirius.addToBody(siriusCheckbox1);
-        sirius.addToBody(siriusCheckbox2);
+        siriusCheckbox1.addToBody()
     };
 
 </script>
