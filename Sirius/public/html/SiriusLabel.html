@@ -19,18 +19,17 @@
         const siriusLabel2 = await sirius.createInstance(SIRIUS_LABEL.NAME, SIRIUS_LABEL.NAME, {
             'id': 'label-2',
             'caption': 'Hello world con HTML',
+            'style': {'border': "1px solid black", 'padding': '10px', 'color': 'red'}
     });
 
-        // Add the label to the DOM
+        // Add the label to the DOMs
         sirius.addToBody(siriusLabel2);
 
     }
 </script>
 
-    <sirius-label id="label-1" caption="Hello world script1"></sirius-label>
-    <sirius-label id="label-3" caption="Hello world script2"></sirius-label>
-    <sirius-label id="label-4" caption="Hello world script2"></sirius-label> 
-    <sirius-label id="label-5" caption="Hello world script2"></sirius-label>  
+    <sirius-label id="label-1" caption="Hello world script1" style="border-radius: 50%;" caption-style="color: red;"></sirius-label>
+
     
 
 </body>
