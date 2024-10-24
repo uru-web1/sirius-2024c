@@ -66,12 +66,12 @@ export class SiriusLabel extends SiriusElement {
                 case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
 
                     if (typeof attributeValue === SIRIUS_TYPES.STRING) {
-                        this.elementContainer.style.cssText = attributeValue;
+                        this.containerElement.style.cssText = attributeValue;
                         return;
                     }
 
                     for (let styleName in attributeValue) {
-                        this.elementContainer.style[styleName] = attributeValue[styleName];
+                        this.containerElement.style[styleName] = attributeValue[styleName];
                     }
                     break;
                     
@@ -110,9 +110,9 @@ export class SiriusLabel extends SiriusElement {
         await this._createTemplate(innerHTML);
 
         // Add label to the shadow DOM
-        this.elementContainer = this._templateContent.firstChild;
-        this.captionElement = this.elementContainer.firstElementChild;
-        this.shadowRoot.appendChild(this.elementContainer);
+        this.containerElement = this._templateContent.firstChild;
+        this.captionElement = this.containerElement.firstElementChild;
+        this.shadowRoot.appendChild(this.containerElement);
 
         // Load attributes
         this.#loadAttributes();

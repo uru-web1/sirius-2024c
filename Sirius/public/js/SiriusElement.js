@@ -34,7 +34,7 @@ export const SIRIUS_ELEMENT = deepFreeze({
 /** Sirius class that represents an element component */
 export class SiriusElement extends HTMLElement {
     _attributes = {}
-    #elementContainer = null
+    #containerElement = null
     #elementName = 'UNDEFINED'
     #logger = null
     #isBuilt = false
@@ -93,15 +93,15 @@ export class SiriusElement extends HTMLElement {
     /** Get the element container
      * @returns {HTMLElement} - Element container
      */
-    get elementContainer() {
-        return this.#elementContainer
+    get containerElement() {
+        return this.#containerElement
     }
 
     /** Set the element container
-     * @param {HTMLElement} elementContainer - Element container
+     * @param {HTMLElement} containerElement - Element container
      */
-    set elementContainer(elementContainer) {
-        this.#elementContainer = elementContainer
+    set containerElement(containerElement) {
+        this.#containerElement = containerElement
     }
 
     /** Set Sirius Element on built callback
@@ -115,14 +115,14 @@ export class SiriusElement extends HTMLElement {
         this.#onBuilt.push(callback);
     }
 
-    /** Check the element container
-     * @returns {boolean} - True if the element container is set
+    /** Check the container element
+     * @returns {boolean} - True if the container element is set
      */
-    checkElementContainer() {
-        if (this.#elementContainer)
+    _checkContainerElement() {
+        if (this.#containerElement)
             return true
 
-        this.logger.error('Element container is not set');
+        this.logger.error('Container element is not set');
         return false
     }
 
@@ -248,45 +248,44 @@ export class SiriusElement extends HTMLElement {
         document.body.appendChild(this);
     }
 
-    /** Added on built element container callback */
-    _onBuiltElementContainer(callback = () => {
-    }) {
+    /** Added on built container element callback */
+    set _onBuiltContainerElement(callback) {
         this.onBuilt = () => {
-            if (this.checkElementContainer())
+            if (this._checkContainerElement())
                 callback()
         }
     }
 
     /** Hide the element */
     hide() {
-        this._onBuiltElementContainer(() => {
-            this.elementContainer.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN.NAME);
+        this._onBuiltContainerElement = () => {
+            this.containerElement.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN.NAME);
             this.logger.log('Element hidden');
-        })
+        }
     }
 
     /** Show the element */
     show() {
-        this._onBuiltElementContainer(() => {
-            this.elementContainer.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN.NAME);
+        this._onBuiltContainerElement = () => {
+            this.containerElement.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN.NAME);
             this.logger.log('Element shown');
-        })
+        }
     }
 
     /** Center the element on the screen */
     centerScreen() {
-        this._onBuiltElementContainer(() => {
-            this.elementContainer.classList.add(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
+        this._onBuiltContainerElement = () => {
+            this.containerElement.classList.add(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
             this.logger.log('Element centered on the screen');
-        })
+        }
     }
 
     /** Remove centering of the element */
     removeCenterScreen() {
-        this._onBuiltElementContainer(() => {
-            this.elementContainer.classList.remove(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
+        this._onBuiltContainerElement = () => {
+            this.containerElement.classList.remove(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
             this.logger.log('Element removed from center screen');
-        })
+        }
     }
 
     dispatchBuiltEvent() {

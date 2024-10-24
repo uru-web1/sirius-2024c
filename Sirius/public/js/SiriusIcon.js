@@ -21,9 +21,9 @@ export const SIRIUS_ICON = deepFreeze({
         ROTATE: {NAME: "rotate", DEFAULT: "right", TYPE: SIRIUS_TYPES.STRING},
     },
     ATTRIBUTES: {
-        CHECKED: {NAME: 'checked', DEFAULT: null, TYPE: SIRIUS_TYPES.BOOLEAN},
-        DISABLED: {NAME: 'disabled', DEFAULT: null, TYPE: SIRIUS_TYPES.BOOLEAN},
-        HIDE: {NAME: 'hide', DEFAULT: null, TYPE: SIRIUS_TYPES.BOOLEAN},
+        CHECKED: {NAME: 'checked', DEFAULT: true, TYPE: SIRIUS_TYPES.BOOLEAN},
+        DISABLED: {NAME: 'disabled', DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
+        HIDE: {NAME: 'hide', DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
     },
     CLASSES: {
         ICON: 'icon',
@@ -73,7 +73,9 @@ export const SIRIUS_ROTATION = deepFreeze({
 /** Sirius class that represents an icon component */
 export class SiriusIcon extends SiriusElement {
     #checked = false
-    #icon
+    #spanElement
+    #iconName
+    #iconRotation
 
     /**
      * Create a Sirius icon element
@@ -95,18 +97,54 @@ export class SiriusIcon extends SiriusElement {
         });
     }
 
+    /** Get span element */
+    get spanElement() {
+        return this.#spanElement;
+    }
+
+    /** Set the icon name
+     * @param {string} name - Icon name
+     */
+    set iconName(name) {
+        this.#iconName = name || SIRIUS_ICON.ICONS.DEFAULT;
+    }
+
     /** Get current icon attribute value
      * @returns {string} - Icon name
      * */
-    get icon() {
-        if (this.#icon)
-            return this.#icon;
+    get iconName() {
+        if (this.#iconName)
+            return this.#iconName;
 
         // Get the icon name
         const iconKey = SIRIUS_ICON.ICON_ATTRIBUTES.ICON.NAME
-        this.#icon = this._attributes[iconKey] || SIRIUS_ICON.ICONS.DEFAULT;
 
-        return this.#icon;
+        // Check if the icon contains the rotation
+        const iconFields = this._attributes[iconKey]?.split('--') || [];
+
+        // Get the icon name
+        this.iconName = iconFields[0];
+
+        // Get the icon rotation
+        if(!this.iconRotation)
+            this.iconRotation = iconFields[1];
+
+        return this.#iconName;
+    }
+
+    /** Set the icon rotation
+     * @param {string} rotate - Rotation direction
+     */
+    set iconRotation(rotate) {
+        this.#iconRotation = rotate || SIRIUS_ICON.ICON_ATTRIBUTES.ROTATE.DEFAULT;
+        this.setIconRotation(this.#iconRotation);
+    }
+
+    /** Get the icon rotation
+     * @returns {string} - Rotation direction
+     */
+    get iconRotation() {
+        return this.#iconRotation;
     }
 
     /** Get the icon attributes
@@ -124,12 +162,28 @@ export class SiriusIcon extends SiriusElement {
         return iconAttributes
     }
 
+
+    /** Get check icon state
+     * @returns {boolean} - True if the icon is checked
+     */
+    get check() {
+        return this.#checked;
+    }
+
+    /** Set check icon state
+     * @param {boolean} checked - True if the icon is checked
+     */
+    set check(checked) {
+        this.#checked = checked;
+        this.#setCheckClasses();
+    }
+
     /** Get the icon SVG
      * @returns {string} - Icon SVG
      * */
     #getIcon() {
         // Get the icon SVG function
-        const iconFn = SIRIUS_SVGS[this.icon];
+        const iconFn = SIRIUS_SVGS[this.iconName];
 
         // Return the icon SVG with the given attributes
         return iconFn({...this.iconAttributes});
@@ -142,8 +196,10 @@ export class SiriusIcon extends SiriusElement {
         // Get the icon classes
         const classes = [SIRIUS_ICON.CLASSES.ICON];
 
-        // Check if the icon is a check icon
-        if (this.icon === SIRIUS_ICON.ICONS.CHECK)
+        // Check if the icon is checked
+        if (this.check)
+            classes.push(SIRIUS_ICON.CLASSES.CHECK);
+        else
             classes.push(SIRIUS_ICON.CLASSES.UNCHECK);
 
         // Get icon width and height
@@ -160,36 +216,34 @@ export class SiriusIcon extends SiriusElement {
 
     /** Set the check icon as disabled */
     setDisabled() {
-        this.elementContainer.classList.add(SIRIUS_ICON.CLASSES.DISABLED);
+        this.containerElement.classList.add(SIRIUS_ICON.CLASSES.DISABLED);
     }
-
     /** Set the check icon as enabled */
     setEnabled() {
-        this.elementContainer.classList.remove(SIRIUS_ICON.CLASSES.DISABLED);
+        this.containerElement.classList.remove(SIRIUS_ICON.CLASSES.DISABLED);
     }
 
     /** Set check and uncheck classes */
-    setCheckClasses() {
-        if (this.#checked) {
-            this.elementContainer.classList.remove(SIRIUS_ICON.CLASSES.UNCHECK);
-            this.elementContainer.classList.add(SIRIUS_ICON.CLASSES.CHECK);
-        } else {
-            this.elementContainer.classList.remove(SIRIUS_ICON.CLASSES.CHECK);
-            this.elementContainer.classList.add(SIRIUS_ICON.CLASSES.UNCHECK);
+    #setCheckClasses() {
+        this._onBuiltContainerElement = () => {
+            if (this.#checked) {
+                this.containerElement.classList.remove(SIRIUS_ICON.CLASSES.UNCHECK);
+                this.containerElement.classList.add(SIRIUS_ICON.CLASSES.CHECK);
+            } else {
+                this.containerElement.classList.remove(SIRIUS_ICON.CLASSES.CHECK);
+                this.containerElement.classList.add(SIRIUS_ICON.CLASSES.UNCHECK);
+            }
         }
     }
 
     /** Toggle check and uncheck classes */
     toggleCheck() {
-        // Check if the icon is not a check icon
-        if (this.icon !== SIRIUS_ICON.ICONS.CHECK) return;
-
-        const nextState = !this.#checked ? 'checked' : 'unchecked';
+        const nextState = this.#checked ? 'checked' : 'unchecked';
         this.logger.log('Toggling check icon. Set as ' + nextState);
 
         // Toggle check and uncheck classes
         this.#checked = !this.#checked;
-        this.setCheckClasses();
+        this.#setCheckClasses();
     }
 
     /** Get rotation degrees
@@ -197,6 +251,9 @@ export class SiriusIcon extends SiriusElement {
      * @returns {number} - Rotation degrees
      * */
     #getRotationDegrees(rotate) {
+        // Check if the rotation is not set
+        if (!rotate) return this.#getRotationDegrees(SIRIUS_ICON.ICON_ATTRIBUTES.ROTATE.DEFAULT);
+
         // Get the rotation degrees based on the rotation direction
         for(let rotationKey of Object.keys(SIRIUS_ROTATION)) {
             const rotation = SIRIUS_ROTATION[rotationKey];
@@ -217,7 +274,7 @@ export class SiriusIcon extends SiriusElement {
     /** Set icon rotation
      * @param {string} rotate - Rotation direction
      * */
-    setRotation(rotate) {
+    setIconRotation(rotate) {
         // Get the icon
         const degrees = this.#getRotationDegrees(rotate)
 
@@ -225,7 +282,9 @@ export class SiriusIcon extends SiriusElement {
         this.logger.log(`Setting rotation to ${degrees} degrees`)
 
         // Set the icon direction
-        this.elementContainer.style.transform = `rotate(${degrees}deg)`
+        this._onBuiltContainerElement = () => {
+            this.spanElement.style.transform = `rotate(${degrees}deg)`
+        }
     }
 
     /** Load dynamic properties and HTML attributes */
@@ -244,7 +303,7 @@ export class SiriusIcon extends SiriusElement {
                 case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
                     // Set the style attributes to the icon element
                     attributeValue.forEach(styleName =>
-                        this.elementContainer.style[styleName] = attributeValue[styleName]);
+                        this.containerElement.style[styleName] = attributeValue[styleName]);
                     break;
 
                 case SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME:
@@ -259,8 +318,7 @@ export class SiriusIcon extends SiriusElement {
 
                 case SIRIUS_ICON.ATTRIBUTES.CHECKED.NAME:
                     // Add check or uncheck class
-                    this.#checked = attributeValue;
-                    this.setCheckClasses();
+                    this.check = attributeValue;
                     break;
 
                 case SIRIUS_ICON.ATTRIBUTES.HIDE.NAME:
@@ -275,9 +333,7 @@ export class SiriusIcon extends SiriusElement {
                     if (attributeValue === SIRIUS_ICON.ICON_ATTRIBUTES.ROTATE.DEFAULT) return;
 
                     // Set the icon rotation
-                    this._onBuiltElementContainer(() =>{
-                        this.setRotation(attributeValue);
-                    })
+                    this.iconRotation = attributeValue;
                     break;
 
                 default:
@@ -303,8 +359,9 @@ export class SiriusIcon extends SiriusElement {
         await this._createTemplate(innerHTML);
 
         // Add icon to the shadow DOM
-        this.elementContainer = this._templateContent.firstChild;
-        this.shadowRoot.appendChild(this.elementContainer);
+        this.containerElement = this._templateContent.firstChild;
+        this.#spanElement = this.containerElement.firstElementChild;
+        this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event
         this.dispatchBuiltEvent();

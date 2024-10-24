@@ -70,8 +70,8 @@ export class SiriusCheckbox extends SiriusElement {
         await this._createTemplate(innerHTML);
 
         // Add checkbox to the shadow DOM
-        this.elementContainer = this._templateContent.firstChild;
-        this.shadowRoot.appendChild(this.elementContainer);
+        this.containerElement = this._templateContent.firstChild;
+        this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event
         this.dispatchBuiltEvent();
