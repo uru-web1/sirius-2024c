@@ -9,6 +9,38 @@ export const AtomGauge = class extends Atom {
         this.attachShadow({mode: 'open'});
     }
 
+    get percentaje() {
+        return this._percentaje;
+    }
+
+    set percentaje(val) {
+        this._percentaje = parseInt(val);
+        if (isNaN(this._percentaje) || this._percentaje < 0) this._percentaje = 0;
+        if (this._percentaje > 100) this._percentaje = 100;
+
+        let sheet = new CSSStyleSheet();
+        sheet.replaceSync(this.#getCss());
+        this.shadowRoot.adoptedStyleSheets = [sheet];
+
+        let start = 0;
+        let end = this._percentaje;
+        let duration = 100;
+        let stepTime = Math.abs(Math.floor(duration / end));
+
+        let current = start;
+        let increment = end > start ? 1 : -1;
+
+        // let timer = setInterval(() => {
+        //     current += increment;
+        //     this.percentajeElement.innerText = `${current}%`;
+        //     if (current == end) {
+        //         clearInterval(timer);
+        //     }
+        // }, stepTime);
+        this.percentajeElement.innerText = `${this._percentaje}%`;
+        this.accumulatorElement.style.width = `${this._percentaje}%`;
+    }
+
     #getTemplate() {
         return `
             <div class='Container'>
@@ -110,38 +142,6 @@ export const AtomGauge = class extends Atom {
 
     addToBody() {
         document.body.appendChild(this);
-    }
-
-    get percentaje() {
-        return this._percentaje;
-    }
-
-    set percentaje(val) {
-        this._percentaje = parseInt(val);
-        if (isNaN(this._percentaje) || this._percentaje < 0) this._percentaje = 0;
-        if (this._percentaje > 100) this._percentaje = 100;
-
-        let sheet = new CSSStyleSheet();
-        sheet.replaceSync(this.#getCss());
-        this.shadowRoot.adoptedStyleSheets = [sheet];
-
-        let start = 0;
-        let end = this._percentaje;
-        let duration = 100;
-        let stepTime = Math.abs(Math.floor(duration / end));
-
-        let current = start;
-        let increment = end > start ? 1 : -1;
-
-        // let timer = setInterval(() => {
-        //     current += increment;
-        //     this.percentajeElement.innerText = `${current}%`;
-        //     if (current == end) {
-        //         clearInterval(timer);
-        //     }
-        // }, stepTime);
-        this.percentajeElement.innerText = `${this._percentaje}%`;
-        this.accumulatorElement.style.width = `${this._percentaje}%`;
     }
 }
 

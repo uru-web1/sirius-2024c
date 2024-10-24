@@ -16,19 +16,29 @@ export const SIRIUS_TYPES = deepFreeze({
 
 /** Sirius element constants */
 export const SIRIUS_ELEMENT = deepFreeze({
+    NAME: 'SiriusElement',
+    EVENTS: {
+        BUILT: 'built'
+    },
     ATTRIBUTES: {
         ID: {NAME: "id", DEFAULT: null, TYPE: SIRIUS_TYPES.STRING},
         STYLE: {NAME: 'style', DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
         EVENTS: {NAME: 'events', DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
+    },
+    CLASSES: {
+        HIDDEN: 'hidden',
+        CENTER_SCREEN: 'center-screen'
     }
 })
 
 /** Sirius class that represents an element component */
 export class SiriusElement extends HTMLElement {
-    _sheet = null
     _attributes = {}
+    #elementContainer = null
     #elementName = 'UNDEFINED'
-    #logger
+    #logger = null
+    #isBuilt = false
+    #onBuilt = []
 
     /**
      * Create a Sirius element
@@ -57,8 +67,21 @@ export class SiriusElement extends HTMLElement {
             elementId: this._attributes.id
         });
 
-        // Callback for when the component is built
-        // this.built = () => {};
+        // Attach shadow DOM
+        this.attachShadow({mode: "open"});
+        console.log(this.shadowRoot)
+
+        // Built event listener
+        this.addEventListener(SIRIUS_ELEMENT.EVENTS.BUILT, async () => {
+            // Set the element as built
+            this.#isBuilt = true;
+
+            // Call the initialization callbacks
+            for (const callback of this.#onBuilt) await callback();
+
+            // Clear the initialization callbacks
+            this.#onBuilt = [];
+        });
     }
 
     /** Get Sirius logger
@@ -66,6 +89,42 @@ export class SiriusElement extends HTMLElement {
      * */
     get logger() {
         return this.#logger
+    }
+
+    /** Get the element container
+     * @returns {HTMLElement} - Element container
+     */
+    get elementContainer() {
+        return this.#elementContainer
+    }
+
+    /** Set the element container
+     * @param {HTMLElement} elementContainer - Element container
+     */
+    set elementContainer(elementContainer) {
+        this.#elementContainer = elementContainer
+    }
+
+    /** Set Sirius Element on built callback
+     * @param callback - On built callback
+     * */
+    set onBuilt(callback) {
+        if (this.#isBuilt) {
+            callback();
+            return;
+        }
+        this.#onBuilt.push(callback);
+    }
+
+    /** Check the element container
+     * @returns {boolean} - True if the element container is set
+     */
+    checkElementContainer() {
+        if (this.#elementContainer)
+            return true
+
+        this.logger.error('Element container is not set');
+        return false
     }
 
     /** Validate the element attribute
@@ -119,25 +178,64 @@ export class SiriusElement extends HTMLElement {
         })
     }
 
-    /**
-     * Create a Sirius element stylesheet and store it
+    /** Get a given stylesheet file content
      * @param {string} cssFilename - CSS filename
      */
-    async getCss(cssFilename = this.#elementName) {
-        this._sheet = new CSSStyleSheet();
+    async #getStyles(cssFilename) {
+        // Create the CSS stylesheet
+        const sheet = new CSSStyleSheet();
 
-        // Load the CSS file
-        const css = await sirius.getCssFile(cssFilename);
+        // Load the CSS file content
+        const css = await sirius.getStylesFile(cssFilename);
 
-        // Add the CSS to the stylesheet
-        this._sheet.replaceSync(css);
+        // Add the CSS content to the stylesheet
+        sheet.replaceSync(css);
+
+        return sheet;
+    }
+
+    /**
+     * Get the Sirius element stylesheets
+     * @param {string} cssFilename - CSS filename
+     * @returns {Promise<{element: CSSStyleSheet, general: CSSStyleSheet}>} - Stylesheets
+     */
+    async #getElementStyles(cssFilename) {
+        // Get the element and the general stylesheets
+        const elementStylesheet = await this.#getStyles(cssFilename);
+        const generalStylesheet = await this.#getStyles(SIRIUS_ELEMENT.NAME);
+
+        return {element: elementStylesheet, general: generalStylesheet};
+    }
+
+    /**
+     * Load style sheets to the shadow DOM
+     * @param {CSSStyleSheet[]} styleSheets - Stylesheets
+     */
+    async #loadStyles(...styleSheets) {
+        this.shadowRoot.adoptedStyleSheets = styleSheets;
+    }
+
+    /**
+     * Load element styles sheets to the shadow DOM
+     * @param {string} cssFilename - CSS filename
+     */
+    async _loadElementStyles(cssFilename = this.#elementName) {
+        // Create the CSS style sheets and add them to the shadow DOM
+        const {element,general} = await this.#getElementStyles(cssFilename);
+        this.#loadStyles(element, general);
     }
 
     /**
      * Create a template from the inner HTML
      * @param {string} innerHTML - Inner HTML
      */
-    async createTemplate(innerHTML) {
+    async _createTemplate(innerHTML) {
+        // Check if the inner HTML is empty
+        if (!innerHTML) {
+            this.logger.error('Failed to create template');
+            return;
+        }
+
         // Create HTML template
         this._template = document.createElement("template");
         this._template.innerHTML = innerHTML;
@@ -151,29 +249,48 @@ export class SiriusElement extends HTMLElement {
         document.body.appendChild(this);
     }
 
-    // Hide the element
+    /** Added on built element container callback */
+    _onBuiltElementContainer(callback = () => {
+    }) {
+        this.onBuilt = () => {
+            if (this.checkElementContainer())
+                callback()
+        }
+    }
+
+    /** Hide the element */
     hide() {
-        this.style.display = 'none';
+        this._onBuiltElementContainer(() => {
+            this.elementContainer.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN.NAME);
+            this.logger.log('Element hidden');
+        })
     }
 
-    // Show the element
+    /** Show the element */
     show() {
-        this.style.display = '';
+        this._onBuiltElementContainer(() => {
+            this.elementContainer.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN.NAME);
+            this.logger.log('Element shown');
+        })
     }
 
-    // Center the element on the screen
-    centerScreen(object = {}) {
-        const element = object.id || this;
-        element.style.position = 'fixed';
-        element.style.top = '50%';
-        element.style.left = '50%';
-        element.style.transform = 'translate(-50%, -50%)';
-        
-        return this.style.transform;
+    /** Center the element on the screen */
+    centerScreen() {
+        this._onBuiltElementContainer(() => {
+            this.elementContainer.classList.add(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
+            this.logger.log('Element centered on the screen');
+        })
     }
 
-    // TO IMPLEMENT
-    // hide
-    // show
-    // centerScreen
+    /** Remove centering of the element */
+    removeCenterScreen() {
+        this._onBuiltElementContainer(() => {
+            this.elementContainer.classList.remove(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
+            this.logger.log('Element removed from center screen');
+        })
+    }
+
+    dispatchBuiltEvent() {
+        this.dispatchEvent(new Event(SIRIUS_ELEMENT.EVENTS.BUILT));
+    }
 }

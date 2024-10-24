@@ -9,6 +9,23 @@ export const AtomRadio = class extends Atom {
         this._caption = "";
     }
 
+    get caption() {
+        return this._caption
+    }
+
+    set caption(val) {
+        this._caption = val;
+        this.captionPanel.innerText = val;
+    }
+
+    get checked() {
+        return this._checked
+    }
+
+    set checked(val) {
+        this.#selectRadio(val)
+    }
+
     #getTemplate() {
         return `
         <div class="AtomRadioPanel">
@@ -155,23 +172,6 @@ export const AtomRadio = class extends Atom {
         await this.#checkProps();
         this.#events();
         this.built(this);
-    }
-
-    get caption() {
-        return this._caption
-    }
-
-    set caption(val) {
-        this._caption = val;
-        this.captionPanel.innerText = val;
-    }
-
-    get checked() {
-        return this._checked
-    }
-
-    set checked(val) {
-        this.#selectRadio(val)
     }
 
     addToBody() {

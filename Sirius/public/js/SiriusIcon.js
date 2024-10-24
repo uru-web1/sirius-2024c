@@ -5,8 +5,6 @@ import deepFreeze from "./utils/deep-freeze.js";
 export const SIRIUS_ICON = deepFreeze({
     NAME: "SiriusIcon",
     TAG: "sirius-icon",
-    HIDE:"hide",
-    SHOW:"show",
     ICONS: {
         CHEVRON: 'chevron',
         STAR: 'star',
@@ -23,6 +21,7 @@ export const SIRIUS_ICON = deepFreeze({
     ATTRIBUTES: {
         CHECKED: {NAME: 'checked', DEFAULT: null, TYPE: SIRIUS_TYPES.BOOLEAN},
         DISABLED: {NAME: 'disabled', DEFAULT: null, TYPE: SIRIUS_TYPES.BOOLEAN},
+        HIDE: {NAME: 'hide', DEFAULT: null, TYPE: SIRIUS_TYPES.BOOLEAN},
     },
     CLASSES: {
         ICON: 'icon',
@@ -58,6 +57,7 @@ const SIRIUS_SVGS = {
 
 /** Sirius class that represents an icon component */
 export class SiriusIcon extends SiriusElement {
+    #checked = false
     #icon
 
     /**
@@ -78,9 +78,6 @@ export class SiriusIcon extends SiriusElement {
             htmlAttributes: SIRIUS_ICON.ICON_ATTRIBUTES,
             properties: props
         });
-
-        // Attach shadow DOM
-        this.attachShadow({mode: "open"});
     }
 
     /** Get current icon attribute value
@@ -128,20 +125,43 @@ export class SiriusIcon extends SiriusElement {
      * */
     #getTemplate() {
         // Get the icon classes
-        let classes = [SIRIUS_ICON.CLASSES.ICON];
+        const classes = [SIRIUS_ICON.CLASSES.ICON];
 
         // Check if the icon is a check icon
         if (this.icon === SIRIUS_ICON.ICONS.CHECK)
             classes.push(SIRIUS_ICON.CLASSES.UNCHECK);
 
-        return `<span class='${classes.join(' ')}'>
-                ${this.#getIcon()}
-            </span>`;
+        // Get icon width and height
+        const widthKey = SIRIUS_ICON.ICON_ATTRIBUTES.WIDTH.NAME
+        const heightKey = SIRIUS_ICON.ICON_ATTRIBUTES.HEIGHT.NAME
+        const {[widthKey]: width, [heightKey]: height} = this.iconAttributes;
+
+        return `<div class='${classes.join(' ')}'>
+                    <span width="${width}" height="${height}">
+                        ${this.#getIcon()}
+                    </span>
+                </div>`;
     }
 
     /** Set the check icon as disabled */
     setDisabled() {
-        this.iconElement.classList.add(SIRIUS_ICON.CLASSES.DISABLED);
+        this.elementContainer.classList.add(SIRIUS_ICON.CLASSES.DISABLED);
+    }
+
+    /** Set the check icon as enabled */
+    setEnabled() {
+        this.elementContainer.classList.remove(SIRIUS_ICON.CLASSES.DISABLED);
+    }
+
+    /** Set check and uncheck classes */
+    setCheckClasses() {
+        if (this.#checked) {
+            this.elementContainer.classList.remove(SIRIUS_ICON.CLASSES.UNCHECK);
+            this.elementContainer.classList.add(SIRIUS_ICON.CLASSES.CHECK);
+        } else {
+            this.elementContainer.classList.remove(SIRIUS_ICON.CLASSES.CHECK);
+            this.elementContainer.classList.add(SIRIUS_ICON.CLASSES.UNCHECK);
+        }
     }
 
     /** Toggle check and uncheck classes */
@@ -149,22 +169,18 @@ export class SiriusIcon extends SiriusElement {
         // Check if the icon is not a check icon
         if (this.icon !== SIRIUS_ICON.ICONS.CHECK) return;
 
-        this.logger.log('Toggling check icon');
-
-        // Remove disabled classes, if exists
-        this.iconElement.classList.remove(SIRIUS_ICON.CLASSES.DISABLED);
+        const nextState = !this.#checked ? 'checked' : 'unchecked';
+        this.logger.log('Toggling check icon. Set as ' + nextState);
 
         // Toggle check and uncheck classes
-        [SIRIUS_ICON.CLASSES.CHECK, SIRIUS_ICON.CLASSES.UNCHECK].forEach(cls => this.iconElement.classList.toggle(cls));
+        this.#checked = !this.#checked;
+        this.setCheckClasses();
     }
 
     /** Load dynamic properties and HTML attributes */
     #loadAttributes() {
         if (!this._attributes)
             this.logger.log("No attributes");
-
-        // Get mask element
-        const maskElement = this.maskElement;
 
         Object.keys(this._attributes).forEach(attributeName => {
             // Get the attribute value
@@ -175,11 +191,9 @@ export class SiriusIcon extends SiriusElement {
 
             switch (attributeName) {
                 case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
-                    console.log(attributeName);
-                    
                     // Set the style attributes to the icon element
                     attributeValue.forEach(styleName =>
-                        this.iconElement.style[styleName] = attributeValue[styleName]);
+                        this.elementContainer.style[styleName] = attributeValue[styleName]);
                     break;
 
                 case SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME:
@@ -189,21 +203,19 @@ export class SiriusIcon extends SiriusElement {
                 case SIRIUS_ICON.ATTRIBUTES.DISABLED.NAME:
                     // Add disabled class
                     if (attributeValue)
-                        maskElement.classList.add(SIRIUS_ICON.CLASSES.DISABLED);
+                        this.setDisabled();
                     break;
 
                 case SIRIUS_ICON.ATTRIBUTES.CHECKED.NAME:
                     // Add check or uncheck class
-                    if (attributeValue)
-                        maskElement.classList.add(SIRIUS_ICON.CLASSES.CHECK);
-                    else
-                        maskElement.classList.add(SIRIUS_ICON.CLASSES.UNCHECK);
+                    this.#checked = attributeValue;
+                    this.setCheckClasses();
                     break;
-                case SIRIUS_ICON.ATTRIBUTES.HIDE:
-                    if(attributeValue)
-                        console.log('probando123');
-                        
-                        maskElement.classList.add(this.hide())
+                case SIRIUS_ICON.ATTRIBUTES.HIDE.NAME:
+                    if (attributeValue)
+                        this.hide()
+                    else
+                        this.show()
                     break;
                 default:
                     // this.logger.log(`Unregistered attribute: ${attributeName}`);
@@ -218,23 +230,21 @@ export class SiriusIcon extends SiriusElement {
         // Load attributes
         this.#loadAttributes();
 
-        // Create the CSS stylesheet and add it to the shadow DOM
-        await this.getCss(SIRIUS_ICON.NAME);
-        this.shadowRoot.adoptedStyleSheets = [this._sheet];
+        // Create the CSS style sheets and add them to the shadow DOM
+        await this._loadElementStyles();
 
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
-        if (!innerHTML) {
-            this.logger.error('Failed to create template')
-            return
-        }
 
         // Create the HTML template
-        await this.createTemplate(innerHTML);
+        await this._createTemplate(innerHTML);
 
         // Add icon to the shadow DOM
-        this.iconElement = this._templateContent.firstChild;
-        this.shadowRoot.appendChild(this.iconElement);
+        this.elementContainer = this._templateContent.firstChild;
+        this.shadowRoot.appendChild(this.elementContainer);
+
+        // Dispatch the built event
+        this.dispatchBuiltEvent();
     }
 }
 

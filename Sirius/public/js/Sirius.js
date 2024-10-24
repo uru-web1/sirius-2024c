@@ -26,7 +26,7 @@ class Sirius {
     #cssFiles
     #CSSFilesPromises
     #lockedCSSFiles
-    #init = []
+    #onLoaded = []
 
     /** Create Sirius object */
     constructor() {
@@ -57,24 +57,19 @@ class Sirius {
         return this.#logger
     }
 
-    /** Sirius initialization */
-    get init() {
-        this.logger.log('Initializing Sirius');
-    }
-
-    /** Set Sirius initialization
-     * @param callback - Initialization callback
+    /** Set Sirius on loaded callback
+     * @param callback - On loaded callback
      * */
-    set init(callback) {
-        this.#init.push(callback);
+    set onLoaded(callback) {
+        this.#onLoaded.push(callback);
 
         // On DOM content loaded
         addEventListener("DOMContentLoaded", async () => {
             // Call the initialization callbacks
-            for (const callback of this.#init) await callback();
+            for (const callback of this.#onLoaded) await callback();
 
             // Clear the initialization callbacks
-            this.#init = [];
+            this.#onLoaded = [];
         });
     }
 
@@ -89,87 +84,51 @@ class Sirius {
         this.#instancesId.set(id, instance);
     }
 
-    /** Get CSS file
-     * @param fileName - File name
+    /** Get CSS styles file
+     * @param cssFilename - CSS filename
      * @returns {Promise<any|string>} - CSS file
      */
-    async getCssFile(fileName) {
+    async getStylesFile(cssFilename) {
         // Check if the CSS file is already loaded
-        if (this.#cssFiles.has(fileName)) {
-            this.logger.log(`CSS file '${fileName}' already loaded`);
-            return this.#cssFiles.get(fileName);
+        if (this.#cssFiles.has(cssFilename)) {
+            this.logger.log(`CSS file '${cssFilename}' already loaded`);
+            return this.#cssFiles.get(cssFilename);
         }
 
         // Wait for the CSS file to be loaded
-        if (this.#lockedCSSFiles.has(fileName)) {
-            this.logger.log(`Waiting for CSS file '${fileName}' to be loaded`);
+        if (this.#lockedCSSFiles.has(cssFilename)) {
+            this.logger.log(`Waiting for CSS file '${cssFilename}' to be loaded`);
 
             // Wait for the CSS file to be loaded
-            if(this.#CSSFilesPromises.has(fileName))
-                return await this.#CSSFilesPromises.get(fileName);
+            if (this.#CSSFilesPromises.has(cssFilename))
+                return await this.#CSSFilesPromises.get(cssFilename);
 
             // Throw an error if the CSS file is locked
-            throw new Error(`CSS file '${fileName}' is locked and cannot be loaded`);
+            throw new Error(`CSS file '${cssFilename}' is locked and cannot be loaded`);
         }
 
         // Lock the CSS file
-        this.#lockedCSSFiles.add(fileName);
+        this.#lockedCSSFiles.add(cssFilename);
 
         // Create CSS promise and store it
-        const cssRoute = SIRIUS.ROUTES.CSS(fileName);
-        const cssPromise = (async ()=>{
-             // Load the CSS file
+        const cssRoute = SIRIUS.ROUTES.CSS(cssFilename);
+        const cssPromise = (async () => {
+            // Load the CSS file
             const response = await fetch(cssRoute)
             const css = await response.text()
-            this.logger.log(`CSS file '${fileName}' loaded`);
+            this.logger.log(`CSS file '${cssFilename}' loaded`);
 
             // Store the CSS file
-            this.#cssFiles.set(fileName, css);
+            this.#cssFiles.set(cssFilename, css);
             return css
         })()
 
         // Store the CSS promise
-        this.#CSSFilesPromises.set(fileName, cssPromise);
-        this.logger.log(`Loading CSS file '${fileName}'`);
+        this.#CSSFilesPromises.set(cssFilename, cssPromise);
+        this.logger.log(`Loading CSS file '${cssFilename}'`);
 
         return cssPromise;
     }
-
-    /*
-    async getCssFile(fileName) {
-        // Check if the CSS file is already loaded
-        if (this.#cssFiles.has(fileName)) {
-            this.logger.log(`CSS file '${fileName}' already loaded`);
-            return this.#cssFiles.get(fileName);
-        }
-
-        // Wait for the CSS file to be loaded
-        if (this.#CSSFilesPromises.has(fileName)) {
-            this.logger.log(`Waiting for CSS file '${fileName}' to be loaded`);
-            return await this.#CSSFilesPromises.get(fileName);
-        }
-
-        // Create CSS promise and store it
-        const cssRoute = SIRIUS.ROUTES.CSS(fileName);
-        const cssPromise = fetch(cssRoute)
-            .then(response => response.text())
-            .then(css => {
-                this.logger.log(`CSS file '${fileName}' loaded`);
-                this.#cssFiles.set(fileName, css);
-                return css;
-            })
-            .finally(() => {
-                // Remove the promise from the pending list
-                this.#CSSFilesPromises.delete(fileName);
-            });
-
-        // Store the CSS promise
-        this.#CSSFilesPromises.set(fileName, cssPromise);
-        this.logger.log(`Loading CSS file '${fileName}'`);
-
-        return cssPromise;
-    }
-    */
 
     /** Get Sirius element by ID
      * @param id - Element ID
@@ -190,24 +149,27 @@ class Sirius {
     async getClass(jsFilename, jsClass) {
         // Check if script has been loaded
         if (this.#jsModules.has(jsFilename)) {
-            const currentClasses = this.#jsModules.get(jsFilename);
+            const jsModule = this.#jsModules.get(jsFilename);
 
             // Loaded class
-            if (currentClasses.has(jsClass))
-                return currentClasses.get(jsClass)
+            if (jsModule.has(jsClass))
+                return jsModule.get(jsClass)
 
             const importedClass = this.#jsModules[jsClass]
             if (!importedClass) {
                 this.logger.error(`Class '${jsClass}' not found on loaded script '${jsFilename}'`);
                 return null;
             }
-        }else{
-            
-            // Store the class in a new Map if jsFilename is not already in the map
-            this.#jsModules.set(jsFilename, new Map());
+
+            // Store the class in the map
+            jsModule.set(jsClass, importedClass);
+            return importedClass;
         }
-        
-        
+
+        // Store the class in a new Map if jsFilename is not already in the map
+        this.#jsModules.set(jsFilename, new Map());
+        const jsModule = this.#jsModules.get(jsFilename);
+
         // Load the script
         const importedScript = await import(SIRIUS.ROUTES.JS(jsFilename));
         if (!importedScript) {
@@ -221,7 +183,7 @@ class Sirius {
             this.logger.error(`Error loading class '${jsClass}'`);
             return null;
         }
-    this.#jsModules.get(jsFilename).set(jsClass, importedClass);
+        jsModule.set(jsClass, importedClass);
         return importedClass;
     }
 
@@ -250,13 +212,6 @@ class Sirius {
             this.logger.error(`An error occurred: ${err}`)
             return null;
         }
-    }
-
-    /** Add the element to the body
-     * @param {HTMLElement} element - Element to add
-     * */
-    addToBody(element) {
-        document.body.appendChild(element);
     }
 }
 

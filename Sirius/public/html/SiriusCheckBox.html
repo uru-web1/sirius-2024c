@@ -2,39 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Sirius Checkbox Example</title>
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusCheckbox.js" type="module"></script>
 </head>
 <body>
-    <script type="module">
-        import sirius from '../js/Sirius.js';
-        import { SIRIUS_CHECKBOX } from '../js/SiriusCheckbox.js';
+<script type="module">
+    import sirius from '../js/Sirius.js';
+    import {SIRIUS_CHECKBOX, SiriusCheckbox} from '../js/SiriusCheckbox.js';
+    import {SIRIUS_ELEMENT} from "../js/SiriusElement.js";
 
-        sirius.init = async () => {
-            const siriusCheckbox1 = await sirius.createInstance(SIRIUS_CHECKBOX.NAME, SIRIUS_CHECKBOX.NAME, {
-                'id': 'checkbox-1',
-                'label': 'La hamburguesa es buena',
-                'checked': false
-            });
+    // Get the attributes keys
+    const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
+    const labelKey = SIRIUS_CHECKBOX.ATTRIBUTES.LABEL.NAME;
+    const checkedKey = SIRIUS_CHECKBOX.ATTRIBUTES.CHECKED.NAME;
 
-            //no está leyendo esto 
-            const siriusCheckbox2 = await sirius.createInstance(SIRIUS_CHECKBOX.NAME, SIRIUS_CHECKBOX.NAME, {
-                'id': 'checkbox-2',
-                'label': 'La pizza es buena',
-                'checked': true
-                
-            });
+    sirius.onLoaded = async () => {
+        const siriusCheckbox1 = new SiriusCheckbox({
+            [idKey]: 'checkbox-1',
+            [labelKey]: 'La hamburguesa es buena',
+            [checkedKey]: false
+        });
 
-            sirius.addToBody(siriusCheckbox1);
-            sirius.addToBody(siriusCheckbox2);
-        };
+        // Doesn't work
+        const siriusCheckbox2 = new SiriusCheckbox({
+            [idKey]: 'checkbox-2',
+            [labelKey]: 'La pizza es buena',
+            [checkedKey]: true
+        });
 
-    </script>
+        siriusCheckbox1.addToBody()
+    };
 
-    <sirius-checkbox id="checkbox-3" label="Hola"></sirius-checkbox>
-    <sirius-checkbox id="checkbox-4" label="Soy"></sirius-checkbox>
-    <sirius-checkbox id="checkbox-5" label="Yo"></sirius-checkbox>
+</script>
+
+<sirius-checkbox id="checkbox-3" label="Hola"></sirius-checkbox>
+<sirius-checkbox id="checkbox-4" label="Soy"></sirius-checkbox>
+<sirius-checkbox id="checkbox-5" label="Yo"></sirius-checkbox>
 </body>
 </html>
