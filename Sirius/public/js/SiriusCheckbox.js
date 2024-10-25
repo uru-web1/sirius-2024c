@@ -8,7 +8,8 @@ export const SIRIUS_CHECKBOX = deepFreeze({
     NAME: "SiriusCheckbox",
     TAG: "sirius-checkbox",
     ATTRIBUTES: {
-        LABEL: {NAME: "label", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING},
+        LABEL: {NAME: "label", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
+        CAPTION: {NAME: "caption", DEFAULT: "Valor", TYPE: SIRIUS_TYPES.STRING},
         CHECKED: {NAME: "checked", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
         DISABLED: {NAME: "disabled", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
     },
@@ -47,6 +48,9 @@ export class SiriusCheckbox extends SiriusElement {
         // Get the instance id of the checkbox
         const idInstance= this._attributes[SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME].split('-')[1];
         
+        // Check if the label should be shown
+        const showLabel = this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.LABEL.NAME];
+
         // Add classes based on the checkbox attributes
         if (this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.DISABLED.NAME])
             inputClasses.push(SIRIUS_CHECKBOX.CLASSES.DISABLED);
@@ -56,9 +60,9 @@ export class SiriusCheckbox extends SiriusElement {
 
         return `<div class="${SIRIUS_CHECKBOX.CLASSES.CONTAINER}">
                     <div class="icon-container">
-                        <sirius-icon fill="red" height="20" icon="check" id="icon-${idInstance}" width="20"></sirius-icon>
+                        <sirius-icon fill="blue" height="20" icon="check" id="icon-${idInstance}" width="20" onclick="toggleCheck()"></sirius-icon>
                     </div>
-                    <sirius-label caption="La pizza es buena" id="label-${idInstance}" caption-style="color:red;"></sirius-label>
+                    ${showLabel ? `<sirius-label caption="${this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.CAPTION.NAME]}" id="label-${idInstance}";"></sirius-label>` : ''}
                 </div>`;
     }
 
