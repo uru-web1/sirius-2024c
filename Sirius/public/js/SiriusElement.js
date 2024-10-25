@@ -55,7 +55,7 @@ export class SiriusElement extends HTMLElement {
         this._loadAttributes({htmlAttributes: SIRIUS_ELEMENT.ATTRIBUTES, properties: props});
 
         // Check if the element has an ID
-        if (this._attributes?.id === null)
+        if (!this._attributes?.id)
             throw new Error('Element ID is required');
 
         // Set instance ID

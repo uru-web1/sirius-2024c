@@ -26,6 +26,7 @@ class Sirius {
     #cssFiles
     #CSSFilesPromises
     #lockedCSSFiles
+    #loaded
     #onLoaded = []
 
     /** Create Sirius object */
@@ -45,9 +46,22 @@ class Sirius {
             errorColor: SIRIUS.ERROR.COLOR
         })
 
+        // CSS files
         this.#cssFiles = new Map();
         this.#lockedCSSFiles = new Set();
         this.#CSSFilesPromises = new Map();
+
+        // On DOM content loaded
+        addEventListener("DOMContentLoaded", async () => {
+            // Set the loaded flag
+            this.#loaded = true;
+
+            // Call the initialization callbacks
+            for (const callback of this.#onLoaded) await callback();
+
+            // Clear the initialization callbacks
+            this.#onLoaded = [];
+        });
     }
 
     /** Get Sirius logger
@@ -61,16 +75,12 @@ class Sirius {
      * @param callback - On loaded callback
      * */
     set onLoaded(callback) {
+        if (!this.#loaded){
+            this.#onLoaded.push(callback);
+            return;
+        }
+
         this.#onLoaded.push(callback);
-
-        // On DOM content loaded
-        addEventListener("DOMContentLoaded", async () => {
-            // Call the initialization callbacks
-            for (const callback of this.#onLoaded) await callback();
-
-            // Clear the initialization callbacks
-            this.#onLoaded = [];
-        });
     }
 
     /** Set instance ID */
