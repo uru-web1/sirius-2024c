@@ -8,6 +8,7 @@ export const SIRIUS_LABEL = deepFreeze({
     ATTRIBUTES: {
         CAPTION: {NAME: "caption", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING},
         CAPTION_STYLE: { NAME: "caption-style", DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING] },
+        LABEL_STYLE: { NAME: "label-style", DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING] },
     },
     CLASSES: {
         LABEL: 'label-container',
@@ -63,7 +64,7 @@ export class SiriusLabel extends SiriusElement {
             
             switch (attributeName) {
                 
-                case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
+                case SIRIUS_LABEL.ATTRIBUTES.LABEL_STYLE.NAME:
 
                     if (typeof attributeValue === SIRIUS_TYPES.STRING) {
                         this.containerElement.style.cssText = attributeValue;

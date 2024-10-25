@@ -1,5 +1,7 @@
-import {SIRIUS_TYPES, SiriusElement} from "./SiriusElement.js";
+import {SIRIUS_ELEMENT, SIRIUS_TYPES, SiriusElement} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
+import { SIRIUS_LABEL } from "./SiriusLabel.js";
+import { SIRIUS_ICON} from "./SiriusIcon.js";
 
 /** Sirius checkbox constants */
 export const SIRIUS_CHECKBOX = deepFreeze({
@@ -42,6 +44,9 @@ export class SiriusCheckbox extends SiriusElement {
         // Checkbox input classes
         const inputClasses = [SIRIUS_CHECKBOX.CLASSES.CONTAINER];
 
+        // Get the instance id of the checkbox
+        const idInstance= this._attributes[SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME].split('-')[1];
+        
         // Add classes based on the checkbox attributes
         if (this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.DISABLED.NAME])
             inputClasses.push(SIRIUS_CHECKBOX.CLASSES.DISABLED);
@@ -50,12 +55,19 @@ export class SiriusCheckbox extends SiriusElement {
             inputClasses.push(SIRIUS_CHECKBOX.CLASSES.CHECKED);
 
         return `<div class="${SIRIUS_CHECKBOX.CLASSES.CONTAINER}">
-                    <input type="checkbox" class="${inputClasses.join(' ')}">
-                    <label class="${SIRIUS_CHECKBOX.CLASSES.LABEL}">
-                        ${this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.LABEL.NAME]}
-                    </label>
+                    <div class="icon-container">
+                        <sirius-icon fill="red" height="20" icon="check" id="icon-${idInstance}" width="20"></sirius-icon>
+                    </div>
+                    <sirius-label caption="La pizza es buena" id="label-${idInstance}" caption-style="color:red;"></sirius-label>
                 </div>`;
     }
+
+    // return `<div class="${SIRIUS_CHECKBOX.CLASSES.CONTAINER}">
+    //             <input type="checkbox" class="${inputClasses.join(' ')}">
+    //             <label class="${SIRIUS_CHECKBOX.CLASSES.LABEL}">
+    //                     ${this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.LABEL.NAME]}
+    //             </label>
+    //         </div>`;
 
     /** Lifecycle method called when the component is connected to the DOM
      */
