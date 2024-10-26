@@ -1,8 +1,12 @@
-.label-container {
+:host{
+    display: block;
     width: fit-content;
-    padding: 5px 10px;
+    padding: 0px;
 }
-
+.label-container {
+    padding: 0px;
+    
+}
 .caption {
     font-size: 14px;
     font-family: 'Arial', sans-serif;
