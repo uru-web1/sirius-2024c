@@ -163,7 +163,20 @@ export class SiriusElement extends HTMLElement {
             const {NAME, DEFAULT} = htmlAttribute
 
             // Get the attribute value
-            const attributeValue = this.getAttribute(NAME) || properties?.[NAME] || DEFAULT
+            let attributeValue = this.getAttribute(NAME)
+
+            if (attributeValue===null||attributeValue===""){
+                // Check if the attribute is not set
+                if (properties?.[NAME] === undefined)
+                    attributeValue = DEFAULT
+                else {
+                    // Get the attribute value from the properties
+                    attributeValue = properties[NAME]
+
+                    // Set the attribute value
+                    this.setAttribute(NAME, attributeValue)
+                }
+            }
 
             // Validate the attribute
             this._validateAttribute({
