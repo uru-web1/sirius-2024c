@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Sirius Switch</title>
+    <script defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusSwitch.js" type="module"></script>
+</head>
+<body>
+<script type="module">
+    import sirius from '../js/Sirius.js';
+    import { SIRIUS_SWITCH, SiriusSwitch } from '../js/SiriusSwitch.js';
+    import { SIRIUS_ELEMENT } from "../js/SiriusElement.js";
+
+    // Get the attributes keys
+    const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
+    const activeKey = SIRIUS_SWITCH.ATTRIBUTES.ACTIVE.NAME;
+    const disabledKey = SIRIUS_SWITCH.ATTRIBUTES.DISABLED.NAME;
+
+    sirius.onLoaded = async () => {
+        const siriusSwitch1 = new SiriusSwitch({
+            [idKey]: 'switch-1',
+            [activeKey]: false,
+            [disabledKey]: false
+        });
+
+        const siriusSwitch2 = new SiriusSwitch({
+            [idKey]: 'switch-2',
+            [activeKey]: true,
+            [disabledKey]: false
+        });
+
+        siriusSwitch1.addToBody();
+        siriusSwitch2.addToBody();
+    };
+</script>
+
+<sirius-switch id="switch-3"></sirius-switch>
+<sirius-switch id="switch-4"></sirius-switch>
+</body>
+</html>

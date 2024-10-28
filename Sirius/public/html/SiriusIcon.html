@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/Sirius.css">
+    <script defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusIcon.js" type="module"></script>
+
+    <style>
+        .svg-container {
+            width: 100px;
+            height: 100px;
+            overflow: hidden;
+        }
+
+        div {
+            background-color: black;
+        }
+
+        button {
+            width: 100px;
+            height: 100px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="svg-container">
+    <sirius-icon fill="red" height="50" icon="check" id="icon-1" width="24"></sirius-icon>
+</div>
+
+<div class="svg-container">
+    <sirius-icon fill="blue" height="48" icon="check" id="icon-2" width="48"></sirius-icon>
+</div>
+
+<div class="svg-container">
+    <sirius-icon rotate="sidjasd" fill="red" height="50" icon="double-arrow--up" id="icon-3" width="24"></sirius-icon>
+</div>
+
+<button class="button" id="animateButton" title="Animar">
+</button>
+
+<script type="module">
+    import sirius from '../js/Sirius.js'
+    import {SiriusIcon} from "../js/SiriusIcon.js";
+    import {SIRIUS_ELEMENT} from "../js/SiriusElement.js";
+
+    // Wait for the DOM to be fully loaded
+    sirius.onLoaded = async () => {
+        // Create the icon
+        const siriusIcon4 = new SiriusIcon({[SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME]: 'icon-4'})
+
+        // Add the icon to the DOM
+        siriusIcon4.addToBody()
+
+        // Link the button to the icon
+        const icon = document.getElementById('icon-1');
+        icon.centerScreen();
+        const click = document.getElementById('animateButton');
+
+        click.addEventListener("click", () => {
+            if (!icon)
+                return
+
+            icon.toggleCheck();
+        });
+    }
+</script>
+</body>
+</html>
