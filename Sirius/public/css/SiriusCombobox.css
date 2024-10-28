@@ -1,0 +1,56 @@
+.sirius-combobox-container {
+    position: relative;
+    display: inline-block;
+    width: 200px;
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+.sirius-combobox-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.sirius-combobox-input:focus {
+    border-color: #007bff;
+}
+
+.sirius-combobox-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 5px;
+    max-height: 150px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: none; /* Oculto inicialmente, controlado con JavaScript */
+}
+
+.sirius-combobox-option {
+    padding: 10px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.sirius-combobox-option:hover {
+    background-color: #f0f0f0;
+}
+
+.sirius-combobox-option:active {
+    background-color: #007bff;
+    color: #fff;
+}
