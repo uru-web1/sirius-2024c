@@ -7,8 +7,11 @@ export const SIRIUS_LABEL = deepFreeze({
     TAG: "sirius-label",
     ATTRIBUTES: {
         CAPTION: {NAME: "caption", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING},
-        CAPTION_STYLE: { NAME: "caption-style", DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING] },
-        LABEL_STYLE: { NAME: "label-style", DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING] },
+    },
+    CAPTION_ATTRIBUTES: {
+        POSITION: {NAME: "captionPosition", DEFAULT: "center", TYPE: SIRIUS_TYPES.STRING},
+        COLOR: {NAME:"captionColor", DEFAULT: "black", TYPE: SIRIUS_TYPES.STRING},
+        FONT: {NAME:"captionFont", DEFAULT: "Arial", TYPE: SIRIUS_TYPES.STRING}
     },
     CLASSES: {
         LABEL: 'label-container',
@@ -28,6 +31,12 @@ export class SiriusLabel extends SiriusElement {
         // Load Sirius Label HTML attributes
         this._loadAttributes({
             htmlAttributes: SIRIUS_LABEL.ATTRIBUTES,
+            properties: props
+        });
+
+        // Load Sirius Label caption attributes
+        this._loadAttributes({
+            htmlAttributes: SIRIUS_LABEL.CAPTION_ATTRIBUTES,
             properties: props
         });
     }
@@ -61,13 +70,19 @@ export class SiriusLabel extends SiriusElement {
 
             // Check if the attribute value is null
             if (!attributeValue) return;
-            
+
+            // Check if the attribute value is an object
+
             switch (attributeName) {
                 
-                case SIRIUS_LABEL.ATTRIBUTES.LABEL_STYLE.NAME:
+                case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
 
                     if (typeof attributeValue === SIRIUS_TYPES.STRING) {
                         this.containerElement.style.cssText = attributeValue;
+
+                        // Remove the style attribute of the component
+                        this.removeAttribute(SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME);
+
                         return;
                     }
 
@@ -75,22 +90,37 @@ export class SiriusLabel extends SiriusElement {
                         this.containerElement.style[styleName] = attributeValue[styleName];
                     }
                     break;
-                    
-                case SIRIUS_LABEL.ATTRIBUTES.CAPTION_STYLE.NAME:
-
-                    if (typeof attributeValue === SIRIUS_TYPES.STRING) {
-                        this.captionElement.style.cssText = attributeValue;
-                        return;
-                    }
-
-                    for (let styleName in attributeValue) {
-                        this.captionElement.style[styleName] = attributeValue[styleName];
-                    }
-                break;
 
                 case SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME:
-                    // TO BE IMPLEMENTED
+                    
+                    for (let event in attributeValue) {
+                        this.captionElement.addEventListener(event, attributeValue[event])
+                    }
                     break;
+                
+                // case attributeName.startsWith("on"):
+                //     console.log("Event attribute: ", attributeName);
+                    
+                //     break;
+
+                case SIRIUS_LABEL.CAPTION_ATTRIBUTES.POSITION.NAME:
+
+                    this.containerElement.style.textAlign = attributeValue;
+
+                    break;
+
+                case SIRIUS_LABEL.CAPTION_ATTRIBUTES.COLOR.NAME:
+                    
+                    this.captionElement.style.color = attributeValue;
+                    break;
+                
+                case SIRIUS_LABEL.CAPTION_ATTRIBUTES.FONT.NAME:
+
+                    this.captionElement.style.fontFamily = attributeValue.toLowerCase();
+                    break;
+                
+                
+                
 
                 default:
                     // this.logger.log(`Unregistered attribute: ${attributeName}`);
@@ -113,6 +143,8 @@ export class SiriusLabel extends SiriusElement {
         // Add label to the shadow DOM
         this.containerElement = this._templateContent.firstChild;
         this.captionElement = this.containerElement.firstElementChild;
+
+        
         this.shadowRoot.appendChild(this.containerElement);
 
         // Load attributes

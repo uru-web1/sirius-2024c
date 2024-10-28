@@ -16,27 +16,46 @@
 
     // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
+
         // Get the attributes keys
         const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
         const captionKey = SIRIUS_LABEL.ATTRIBUTES.CAPTION.NAME;
-        const style = SIRIUS_LABEL.ATTRIBUTES.LABEL_STYLE.NAME;
-        const style2 = SIRIUS_LABEL.ATTRIBUTES.CAPTION_STYLE.NAME;
+        const captionPositionKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.POSITION.NAME;
+        const captionColorKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.COLOR.NAME;
+        const captionFontKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.FONT.NAME;
+        const eventsKey = SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME
+        const styleKey = SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME;
 
         // Create the label
         const siriusLabel2 = new SiriusLabel({
             [idKey]: 'label-1',
             [captionKey]: 'Hello world con JS',
-            [style]: {'border': "1px solid red"},
-            [style2]: {'color': 'red'}
+            [eventsKey]: {
+                'click': () => {
+                    console.log('Hizo click en el Caption...');
+                },
+                'mouseover': () => {
+                    console.log('Hizo mouseover en el Caption...');
+                },
+                'mouseout': () => {
+                    console.log('Hizo mouseout en el Caption...');
+                }
+            },
+            [captionPositionKey]: 'left',
+            [captionColorKey]: 'blue',
+            [captionFontKey]: 'fantasy',
+            [styleKey]:{'border': '1px solid red','padding': '20px'}
+
         });
 
+        
         // Add the label to the DOM
         siriusLabel2.addToBody()
     }
 </script>
 
-<sirius-label caption="Hello world HTML" id="label-2" label-style="border: 1px solid blue" caption-style="color:red;"></sirius-label>
-<sirius-label caption="Hello world HTML" id="label-3" label-style="border: 1px solid green" caption-style="color:red;"></sirius-label>
+<sirius-label caption="Hello world HTML" id="label-2" style="border: 1px solid green; width: 100px;" 
+captionColor="red" captionFont="monospace" captionPosition="center"></sirius-label>
 
 </body>
 </html>
