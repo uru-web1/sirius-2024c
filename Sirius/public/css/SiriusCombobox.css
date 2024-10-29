@@ -6,9 +6,16 @@
     color: #333;
 }
 
+.sirius-combobox-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
 .sirius-combobox-input {
     width: 100%;
     padding: 10px;
+    padding-right: 30px; /* Espacio adicional para el icono */
     font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -20,6 +27,12 @@
 
 .sirius-combobox-input:focus {
     border-color: #007bff;
+}
+
+.sirius-combobox-icon {
+    position: absolute;
+    right: 10px;
+    pointer-events: none; /* El icono no interfiere con los clics */
 }
 
 .sirius-combobox-dropdown {
