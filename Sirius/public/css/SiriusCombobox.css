@@ -4,6 +4,7 @@
     width: 200px;
     font-family: Arial, sans-serif;
     color: #333;
+    border-radius: 10%;
 }
 
 .sirius-combobox-input-wrapper {
@@ -12,21 +13,26 @@
     align-items: center;
 }
 
+.sirius-combobox-label {
+    color:#000000;
+    font-size: 14px;
+}
+
 .sirius-combobox-input {
     width: 100%;
     padding: 10px;
     padding-right: 30px; /* Espacio adicional para el icono */
     font-size: 14px;
     border: 1px solid #ccc;
-    border-radius: 4px;
     background-color: #fff;
     cursor: pointer;
     outline: none;
     transition: border-color 0.2s ease-in-out;
+    border-radius: 20px;
 }
 
 .sirius-combobox-input:focus {
-    border-color: #007bff;
+    border-color: #2d2d2d;
 }
 
 .sirius-combobox-icon {
@@ -43,7 +49,7 @@
     z-index: 10;
     background-color: #fff;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 20px;
     margin-top: 5px;
     max-height: 150px;
     overflow-y: auto;
@@ -60,7 +66,7 @@
 }
 
 .sirius-combobox-option:hover {
-    background-color: #f0f0f0;
+    background-color: #499fd125;
 }
 
 .sirius-combobox-option:active {

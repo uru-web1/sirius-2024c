@@ -17,12 +17,15 @@
     // Atributos del Combobox
     const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
     const optionsKey = SIRIUS_COMBOBOX.ATTRIBUTES.OPTIONS.NAME;
+    const textKey = SIRIUS_COMBOBOX.ATTRIBUTES.TEXT.NAME;
 
     sirius.onLoaded = async () => {
         // Crear una instancia dinámica de SiriusCombobox
         const siriusCombobox = new SiriusCombobox({
             [idKey]: 'combobox-1',
-            [optionsKey]: ['Option 1', 'Option 2', 'Option 3'] // Agregar opciones
+            [optionsKey]: '["Option 1", "Option 2", "Option 3"]',
+            [textKey]: 'Field'
+
         });
 
         // Añadir al body
@@ -31,6 +34,6 @@
 </script>
 
 <!-- Incluir directamente una instancia del combobox con opciones en el HTML -->
-<sirius-combobox id="combobox-2" placeholder="Select an option" options='["Option A", "Option B", "Option C"]'></sirius-combobox>
+<sirius-combobox id="combobox-2" placeholder="Select an option" text="Field" options='["Option A", "Option B", "Option C"]'></sirius-combobox>
 </body>
 </html>

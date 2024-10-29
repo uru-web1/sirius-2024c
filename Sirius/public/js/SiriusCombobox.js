@@ -9,6 +9,7 @@ export const SIRIUS_COMBOBOX = deepFreeze({
     ATTRIBUTES: {
         PLACEHOLDER: { NAME: "placeholder", DEFAULT: "Select an option", TYPE: "string" }, // Define el texto predeterminado en el campo de entrada
         OPTIONS: { NAME: "options", DEFAULT: [], TYPE: "array" }, // Contiene las opciones desplegables del combobox
+        TEXT: { NAME: "text", DEFAULT: "Field", TYPE: "string" }
     },
     CLASSES: {
         CONTAINER: 'sirius-combobox-container',
@@ -16,11 +17,12 @@ export const SIRIUS_COMBOBOX = deepFreeze({
         INPUT: 'sirius-combobox-input',
         ICON: 'sirius-combobox-icon', // Clase para el icono de flecha dentro del combobox
         DROPDOWN: 'sirius-combobox-dropdown',
-        OPTION: 'sirius-combobox-option'
+        OPTION: 'sirius-combobox-option',
+        LABEL: 'sirius-combobox-label'
     }
 });
 
-class SiriusCombobox extends SiriusElement {
+export class SiriusCombobox extends SiriusElement {
     constructor(props) {
         super(props, SIRIUS_COMBOBOX.NAME);
 
@@ -28,6 +30,10 @@ class SiriusCombobox extends SiriusElement {
         let options = props?.options || this.getAttribute(SIRIUS_COMBOBOX.ATTRIBUTES.OPTIONS.NAME);
         options = options ? JSON.parse(options) : SIRIUS_COMBOBOX.ATTRIBUTES.OPTIONS.DEFAULT;
         this._attributes[SIRIUS_COMBOBOX.ATTRIBUTES.OPTIONS.NAME] = options;
+
+        // Cargar el texto
+        const text = props?.text || this.getAttribute(SIRIUS_COMBOBOX.ATTRIBUTES.TEXT.NAME);
+        this._attributes[SIRIUS_COMBOBOX.ATTRIBUTES.TEXT.NAME] = text || SIRIUS_COMBOBOX.ATTRIBUTES.TEXT.DEFAULT;
 
         this._selectedOption = ""; // Almacena la opción actualmente seleccionada
         this._createComboboxTemplate(); // Crea y configura la estructura HTML del combobox
@@ -44,9 +50,14 @@ class SiriusCombobox extends SiriusElement {
             (option) => `<div class="${SIRIUS_COMBOBOX.CLASSES.OPTION}" data-value="${option}">${option}</div>`
         ).join("");
 
+        const textHTML = this._attributes[SIRIUS_COMBOBOX.ATTRIBUTES.TEXT.NAME];
+
+        console.log(textHTML);
+
         // Estructura HTML del combobox, incluyendo el input, icono, y dropdown
         const comboboxHTML = `
             <div id="${this._attributes.id}-container" class="${SIRIUS_COMBOBOX.CLASSES.CONTAINER}">
+                <label class="${SIRIUS_COMBOBOX.CLASSES.LABEL}">${textHTML}</label>
                 <div class="${SIRIUS_COMBOBOX.CLASSES.INPUT_WRAPPER}">
                     <input type="text" placeholder="${this._attributes[PLACEHOLDER.NAME] || PLACEHOLDER.DEFAULT}" class="${SIRIUS_COMBOBOX.CLASSES.INPUT}" readonly>
                     <sirius-icon id="${this._attributes.id}-arrow" class="${SIRIUS_COMBOBOX.CLASSES.ICON}" icon="arrow" width="20" height="20" rotate="down" fill="black"></sirius-icon>
@@ -136,4 +147,3 @@ class SiriusCombobox extends SiriusElement {
 
 // Define el componente personalizado en el navegador
 customElements.define(SIRIUS_COMBOBOX.TAG, SiriusCombobox);
-export default SiriusCombobox;
