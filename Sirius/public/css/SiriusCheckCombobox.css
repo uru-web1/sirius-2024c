@@ -1,0 +1,86 @@
+.sirius-checkcombobox-container {
+    position: relative;
+    display: inline-block;
+    width: 400px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    border-radius: 10%;
+}
+
+.sirius-checkcombobox-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.sirius-checkcombobox-label {
+    color:#000000;
+    font-size: 14px;
+}
+
+.sirius-checkcombobox-input {
+    width: 100%;
+    padding: 10px;
+    padding-right: 30px; /* Espacio adicional para el icono */
+    font-size: 14px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+    border-radius: 20px;
+}
+
+.sirius-checkcombobox-input:focus {
+    border-color: #2d2d2d;
+}
+
+.sirius-checkcombobox-icon {
+    position: absolute;
+    right: 10px;
+    pointer-events: none; /* El icono no interfiere con los clics */
+}
+
+.sirius-checkcombobox-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    margin-top: 5px;
+    max-height: 150px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: none; /* Oculto inicialmente, controlado con JavaScript */
+}
+
+.sirius-checkcombobox-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Para alinear el checkbox a la derecha y el texto a la izquierda */
+    padding-left: 10px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.sirius-checkcombobox-option:hover {
+    background-color: #499fd125;
+}
+
+.sirius-checkcombobox-option:active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.sirius-checkcombobox-checkbox {
+    margin-left: 10px; /* Espacio entre el texto y el checkbox */
+}
+
+.checkbox-container {
+    padding-top: 50px; /* Espacio entre el texto y el checkbox */
+}
