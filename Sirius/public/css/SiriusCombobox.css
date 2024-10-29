@@ -14,11 +14,16 @@
 }
 
 .sirius-combobox-label {
-    color:#000000;
+    color: #000000;
     font-size: 14px;
 }
 
+.sirius-combobox-input.placeholder-color {
+    color: #8f8d8d; /* Color gris claro para el placeholder */
+}
+
 .sirius-combobox-input {
+    color: #000000; /* Color negro para las opciones seleccionadas */
     width: 100%;
     padding: 10px;
     padding-right: 30px; /* Espacio adicional para el icono */
@@ -26,35 +31,26 @@
     border: 1px solid #ccc;
     background-color: #fff;
     cursor: pointer;
-    outline: none;
-    transition: border-color 0.2s ease-in-out;
-    border-radius: 20px;
-}
-
-.sirius-combobox-input:focus {
-    border-color: #2d2d2d;
+    border-radius: 8px;
 }
 
 .sirius-combobox-icon {
     position: absolute;
-    right: 10px;
-    pointer-events: none; /* El icono no interfiere con los clics */
+    right: 5px;
+    pointer-events: none;
 }
 
 .sirius-combobox-dropdown {
+    display: none;
     position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 10;
+    width: 100%;
+    top: calc(100% + 5px);
     background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    margin-top: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10%;
     max-height: 150px;
     overflow-y: auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    display: none; /* Oculto inicialmente, controlado con JavaScript */
+    z-index: 100;
 }
 
 .sirius-combobox-option {
@@ -62,14 +58,8 @@
     font-size: 14px;
     color: #333;
     cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
 }
 
 .sirius-combobox-option:hover {
-    background-color: #499fd125;
-}
-
-.sirius-combobox-option:active {
-    background-color: #007bff;
-    color: #fff;
+    background-color: #f5f5f5;
 }
