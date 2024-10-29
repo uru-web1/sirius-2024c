@@ -2,7 +2,9 @@
     display: grid;
     place-items: center;
 }
-
+span{
+    height: 24px;
+}
 .icon.check > span > svg {
     animation: draw  var(--sirius-animation-duration) forwards;
 }

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Sirius Checkbox Example</title>
+    <link rel="stylesheet" href="../css/Sirius.css">
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusCheckbox.js" type="module"></script>
 </head>
@@ -18,13 +19,16 @@
     const labelKey = SIRIUS_CHECKBOX.ATTRIBUTES.LABEL.NAME;
     const captionKey = SIRIUS_CHECKBOX.ATTRIBUTES.CAPTION.NAME;
     const checkedKey = SIRIUS_CHECKBOX.ATTRIBUTES.CHECKED.NAME;
+    const checkmarkKey = SIRIUS_CHECKBOX.ATTRIBUTES.CHECKMARKCOLOR.NAME;
+    const styleKey = SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME;
 
     sirius.onLoaded = async () => {
         const siriusCheckbox1 = new SiriusCheckbox({
             [idKey]: 'checkbox-1',
-            [labelKey]: false,
+            [labelKey]: true,
             [captionKey]: 'La hamburguesa es buena',
-            [checkedKey]: false
+            [checkmarkKey]: 'blue',
+            [styleKey]: 'position: absolute; top: 50px; left: 50px;'
         });
 
         // Doesn't work
@@ -32,7 +36,6 @@
             [idKey]: 'checkbox-2',
             [labelKey]: true,
             [captionKey]: 'La pizza es buena',
-            [checkedKey]: true
         });
 
         siriusCheckbox1.addToBody()
@@ -40,7 +43,7 @@
 
 </script>
 
-<sirius-checkbox id="checkbox-3"></sirius-checkbox>
+<sirius-checkbox id="checkbox-3" label=true caption="Holakease"></sirius-checkbox>
 
 </body>
 </html>
