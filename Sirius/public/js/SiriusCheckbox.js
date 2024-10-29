@@ -12,7 +12,7 @@ export const SIRIUS_CHECKBOX = deepFreeze({
         CAPTION: {NAME: "caption", DEFAULT: "Valor", TYPE: SIRIUS_TYPES.STRING},
         CHECKED: {NAME: "checked", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
         DISABLED: {NAME: "disabled", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
-        CHECKMARKCOLOR: {NAME: "checkmarkColor", DEFAULT: "black", TYPE: SIRIUS_TYPES.STRING},
+        CHECKMARK_COLOR: {NAME: "checkmark-color", DEFAULT: "black", TYPE: SIRIUS_TYPES.STRING},
     },
     CLASSES: {
         CONTENT: 'checkbox-content',
@@ -48,7 +48,7 @@ export class SiriusCheckbox extends SiriusElement {
         const idInstance= this._attributes[SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME].split('-')[1];
         const showLabel = this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.LABEL.NAME];
         const caption = this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.CAPTION.NAME];
-        const checkmarkColor = this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.CHECKMARKCOLOR.NAME];
+        const checkmarkColor = this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.CHECKMARK_COLOR.NAME];
 
         return `<div class="${SIRIUS_CHECKBOX.CLASSES.CONTAINER}">
                     <div class="${SIRIUS_CHECKBOX.CLASSES.CONTENT}">

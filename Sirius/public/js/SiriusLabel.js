@@ -9,9 +9,9 @@ export const SIRIUS_LABEL = deepFreeze({
         CAPTION: {NAME: "caption", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING},
     },
     CAPTION_ATTRIBUTES: {
-        POSITION: {NAME: "captionPosition", DEFAULT: "center", TYPE: SIRIUS_TYPES.STRING},
-        COLOR: {NAME:"captionColor", DEFAULT: "black", TYPE: SIRIUS_TYPES.STRING},
-        FONT: {NAME:"captionFont", DEFAULT: "Arial", TYPE: SIRIUS_TYPES.STRING}
+        POSITION: {NAME: "caption-position", DEFAULT: "center", TYPE: SIRIUS_TYPES.STRING},
+        COLOR: {NAME:"caption-color", DEFAULT: "black", TYPE: SIRIUS_TYPES.STRING},
+        FONT: {NAME:"caption-font", DEFAULT: "Arial", TYPE: SIRIUS_TYPES.STRING}
     },
     CLASSES: {
         LABEL: 'label-container',

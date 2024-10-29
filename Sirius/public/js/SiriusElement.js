@@ -22,8 +22,8 @@ export const SIRIUS_ELEMENT = deepFreeze({
     },
     ATTRIBUTES: {
         ID: {NAME: "id", DEFAULT: null, TYPE: SIRIUS_TYPES.STRING},
-        STYLE: {NAME: 'style', DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING]},
-        EVENTS: {NAME: 'events', DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
+        STYLE: {NAME: 'custom-style', DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING]},
+        EVENTS: {NAME: 'custom-events', DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
     },
     CLASSES: {
         HIDDEN: 'hidden',
