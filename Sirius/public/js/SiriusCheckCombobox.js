@@ -1,67 +1,75 @@
-import { SiriusElement } from "./SiriusElement.js";
-import { SiriusIcon } from "./SiriusIcon.js";
-import { SiriusCheckbox } from "./SiriusCheckbox.js";
-import deepFreeze from "./utils/deep-freeze.js";
+import { SiriusElement } from "./SiriusElement.js"; 
+import { SiriusIcon } from "./SiriusIcon.js"; 
+import { SiriusCheckbox } from "./SiriusCheckbox.js"; 
+import deepFreeze from "./utils/deep-freeze.js"; 
 
-/** Sirius Combobox constants */
+/** Define constants used in SiriusCheckCombobox */
 export const SIRIUS_CHECKCOMBOBOX = deepFreeze({
-    NAME: "SiriusCheckCombobox",
-    TAG: "sirius-checkcombobox",
-    ATTRIBUTES: {
-        PLACEHOLDER: { NAME: "placeholder", DEFAULT: "Select an option", TYPE: "string" }, // Define el texto predeterminado en el campo de entrada
-        OPTIONS: { NAME: "options", DEFAULT: [], TYPE: "array" }, // Contiene las opciones desplegables del combobox
+    NAME: "SiriusCheckCombobox", 
+    TAG: "sirius-checkcombobox", 
+    ATTRIBUTES: { // Default attributes for the combobox
+        PLACEHOLDER: { NAME: "placeholder", DEFAULT: "Select an option", TYPE: "string" },
+        OPTIONS: { NAME: "options", DEFAULT: [], TYPE: "array" },
         TEXT: { NAME: "text", DEFAULT: "Field", TYPE: "string" }
     },
-    CLASSES: {
+    CLASSES: { // CSS classes for different parts of the combobox
         CONTAINER: 'sirius-checkcombobox-container',
-        INPUT_WRAPPER: 'sirius-checkcombobox-input-wrapper', // Clase para contener el input y el icono en el mismo contenedor
+        INPUT_WRAPPER: 'sirius-checkcombobox-input-wrapper',
         INPUT: 'sirius-checkcombobox-input',
-        ICON: 'sirius-checkcombobox-icon', // Clase para el icono de flecha dentro del combobox
+        ICON: 'sirius-checkcombobox-icon',
         DROPDOWN: 'sirius-checkcombobox-dropdown',
         OPTION: 'sirius-checkcombobox-option',
+        SELECT_ALL: 'sirius-checkcombobox-select-all',
         CHECKBOX: 'sirius-checkcombobox-checkbox',
         LABEL: 'sirius-checkcombobox-label'
     }
 });
 
+// Define the SiriusCheckCombobox component class extending SiriusElement
 export class SiriusCheckCombobox extends SiriusElement {
+    // Constructor to initialize component with properties and default values
     constructor(props) {
-        super(props, SIRIUS_CHECKCOMBOBOX.NAME);
+        super(props, SIRIUS_CHECKCOMBOBOX.NAME); // Call parent constructor
 
-        // Carga las opciones pasadas como props o desde el atributo HTML, y configura el estado inicial
+        // Initialize options from properties or attributes, with fallback to default
         let options = props?.options || this.getAttribute(SIRIUS_CHECKCOMBOBOX.ATTRIBUTES.OPTIONS.NAME);
         options = options ? JSON.parse(options) : SIRIUS_CHECKCOMBOBOX.ATTRIBUTES.OPTIONS.DEFAULT;
         this._attributes[SIRIUS_CHECKCOMBOBOX.ATTRIBUTES.OPTIONS.NAME] = options;
 
-        // Cargar el texto
+        // Initialize text attribute with a default if not provided
         const text = props?.text || this.getAttribute(SIRIUS_CHECKCOMBOBOX.ATTRIBUTES.TEXT.NAME);
         this._attributes[SIRIUS_CHECKCOMBOBOX.ATTRIBUTES.TEXT.NAME] = text || SIRIUS_CHECKCOMBOBOX.ATTRIBUTES.TEXT.DEFAULT;
 
-        this._selectedOption = ""; // Almacena la opción actualmente seleccionada
-        this._createComboboxTemplate(); // Crea y configura la estructura HTML del combobox
+        this._selectedOption = ""; // Track currently selected option
+        this._createComboboxTemplate(); // Set up HTML structure for the combobox
     }
 
-    /**
-     * Genera el HTML para el combobox y su estructura, y aplica estilos.
-     */
+    // Asynchronously creates the HTML template for the combobox
     async _createComboboxTemplate() {
         const { PLACEHOLDER, OPTIONS } = SIRIUS_CHECKCOMBOBOX.ATTRIBUTES;
 
-        // Genera el HTML para las opciones desplegables
+        // Generate HTML for each option with a checkbox
         const optionsHTML = this._attributes[OPTIONS.NAME].map(
             (option, index) => `
             <div class="${SIRIUS_CHECKCOMBOBOX.CLASSES.OPTION}" data-value="${option}">
-                ${option}
+                <span>${option}</span>
                 <sirius-checkbox id="${this._attributes.id.replace("combo", "")}-${index}" class="${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}"></sirius-checkbox>
             </div>
             `
         ).join("");
 
-        const textHTML = this._attributes[SIRIUS_CHECKCOMBOBOX.ATTRIBUTES.TEXT.NAME];
-         this.is
-        console.log(textHTML);
+        // HTML for the "Select All" option at the top of the dropdown
+        const selectAllHTML = `
+            <div class="${SIRIUS_CHECKCOMBOBOX.CLASSES.SELECT_ALL}" data-value="select-all">
+                <span>Select All</span>
+                <sirius-checkbox id="${this._attributes.id.replace("combo", "")}-select-all" class="${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}"></sirius-checkbox>
+            </div>
+        `;
 
-        // Estructura HTML del combobox, incluyendo el input, icono, y dropdown
+        // HTML for the label text of the combobox
+        const textHTML = this._attributes[SIRIUS_CHECKCOMBOBOX.ATTRIBUTES.TEXT.NAME];
+
+        // Complete HTML structure of the combobox component
         const comboboxHTML = `
             <div id="${this._attributes.id}-container" class="${SIRIUS_CHECKCOMBOBOX.CLASSES.CONTAINER}">
                 <label class="${SIRIUS_CHECKCOMBOBOX.CLASSES.LABEL}">${textHTML}</label>
@@ -70,175 +78,89 @@ export class SiriusCheckCombobox extends SiriusElement {
                     <sirius-icon id="${this._attributes.id}-arrow" class="${SIRIUS_CHECKCOMBOBOX.CLASSES.ICON}" icon="arrow" width="20" height="20" rotate="down" fill="black"></sirius-icon>
                 </div>
                 <div class="${SIRIUS_CHECKCOMBOBOX.CLASSES.DROPDOWN}" style="display: none;">
+                    ${selectAllHTML}
                     ${optionsHTML}
                 </div>
             </div>
         `;
 
-        // Inserta la plantilla generada en el shadow DOM
+        // Create and attach the template to the shadow DOM
         await this._createTemplate(comboboxHTML);
-
-        // Referencias a los elementos clave para manipulación posterior
         this.containerElement = this._templateContent.querySelector(`#${this._attributes.id}-container`);
         this.inputElement = this.containerElement.querySelector(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.INPUT}`);
         this.dropdownElement = this.containerElement.querySelector(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.DROPDOWN}`);
         this.arrowIcon = this.containerElement.querySelector(`#${this._attributes.id}-arrow`);
+        this.selectAllCheckbox = this.containerElement.querySelector(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.SELECT_ALL} .${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}`);
 
+        // Append template content and apply styles
         this.shadowRoot.appendChild(this._templateContent);
-        await this._loadElementStyles(SIRIUS_CHECKCOMBOBOX.NAME); // Carga estilos de componente
-        this.dispatchBuiltEvent(); // Evento de construcción completada del componente
+        await this._loadElementStyles(SIRIUS_CHECKCOMBOBOX.NAME);
+        this.dispatchBuiltEvent(); // Dispatch event indicating component is built
 
-        this._addEventListeners(); // Asigna los eventos necesarios
+        this._addEventListeners(); // Add necessary event listeners for interaction
     }
 
-    /**
-     * Agrega listeners de eventos para manejar el despliegue de la lista y la selección de opciones.
-     */
-
+    // Add event listeners for input and dropdown interaction
     _addEventListeners() {
-        // Evento para mostrar/ocultar el menú desplegable al hacer clic en el input
+        // Toggle dropdown visibility and arrow rotation when input is clicked
         this.inputElement.addEventListener("click", () => {
             const isHidden = this.dropdownElement.style.display === 'none' || !this.dropdownElement.style.display;
             this.dropdownElement.style.display = isHidden ? 'block' : 'none';
-            
-            // Rota la flecha dependiendo de la visibilidad del dropdown
             this.arrowIcon.iconRotation = isHidden ? 'up' : 'down';
         });
-    
-        // Evento para seleccionar una opción del dropdown
+
+        // Event listener for selecting individual options or "Select All" in the dropdown
         this.dropdownElement.addEventListener("click", (event) => {
-            // Asegúrate de que estamos haciendo clic en el input checkbox dentro del shadow DOM
-            const checkboxElement = event.target.closest(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}`);
+            const optionElement = event.target.closest(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.OPTION}`);
+            const selectAllElement = event.target.closest(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.SELECT_ALL}`);
             
-            // Verifica si se hizo clic en un checkbox
-            if (checkboxElement) {
-                // Encuentra el input checkbox dentro del shadow DOM del sirius-checkbox
-                const inputCheckbox = checkboxElement.shadowRoot.querySelector('input');
-                const optionElement = checkboxElement.closest(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.OPTION}`);
-    
-                // Verifica que la opción correspondiente se encuentre
-                if (optionElement) {
-                    // Verifica el estado del checkbox
-                    const isChecked = inputCheckbox.checked; // Obtiene el estado del checkbox
-                    
-                    // Si el checkbox está chequeado, actualiza el input
-                    if (isChecked) {
-                        this._selectedOption = optionElement.dataset.value;
-    
-                        if (this.inputElement.value) {
-                            // Comprobar si la opción ya está en el input
-                            if (!this.inputElement.value.includes(this._selectedOption)) {
-                                this.inputElement.value += (this.inputElement.value ? ', ' : '') + this._selectedOption;
-                            }
-                        } else {
-                            this.inputElement.value = this._selectedOption;
-                        }
-                    } else {
-                        // Si no está chequeado, eliminamos la opción del input
-                        this._selectedOption = optionElement.dataset.value;
-                        this.inputElement.value = this.inputElement.value.split(',').filter(opt => opt.trim() !== this._selectedOption).join(', ');
-                    }
-                    
-                    // Dispara un evento personalizado
-                    this.dispatchEvent(new CustomEvent("option-selected", { detail: { selectedOption: this._selectedOption } }));
-                }
+            if (selectAllElement) {
+                this._toggleSelectAll(); // Toggle all options
+            } else if (optionElement) {
+                this._toggleOptionSelection(optionElement); // Toggle individual option
             }
+            this._updateSelectAllStatus(); // Update "Select All" checkbox based on selections
         });
-
-    }
-    
-    // _addEventListeners() {
-    //     // Evento para mostrar/ocultar el menú desplegable al hacer clic en el input
-    //     this.inputElement.addEventListener("click", () => {
-    //         const isHidden = this.dropdownElement.style.display === 'none' || !this.dropdownElement.style.display;
-    //         this.dropdownElement.style.display = isHidden ? 'block' : 'none';
-            
-    //         // Rota la flecha dependiendo de la visibilidad del dropdown
-    //         this.arrowIcon.iconRotation = isHidden ? 'up' : 'down';
-    //     });
-
-    //     // Evento para seleccionar una opción del dropdown
-    //     this.dropdownElement.addEventListener("click", (event) => {
-    //         const checkboxElement = event.target.closest(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}`);
-            
-    //         // Verifica si se hizo clic en un checkbox
-    //         if (checkboxElement) {
-    //             const optionElement = checkboxElement.closest(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.OPTION}`);
-                
-    //             // Asegúrate de que la opción correspondiente se encuentre
-    //             if (optionElement) {
-    //                 // Actualiza la opción seleccionada
-    //                 this._selectedOption = optionElement.dataset.value;
-                    
-    //                 if (this.inputElement.value){
-
-    //                     if (this.inputElement.value.includes(`, ${this._selectedOption},`)) {
-
-    //                         this.inputElement.value = this.inputElement.value.replace(`, ${this._selectedOption}`, "");
-
-    //                     } else if (this.inputElement.value.includes(`, ${this._selectedOption}`)) {
-
-    //                         this.inputElement.value = this.inputElement.value.replace(`, ${this._selectedOption}`, "");
-                        
-    //                     } else if (this.inputElement.value.includes(`${this._selectedOption},`)) {
-
-    //                         this.inputElement.value = this.inputElement.value.replace(`${this._selectedOption},`, "");
-
-    //                     } else if (this.inputElement.value.includes(`${this._selectedOption}`)) {
-
-    //                         this.inputElement.value = this.inputElement.value.replace(`${this._selectedOption}`, "");
-
-    //                     } else {
-
-    //                         this.inputElement.value = this.inputElement.value + `, ${this._selectedOption}`;
-    //                     }
-
-    //                 } else {
-
-    //                     this.inputElement.value = this._selectedOption;
-    //                 }
-
-    //                 // Restaura la rotación de la flecha
-    //                 this.arrowIcon.iconRotation = 'down';
-    //                 // Dispara un evento personalizado
-    //                 this.dispatchEvent(new CustomEvent("option-selected", { detail: { selectedOption: this._selectedOption } }));
-    //             }
-    //         }
-    //     });
-
-    // }
-
-    /**
-     * Retorna la opción seleccionada actualmente.
-     */
-    get selectedOption() {
-        return this._selectedOption;
     }
 
-    /**
-     * Configura las opciones del combobox y actualiza el dropdown.
-     */
-    set options(newOptions) {
-        this._attributes[SIRIUS_CHECKCOMBOBOX.ATTRIBUTES.OPTIONS.NAME] = Array.isArray(newOptions) ? newOptions : [];
-        this._updateDropdownOptions(); // Actualiza el dropdown con nuevas opciones
+    // Toggle selection state for all options
+    _toggleSelectAll() {
+        const isChecked = !this.selectAllCheckbox.shadowRoot.querySelector('input').checked;
+        this._setAllOptionsChecked(isChecked);
     }
 
-    /**
-     * Actualiza las opciones del dropdown con el contenido de `options`.
-     */
-    _updateDropdownOptions() {
-        this.dropdownElement.innerHTML = this._attributes[SIRIUS_CHECKCOMBOBOX.ATTRIBUTES.OPTIONS.NAME].map(
-            (option) => `<div class="${SIRIUS_CHECKCOMBOBOX.CLASSES.OPTION}" data-value="${option}">${option}</div>`
-        ).join("");
+    // Check or uncheck all options based on the parameter and update input display text
+    _setAllOptionsChecked(checked) {
+        const optionCheckboxes = this.dropdownElement.querySelectorAll(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}`);
+        optionCheckboxes.forEach(checkbox => checkbox.shadowRoot.querySelector('input').checked = checked);
+        this._updateInputText(); // Update input text to show selected options
     }
 
-    /**
-     * Añade el combobox al DOM del documento.
-     */
-    addToBody() {
-        document.body.appendChild(this);
+    // Toggle the selection of an individual option and update input display text
+    _toggleOptionSelection(optionElement) {
+        const checkbox = optionElement.querySelector(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}`).shadowRoot.querySelector('input');
+        checkbox.checked = !checkbox.checked;
+        this._updateInputText(); // Update input text to reflect selected options
+    }
+
+    // Update the input text to list all selected options
+    _updateInputText() {
+        const selectedOptions = Array.from(this.dropdownElement.querySelectorAll(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.OPTION}`))
+            .filter(option => option.querySelector(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}`).shadowRoot.querySelector('input').checked)
+            .map(option => option.dataset.value);
+
+        this.inputElement.value = selectedOptions.join(', '); // Display selected options in input
+    }
+
+    // Update the "Select All" checkbox based on the selection status of individual options
+    _updateSelectAllStatus() {
+        const allChecked = Array.from(this.dropdownElement.querySelectorAll(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.OPTION} .${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}`))
+            .every(checkbox => checkbox.shadowRoot.querySelector('input').checked);
+        this.selectAllCheckbox.shadowRoot.querySelector('input').checked = allChecked;
     }
 }
 
-// Define el componente personalizado en el navegador
-customElements.define(SIRIUS_CHECKCOMBOBOX.TAG, SiriusCheckCombobox);
+// Define custom element if not already defined
+if (!customElements.get(SIRIUS_CHECKCOMBOBOX.TAG)) {
+    customElements.define(SIRIUS_CHECKCOMBOBOX.TAG, SiriusCheckCombobox);
+}

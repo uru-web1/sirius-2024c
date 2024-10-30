@@ -28,7 +28,7 @@
     cursor: pointer;
     outline: none;
     transition: border-color 0.2s ease-in-out;
-    border-radius: 20px;
+    border-radius: 8px;
 }
 
 .sirius-checkcombobox-input:focus {
@@ -49,12 +49,20 @@
     z-index: 10;
     background-color: #fff;
     border: 1px solid #ccc;
-    border-radius: 20px;
+    border-radius: 8px;
     margin-top: 5px;
     max-height: 150px;
     overflow-y: auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: none; /* Oculto inicialmente, controlado con JavaScript */
+}
+
+.sirius-checkcombobox-dropdown::-webkit-scrollbar {
+    display: none; /* Oculta el scrollbar */
+}
+
+.sirius-checkcombobox-dropdown {
+    scrollbar-width: none; /* Oculta el scrollbar */
 }
 
 .sirius-checkcombobox-option {
@@ -78,9 +86,20 @@
 }
 
 .sirius-checkcombobox-checkbox {
-    margin-left: 10px; /* Espacio entre el texto y el checkbox */
+    margin-left: 5px; /* Espacio entre el texto y el checkbox */
 }
 
 .checkbox-container {
     padding-top: 50px; /* Espacio entre el texto y el checkbox */
+}
+
+.sirius-checkcombobox-select-all{
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Para alinear el checkbox a la derecha y el texto a la izquierda */
+    padding-left: 10px;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
 }
