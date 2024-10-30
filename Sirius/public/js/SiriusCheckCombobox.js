@@ -52,7 +52,7 @@ export class SiriusCheckCombobox extends SiriusElement {
             (option, index) => `
             <div class="${SIRIUS_CHECKCOMBOBOX.CLASSES.OPTION}" data-value="${option}">
                 ${option}
-                <sirius-checkbox id="${this._attributes.id}-${index}" class="${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}"></sirius-checkbox>
+                <sirius-checkbox id="${this._attributes.id.replace("combo", "")}-${index}" class="${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}"></sirius-checkbox>
             </div>
             `
         ).join("");
@@ -94,6 +94,7 @@ export class SiriusCheckCombobox extends SiriusElement {
     /**
      * Agrega listeners de eventos para manejar el despliegue de la lista y la selección de opciones.
      */
+
     _addEventListeners() {
         // Evento para mostrar/ocultar el menú desplegable al hacer clic en el input
         this.inputElement.addEventListener("click", () => {
@@ -103,71 +104,41 @@ export class SiriusCheckCombobox extends SiriusElement {
             // Rota la flecha dependiendo de la visibilidad del dropdown
             this.arrowIcon.iconRotation = isHidden ? 'up' : 'down';
         });
-
-        // Evento para seleccionar una opción del dropdown
-        // this.dropdownElement.addEventListener("click", (event) => {
-        //     const optionElement = event.target.closest(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.OPTION}`);
-        //     if (optionElement) {
-        //         // Actualiza la opción seleccionada
-        //         this._selectedOption = optionElement.dataset.value;
-
-        //         if (this.inputElement.value !== "") {
-        //             this.inputElement.value = this.inputElement.value + ", " + this._selectedOption;
-        //         } else {
-        //             this.inputElement.value = this._selectedOption;
-        //         }
-                
-        //         this.dropdownElement.style.display = 'none';
-
-        //         // Restablece la rotación de la flecha y dispara un evento personalizado
-        //         this.arrowIcon.iconRotation = 'down';
-        //         this.dispatchEvent(new CustomEvent("option-selected", { detail: { selectedOption: this._selectedOption } }));
-        //     }
-        // });
-
+    
         // Evento para seleccionar una opción del dropdown
         this.dropdownElement.addEventListener("click", (event) => {
+            // Asegúrate de que estamos haciendo clic en el input checkbox dentro del shadow DOM
             const checkboxElement = event.target.closest(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}`);
             
             // Verifica si se hizo clic en un checkbox
             if (checkboxElement) {
+                // Encuentra el input checkbox dentro del shadow DOM del sirius-checkbox
+                const inputCheckbox = checkboxElement.shadowRoot.querySelector('input');
                 const optionElement = checkboxElement.closest(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.OPTION}`);
-                
-                // Asegúrate de que la opción correspondiente se encuentre
+    
+                // Verifica que la opción correspondiente se encuentre
                 if (optionElement) {
-                    // Actualiza la opción seleccionada
-                    this._selectedOption = optionElement.dataset.value;
+                    // Verifica el estado del checkbox
+                    const isChecked = inputCheckbox.checked; // Obtiene el estado del checkbox
                     
-                    if (this.inputElement.value){
-
-                        if (this.inputElement.value.includes(`, ${this._selectedOption},`)) {
-
-                            this.inputElement.value = this.inputElement.value.replace(`, ${this._selectedOption}`, "");
-
-                        } else if (this.inputElement.value.includes(`, ${this._selectedOption}`)) {
-
-                            this.inputElement.value = this.inputElement.value.replace(`, ${this._selectedOption}`, "");
-                        
-                        } else if (this.inputElement.value.includes(`${this._selectedOption},`)) {
-
-                            this.inputElement.value = this.inputElement.value.replace(`${this._selectedOption},`, "");
-
-                        } else if (this.inputElement.value.includes(`${this._selectedOption}`)) {
-
-                            this.inputElement.value = this.inputElement.value.replace(`${this._selectedOption}`, "");
-
+                    // Si el checkbox está chequeado, actualiza el input
+                    if (isChecked) {
+                        this._selectedOption = optionElement.dataset.value;
+    
+                        if (this.inputElement.value) {
+                            // Comprobar si la opción ya está en el input
+                            if (!this.inputElement.value.includes(this._selectedOption)) {
+                                this.inputElement.value += (this.inputElement.value ? ', ' : '') + this._selectedOption;
+                            }
                         } else {
-
-                            this.inputElement.value = this.inputElement.value + `, ${this._selectedOption}`;
+                            this.inputElement.value = this._selectedOption;
                         }
-
                     } else {
-
-                        this.inputElement.value = this._selectedOption;
+                        // Si no está chequeado, eliminamos la opción del input
+                        this._selectedOption = optionElement.dataset.value;
+                        this.inputElement.value = this.inputElement.value.split(',').filter(opt => opt.trim() !== this._selectedOption).join(', ');
                     }
-
-                    // Restaura la rotación de la flecha
-                    this.arrowIcon.iconRotation = 'down';
+                    
                     // Dispara un evento personalizado
                     this.dispatchEvent(new CustomEvent("option-selected", { detail: { selectedOption: this._selectedOption } }));
                 }
@@ -175,6 +146,67 @@ export class SiriusCheckCombobox extends SiriusElement {
         });
 
     }
+    
+    // _addEventListeners() {
+    //     // Evento para mostrar/ocultar el menú desplegable al hacer clic en el input
+    //     this.inputElement.addEventListener("click", () => {
+    //         const isHidden = this.dropdownElement.style.display === 'none' || !this.dropdownElement.style.display;
+    //         this.dropdownElement.style.display = isHidden ? 'block' : 'none';
+            
+    //         // Rota la flecha dependiendo de la visibilidad del dropdown
+    //         this.arrowIcon.iconRotation = isHidden ? 'up' : 'down';
+    //     });
+
+    //     // Evento para seleccionar una opción del dropdown
+    //     this.dropdownElement.addEventListener("click", (event) => {
+    //         const checkboxElement = event.target.closest(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.CHECKBOX}`);
+            
+    //         // Verifica si se hizo clic en un checkbox
+    //         if (checkboxElement) {
+    //             const optionElement = checkboxElement.closest(`.${SIRIUS_CHECKCOMBOBOX.CLASSES.OPTION}`);
+                
+    //             // Asegúrate de que la opción correspondiente se encuentre
+    //             if (optionElement) {
+    //                 // Actualiza la opción seleccionada
+    //                 this._selectedOption = optionElement.dataset.value;
+                    
+    //                 if (this.inputElement.value){
+
+    //                     if (this.inputElement.value.includes(`, ${this._selectedOption},`)) {
+
+    //                         this.inputElement.value = this.inputElement.value.replace(`, ${this._selectedOption}`, "");
+
+    //                     } else if (this.inputElement.value.includes(`, ${this._selectedOption}`)) {
+
+    //                         this.inputElement.value = this.inputElement.value.replace(`, ${this._selectedOption}`, "");
+                        
+    //                     } else if (this.inputElement.value.includes(`${this._selectedOption},`)) {
+
+    //                         this.inputElement.value = this.inputElement.value.replace(`${this._selectedOption},`, "");
+
+    //                     } else if (this.inputElement.value.includes(`${this._selectedOption}`)) {
+
+    //                         this.inputElement.value = this.inputElement.value.replace(`${this._selectedOption}`, "");
+
+    //                     } else {
+
+    //                         this.inputElement.value = this.inputElement.value + `, ${this._selectedOption}`;
+    //                     }
+
+    //                 } else {
+
+    //                     this.inputElement.value = this._selectedOption;
+    //                 }
+
+    //                 // Restaura la rotación de la flecha
+    //                 this.arrowIcon.iconRotation = 'down';
+    //                 // Dispara un evento personalizado
+    //                 this.dispatchEvent(new CustomEvent("option-selected", { detail: { selectedOption: this._selectedOption } }));
+    //             }
+    //         }
+    //     });
+
+    // }
 
     /**
      * Retorna la opción seleccionada actualmente.
