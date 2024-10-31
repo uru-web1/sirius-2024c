@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sirius Radio Example</title>
+    <script defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusRadio.js" type="module"></script>
+</head>
+<body>
+<script type="module">
+    import sirius from "../js/Sirius.js";
+    import { SIRIUS_RADIO, SiriusRadio } from "../js/SiriusRadio.js";
+    import { SIRIUS_ELEMENT } from "../js/SiriusElement.js";
+
+    // Get the attribute keys
+    const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
+    const labelKey = SIRIUS_RADIO.ATTRIBUTES.LABEL.NAME;
+    const selectedKey = SIRIUS_RADIO.ATTRIBUTES.SELECTED.NAME;
+    const disabledKey = SIRIUS_RADIO.ATTRIBUTES.DISABLED.NAME;
+
+    sirius.onLoaded = async () => {
+        const radio1 = new SiriusRadio({
+            [idKey]: "radio-1",
+            [labelKey]: "Option 1",
+            [selectedKey]: true
+        });
+
+        const radio2 = new SiriusRadio({
+            [idKey]: "radio-2",
+            [labelKey]: "Option 2",
+            [selectedKey]: false
+        });
+
+        const radio3 = new SiriusRadio({
+            [idKey]: "radio-3",
+            [labelKey]: "Option 3",
+            [selectedKey]: false,
+            [disabledKey]: true 
+        });
+
+        radio1.addToBody();
+        radio2.addToBody();
+        radio3.addToBody();
+    };
+</script>
+
+<sirius-radio label="Option 1"></sirius-radio>
+<sirius-radio label="Option 2" selected="true"></sirius-radio>
+<sirius-radio label="Option 3" disabled="true"></sirius-radio>
+</body>
+</html>
