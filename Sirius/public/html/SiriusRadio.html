@@ -2,51 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Sirius Radio Example</title>
     <script defer src="../js/Sirius.js" type="module"></script>
-    <script defer src="../js/SiriusRadio.js" type="module"></script>
+<script defer src="../js/SiriusElement.js" type="module"></script>
+<script defer src="../js/SiriusRadio.js" type="module"></script>
+    <link rel="stylesheet" href="../css/SiriusRadio.css">
 </head>
 <body>
+
 <script type="module">
-    import sirius from "../js/Sirius.js";
-    import { SIRIUS_RADIO, SiriusRadio } from "../js/SiriusRadio.js";
-    import { SIRIUS_ELEMENT } from "../js/SiriusElement.js";
+    import sirius from '../js/Sirius.js';
+    import { SIRIUS_RADIO, SiriusRadio } from '../js/SiriusRadio.js';
+    import { SIRIUS_ELEMENT } from '../js/SiriusElement.js';
 
-    // Get the attribute keys
-    const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
-    const labelKey = SIRIUS_RADIO.ATTRIBUTES.LABEL.NAME;
-    const selectedKey = SIRIUS_RADIO.ATTRIBUTES.SELECTED.NAME;
-    const disabledKey = SIRIUS_RADIO.ATTRIBUTES.DISABLED.NAME;
+    
+        const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
+        const labelKey = SIRIUS_RADIO.ATTRIBUTES.LABEL.NAME;
+        const checkedKey = SIRIUS_RADIO.ATTRIBUTES.CHECKED.NAME;
+        
+        sirius.onLoaded = async () => {
 
-    sirius.onLoaded = async () => {
-        const radio1 = new SiriusRadio({
-            [idKey]: "radio-1",
-            [labelKey]: "Option 1",
-            [selectedKey]: true
+        const siriusRadio1 = new SiriusRadio({
+            [idKey]: 'radio-1',
+            [labelKey]: 'Fresa',
+            [checkedKey]: false
         });
 
-        const radio2 = new SiriusRadio({
-            [idKey]: "radio-2",
-            [labelKey]: "Option 2",
-            [selectedKey]: false
+        const siriusRadio2 = new SiriusRadio({
+            [idKey]: 'radio-2',
+            [labelKey]: 'Mora',
+            [checkedKey]: true
         });
 
-        const radio3 = new SiriusRadio({
-            [idKey]: "radio-3",
-            [labelKey]: "Option 3",
-            [selectedKey]: false,
-            [disabledKey]: true 
-        });
-
-        radio1.addToBody();
-        radio2.addToBody();
-        radio3.addToBody();
+        
+        siriusRadio1.addToBody();
+        siriusRadio2.addToBody();
     };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (sirius.onLoaded) {
+            await sirius.onLoaded();
+        }
+    });
 </script>
 
-<sirius-radio label="Option 1"></sirius-radio>
-<sirius-radio label="Option 2" selected="true"></sirius-radio>
-<sirius-radio label="Option 3" disabled="true"></sirius-radio>
+<siriusradio id="radio-3" label="Opción 1"></siriusradio>
+<siriusradio id="radio-4" label="Opción 2"></siriusradio>
+<siriusradio id="radio-5" label="Opción 3"></siriusradio>
+
 </body>
 </html>
