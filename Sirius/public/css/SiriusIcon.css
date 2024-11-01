@@ -2,14 +2,16 @@
     display: grid;
     place-items: center;
 }
-span{
+
+div {
     height: 24px;
 }
-.icon.check > span > svg {
+
+.icon-container:not(.hidden) > svg {
     animation: draw  var(--sirius-animation-duration) forwards;
 }
 
-.icon.uncheck > span > svg {
+.icon-container.hiding > svg {
     animation: erase var(--sirius-animation-duration) forwards;
 }
 

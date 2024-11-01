@@ -45,13 +45,22 @@
 
 <script type="module">
     import sirius from '../js/Sirius.js'
-    import {SiriusIcon} from "../js/SiriusIcon.js";
+    import {SiriusIcon, SIRIUS_ICON} from "../js/SiriusIcon.js";
     import {SIRIUS_ELEMENT} from "../js/SiriusElement.js";
 
     // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
+        const idName = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
+        // const hideName = SIRIUS_ELEMENT.ATTRIBUTES.HIDE.NAME;
+        const iconName = SIRIUS_ICON.ICON_ATTRIBUTES.ICON.NAME;
+
+
         // Create the icon
-        const siriusIcon4 = new SiriusIcon({[SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME]: 'icon-4'})
+        const siriusIcon4 = new SiriusIcon({
+            [idName]: 'icon-4',
+            [iconName]: SIRIUS_ICON.ICONS.ARROW,
+            // [hideName]: false
+        })
 
         // Add the icon to the DOM
         siriusIcon4.addToBody()
@@ -65,7 +74,7 @@
             if (!icon)
                 return
 
-            icon.toggleCheck();
+            icon.toggleHidden();
         });
     }
 </script>

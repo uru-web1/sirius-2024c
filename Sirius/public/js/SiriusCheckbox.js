@@ -38,6 +38,7 @@ export class SiriusCheckbox extends SiriusElement {
             properties: props
         });
     }
+
     /** Get the template for the Sirius checkbox
      * @returns {string} - Template
      */
@@ -53,7 +54,7 @@ export class SiriusCheckbox extends SiriusElement {
         return `<div class="${SIRIUS_CHECKBOX.CLASSES.CONTAINER}">
                     <div class="${SIRIUS_CHECKBOX.CLASSES.CONTENT}">
                         <div class="${SIRIUS_CHECKBOX.CLASSES.ICON}">
-                            <sirius-icon fill="${checkmarkColor}" height="24" icon="check" id="icon-${idInstance}" width="20" onclick="toggleCheck()"></sirius-icon>
+                            <sirius-icon fill="${checkmarkColor}" height="24" width="24" icon="check" id="icon-${idInstance}" onclick="toggleHidden()"></sirius-icon>
                         </div>
                         ${showLabel ? `<sirius-label caption="${caption}" id="label-${idInstance}";"></sirius-label>` : ''}
                     </div>
@@ -63,26 +64,21 @@ export class SiriusCheckbox extends SiriusElement {
     /** Lifecycle method called when the component is connected to the DOM
      */
     #loadAttributes() {
-        
         // Check if the element has attributes
         if (!this._attributes)
             this.logger.log("No attributes");
 
         Object.keys(this._attributes).forEach(attributeName => {
-
             // Get the attribute value
             const attributeValue = this._attributes[attributeName]
-
 
             // Check if the attribute value is null
             if (!attributeValue) return;
 
             // Check if the attribute value is an object
-
             switch (attributeName) {
                 
                 case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
-
                     if (typeof attributeValue === SIRIUS_TYPES.STRING) {
                         this.containerElement.style.cssText = attributeValue;
 
@@ -92,16 +88,13 @@ export class SiriusCheckbox extends SiriusElement {
                         return;
                     }
 
-                    for (let styleName in attributeValue) {
+                    for (let styleName in attributeValue)
                         this.containerElement.style[styleName] = attributeValue[styleName];
-                    }
                     break;
 
                 case SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME:
-                    
-                    for (let event in attributeValue) {
+                    for (let event in attributeValue)
                         this.containerElement.addEventListener(event, attributeValue[event])
-                    }
                     break;
 
                 default:
@@ -110,7 +103,13 @@ export class SiriusCheckbox extends SiriusElement {
             }
         })
     }
+
+    /** Lifecycle method called when the component is connected to the DOM
+     */
     async connectedCallback() {
+        // Load attributes
+        this.#loadAttributes();
+
         // Create the CSS style sheets and add them to the shadow DOM
         await this._loadElementStyles();
 
@@ -123,9 +122,6 @@ export class SiriusCheckbox extends SiriusElement {
         // Add checkbox to the shadow DOM
         this.containerElement = this._templateContent.firstChild;
         this.shadowRoot.appendChild(this.containerElement);
-
-        // Load atributtes
-        this.#loadAttributes();
 
         // Dispatch the built event
         this.dispatchBuiltEvent();

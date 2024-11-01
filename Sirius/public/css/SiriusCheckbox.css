@@ -6,15 +6,15 @@
     margin: 10px;
     gap: 5px;
 }
- .icon-container {
-    width: fit-content;
+
+.icon-container {
     display: grid;
     place-items: center;
     border: 2px solid #212529;
     border-radius: 3px;
     cursor: pointer;
-    
 }
+
 /* .checkbox-container {
     display: flex;
     align-items: center;

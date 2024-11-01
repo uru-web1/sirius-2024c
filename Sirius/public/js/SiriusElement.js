@@ -18,7 +18,8 @@ export const SIRIUS_TYPES = deepFreeze({
 export const SIRIUS_ELEMENT = deepFreeze({
     NAME: 'SiriusElement',
     EVENTS: {
-        BUILT: 'built'
+        BUILT: 'built',
+        HIDE: 'hide',
     },
     ATTRIBUTES: {
         ID: {NAME: "id", DEFAULT: null, TYPE: SIRIUS_TYPES.STRING},
@@ -27,6 +28,7 @@ export const SIRIUS_ELEMENT = deepFreeze({
     },
     CLASSES: {
         HIDDEN: 'hidden',
+        HIDING: 'hiding',
         CENTER_SCREEN: 'center-screen'
     }
 })
@@ -126,29 +128,42 @@ export class SiriusElement extends HTMLElement {
         return false
     }
 
-    /** Validate the element attribute
-     * @param {string} attributeName - Attribute name
-     * @param {any} attributeValue - Attribute value
-     * @param {object} attribute - Element attribute used to validate
+    /** Check if the attribute has the given type
+     * @param {object} attribute - Element attribute
+     * @param {string} type - Attribute type
+     * @returns {string[], boolean} - Valid types and true if the attribute has the given type
      */
-    _validateAttribute({attributeName, attributeValue, attribute}) {
+    _hasAttributeType(attribute, type) {
         // Get the attribute valid types
-        let {TYPE: types, DEFAULT: def} = attribute
+        let {TYPE: types} = attribute
 
         // Check if the valid types are an array
         types = Array.isArray(types) ? types : [types]
 
-        // Check if any type is invalid
+        if (types.includes(type))
+            return [types, true]
+
+        return [types, false]
+    }
+
+    /** Validate the element attribute
+     * @param {string} name - Attribute name
+     * @param {any} value - Attribute value
+     * @param {string[]} types - Attribute valid types
+     * @param {object} def - Attribute default value
+     */
+    _validateAttribute({name, value, types, def}) {
+        // Check if the attribute has any type
         if (types.includes(SIRIUS_TYPES.ANY))
             return
 
         // Check if the default value is null
-        if (def === null && attributeValue === null)
+        if (def === null && value === null)
             return
 
         // Check if the attribute value is in the valid types array
-        if (!types.includes(typeof attributeValue))
-            throw new Error(`Invalid attribute value '${attributeValue}' for '${attributeName}' attribute. Valid types: ${types.join(', ')}`)
+        if (!types.includes(typeof value))
+            throw new Error(`Invalid attribute value '${value}' for '${name}' attribute. Valid types: ${types.join(', ')}`)
     }
 
     /** Load HTML attributes and properties
@@ -160,33 +175,39 @@ export class SiriusElement extends HTMLElement {
         Object.keys(htmlAttributes).forEach(attributeName => {
             // Get the attribute name and default value
             const htmlAttribute = htmlAttributes[attributeName]
-            const {NAME, DEFAULT} = htmlAttribute
+            const {NAME: name, DEFAULT: def, TYPE: types} = htmlAttribute
 
             // Get the attribute value
-            let attributeValue = this.getAttribute(NAME)
+            let attributeValue = this.getAttribute(name)
+            const [parsedTypes, hasBoolean] = this._hasAttributeType(htmlAttribute, SIRIUS_TYPES.BOOLEAN)
 
-            if (attributeValue===null||attributeValue===""){
+            if (attributeValue===""&&hasBoolean)
+                attributeValue = true
+
+            else if (attributeValue===null){
                 // Check if the attribute is not set
-                if (properties?.[NAME] === undefined)
-                    attributeValue = DEFAULT
+                if (properties?.[name] === undefined)
+                    attributeValue = def
+
                 else {
                     // Get the attribute value from the properties
-                    attributeValue = properties[NAME]
+                    attributeValue = properties[name]
 
                     // Set the attribute value
-                    this.setAttribute(NAME, attributeValue)
+                    this.setAttribute(name, attributeValue)
                 }
             }
 
             // Validate the attribute
             this._validateAttribute({
-                attributeName: NAME,
-                attributeValue,
-                attribute: htmlAttribute
+                name,
+                def,
+                types: parsedTypes,
+                value: attributeValue,
             })
 
             // Set the attribute value
-            this._attributes[NAME] = attributeValue
+            this._attributes[name] = attributeValue
         })
     }
 
@@ -269,18 +290,49 @@ export class SiriusElement extends HTMLElement {
         }
     }
 
-    /** Hide the element */
-    hide() {
+    /** Hide the element
+     * @param {string} event - Event to wait for before hiding the element
+     * @param {HTMLElement} element - Element to hide
+     * */
+    hide(event, element) {
+        element = element || this.containerElement;
+
         this._onBuiltContainerElement = () => {
-            this.containerElement.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN.NAME);
-            this.logger.log('Element hidden');
+            // Check if there is an event to wait for
+            if (!event){
+                element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                this.logger.log('Element hidden');
+                return;
+            }
+
+            // Get event handler
+            const eventHandler = () => {
+                // Hide the element
+                element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
+                element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                this.logger.log('Element hidden');
+
+                // Remove event listener
+                element.removeEventListener(event, eventHandler);
+            }
+
+            // Add event listener to hide the element
+            element.addEventListener(event, eventHandler);
+
+            // Set hiding class
+            this.logger.log('Element hiding');
+            element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDING);
         }
     }
 
-    /** Show the element */
-    show() {
+    /** Show the element
+     * @param {HTMLElement} element - Element to hide
+     * */
+    show(element) {
+        element = element || this.containerElement;
+
         this._onBuiltContainerElement = () => {
-            this.containerElement.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN.NAME);
+            element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
             this.logger.log('Element shown');
         }
     }
@@ -301,7 +353,13 @@ export class SiriusElement extends HTMLElement {
         }
     }
 
+    /** Dispatch the built event */
     dispatchBuiltEvent() {
         this.dispatchEvent(new Event(SIRIUS_ELEMENT.EVENTS.BUILT));
+    }
+
+    /** Dispatch hide event */
+    dispatchHideEvent() {
+        this.dispatchEvent(new Event(SIRIUS_ELEMENT.EVENTS.HIDE));
     }
 }

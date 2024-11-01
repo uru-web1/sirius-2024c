@@ -21,15 +21,13 @@ export const SIRIUS_ICON = deepFreeze({
         ROTATE: {NAME: "rotate", DEFAULT: "right", TYPE: SIRIUS_TYPES.STRING},
     },
     ATTRIBUTES: {
-        CHECKED: {NAME: 'checked', DEFAULT: true, TYPE: SIRIUS_TYPES.BOOLEAN},
-        DISABLED: {NAME: 'disabled', DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
         HIDE: {NAME: 'hide', DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
+        DISABLED: {NAME: 'disabled', DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
     },
     CLASSES: {
         ICON: 'icon',
-        CHECK: 'check',
-        UNCHECK: 'uncheck',
-        DISABLED: 'disabled'
+        DISABLED: 'disabled',
+        ICON_CONTAINER: 'icon-container',
     }
 })
 
@@ -72,8 +70,8 @@ export const SIRIUS_ROTATION = deepFreeze({
 
 /** Sirius class that represents an icon component */
 export class SiriusIcon extends SiriusElement {
-    #checked = false
-    #spanElement
+    #hidden = false
+    #iconContainer
     #iconName
     #iconRotation
 
@@ -97,16 +95,38 @@ export class SiriusIcon extends SiriusElement {
         });
     }
 
-    /** Get span element */
-    get spanElement() {
-        return this.#spanElement;
+    /** Get icon container element */
+    get iconContainer() {
+        return this.#iconContainer;
     }
 
     /** Set the icon name
      * @param {string} name - Icon name
      */
     set iconName(name) {
+        // Get icon name
         this.#iconName = name || SIRIUS_ICON.ICONS.DEFAULT;
+    }
+
+    /** Set the icon attribute
+     * @param {string} name - Icon name
+     * */
+    set iconAttribute(name) {
+        // Get the icon key
+        const iconKey = SIRIUS_ICON.ICON_ATTRIBUTES.ICON.NAME
+
+        // Set icon attribute
+        this.setAttribute(iconKey, name)
+
+        // Check if the icon contains the rotation
+        const iconFields = name.split('--') || [];
+
+        // Get the icon name
+        this.iconName = iconFields[0];
+
+        // Get the icon rotation
+        if(!this.iconRotation)
+            this.iconRotation = iconFields[1];
     }
 
     /** Get current icon attribute value
@@ -116,7 +136,7 @@ export class SiriusIcon extends SiriusElement {
         if (this.#iconName)
             return this.#iconName;
 
-        // Get the icon name
+        // Get the icon key
         const iconKey = SIRIUS_ICON.ICON_ATTRIBUTES.ICON.NAME
 
         // Check if the icon contains the rotation
@@ -162,20 +182,19 @@ export class SiriusIcon extends SiriusElement {
         return iconAttributes
     }
 
-
-    /** Get check icon state
-     * @returns {boolean} - True if the icon is checked
+    /** Get hidden icon state
+     * @returns {boolean} - True if the icon is hidden
      */
-    get check() {
-        return this.#checked;
+    get hidden() {
+        return this.#hidden;
     }
 
-    /** Set check icon state
-     * @param {boolean} checked - True if the icon is checked
+    /** Set hidden icon state
+     * @param {boolean} hidden - True if the icon is hidden
      */
-    set check(checked) {
-        this.#checked = checked;
-        this.#setCheckClasses();
+    set hidden(hidden) {
+        this.#hidden = hidden;
+        this.#setHiddenClass();
     }
 
     /** Get the icon SVG
@@ -194,56 +213,65 @@ export class SiriusIcon extends SiriusElement {
      * */
     #getTemplate() {
         // Get the icon classes
-        const classes = [SIRIUS_ICON.CLASSES.ICON];
+        const containerClasses = [SIRIUS_ICON.CLASSES.ICON];
+        const iconClasses=[SIRIUS_ICON.CLASSES.ICON_CONTAINER];
 
-        // Check if the icon is checked
-        if (this.check)
-            classes.push(SIRIUS_ICON.CLASSES.CHECK);
-        else
-            classes.push(SIRIUS_ICON.CLASSES.UNCHECK);
+        // Check if the icon is being shown
+        if (this.hidden)
+            iconClasses.push(SIRIUS_ELEMENT.CLASSES.HIDDEN);
 
         // Get icon width and height
         const widthKey = SIRIUS_ICON.ICON_ATTRIBUTES.WIDTH.NAME
         const heightKey = SIRIUS_ICON.ICON_ATTRIBUTES.HEIGHT.NAME
         const {[widthKey]: width, [heightKey]: height} = this.iconAttributes;
 
-        return `<div class='${classes.join(' ')}'>
-                    <span width="${width}" height="${height}">
+        return `<div class='${containerClasses.join(' ')}'>
+                    <div width="${width}" height="${height}" class=${iconClasses.join(' ')}>
                         ${this.#getIcon()}
-                    </span>
+                    </div>
                 </div>`;
     }
 
-    /** Set the check icon as disabled */
+    /** Change icon SVG
+     * @param {string} icon - Icon SVG name
+     */
+    /*
+    changeIcon(icon){
+        // Get icon SVG
+        this.#getIcon()
+    }
+    */
+
+    /** Set the show icon as disabled */
     setDisabled() {
         this.containerElement.classList.add(SIRIUS_ICON.CLASSES.DISABLED);
     }
-    /** Set the check icon as enabled */
+    /** Set the show icon as enabled */
     setEnabled() {
         this.containerElement.classList.remove(SIRIUS_ICON.CLASSES.DISABLED);
     }
 
-    /** Set check and uncheck classes */
-    #setCheckClasses() {
+    /** Add/remove hidden class */
+    #setHiddenClass() {
         this._onBuiltContainerElement = () => {
-            if (this.#checked) {
-                this.containerElement.classList.remove(SIRIUS_ICON.CLASSES.UNCHECK);
-                this.containerElement.classList.add(SIRIUS_ICON.CLASSES.CHECK);
-            } else {
-                this.containerElement.classList.remove(SIRIUS_ICON.CLASSES.CHECK);
-                this.containerElement.classList.add(SIRIUS_ICON.CLASSES.UNCHECK);
-            }
+
+            if (!this.#hidden)
+                super.show(this.iconContainer)
+
+            else
+                // Wait for the element animation to finish
+                super.hide('animationend',this.iconContainer)
         }
     }
 
-    /** Toggle check and uncheck classes */
-    toggleCheck() {
-        const nextState = this.#checked ? 'checked' : 'unchecked';
-        this.logger.log('Toggling check icon. Set as ' + nextState);
+    /** Toggle hidden class */
+    toggleHidden() {
+        const nextState = this.#hidden ? 'shown' : 'hidden';
+        this.logger.log('Toggling icon. Set as ' + nextState);
 
-        // Toggle check and uncheck classes
-        this.#checked = !this.#checked;
-        this.#setCheckClasses();
+        // Toggle hidden class
+        this.#hidden = !this.#hidden;
+        this.#setHiddenClass();
     }
 
     /** Get rotation degrees
@@ -283,7 +311,7 @@ export class SiriusIcon extends SiriusElement {
 
         // Set the icon direction
         this._onBuiltContainerElement = () => {
-            this.spanElement.style.transform = `rotate(${degrees}deg)`
+            this.iconContainer.style.transform = `rotate(${degrees}deg)`
         }
     }
 
@@ -307,25 +335,19 @@ export class SiriusIcon extends SiriusElement {
                     break;
 
                 case SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME:
-                    // TO BE IMPLEMENTED
+                    for (let event in attributeValue) {
+                        this.containerElement.addEventListener(event, attributeValue[event])
+                    }
+                    break;
+
+                case SIRIUS_ICON.ATTRIBUTES.HIDE.NAME:
+                    this.hidden = attributeValue;
                     break;
 
                 case SIRIUS_ICON.ATTRIBUTES.DISABLED.NAME:
                     // Add disabled class
                     if (attributeValue)
                         this.setDisabled();
-                    break;
-
-                case SIRIUS_ICON.ATTRIBUTES.CHECKED.NAME:
-                    // Add check or uncheck class
-                    this.check = attributeValue;
-                    break;
-
-                case SIRIUS_ICON.ATTRIBUTES.HIDE.NAME:
-                    if (attributeValue)
-                        this.hide()
-                    else
-                        this.show()
                     break;
 
                 case SIRIUS_ICON.ICON_ATTRIBUTES.ROTATE.NAME:
@@ -360,7 +382,7 @@ export class SiriusIcon extends SiriusElement {
 
         // Add icon to the shadow DOM
         this.containerElement = this._templateContent.firstChild;
-        this.#spanElement = this.containerElement.firstElementChild;
+        this.#iconContainer = this.containerElement.firstElementChild;
         this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event

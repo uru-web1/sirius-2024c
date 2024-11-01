@@ -56,27 +56,25 @@ export class SiriusLabel extends SiriusElement {
     #getCaption() {
         return this._attributes[SIRIUS_LABEL.ATTRIBUTES.CAPTION.NAME];
     }
+
+    /** Load the attributes of the Sirius label */
     #loadAttributes() {
-        
         // Check if the element has attributes
         if (!this._attributes)
             this.logger.log("No attributes");
 
         Object.keys(this._attributes).forEach(attributeName => {
-
             // Get the attribute value
             const attributeValue = this._attributes[attributeName]
-
 
             // Check if the attribute value is null
             if (!attributeValue) return;
 
             // Check if the attribute value is an object
-
             switch (attributeName) {
-                
-                case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
 
+                case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
+                    // Check if the attribute value is a string
                     if (typeof attributeValue === SIRIUS_TYPES.STRING) {
                         this.containerElement.style.cssText = attributeValue;
 
@@ -86,13 +84,14 @@ export class SiriusLabel extends SiriusElement {
                         return;
                     }
 
+                    // Check if the attribute value is an object
                     for (let styleName in attributeValue) {
                         this.containerElement.style[styleName] = attributeValue[styleName];
                     }
                     break;
 
                 case SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME:
-                    
+                    // Add event listeners to the element
                     for (let event in attributeValue) {
                         this.captionElement.addEventListener(event, attributeValue[event])
                     }
@@ -104,23 +103,20 @@ export class SiriusLabel extends SiriusElement {
                 //     break;
 
                 case SIRIUS_LABEL.CAPTION_ATTRIBUTES.POSITION.NAME:
-
+                    // Set the text alignment of the caption
                     this.containerElement.style.textAlign = attributeValue;
 
                     break;
 
                 case SIRIUS_LABEL.CAPTION_ATTRIBUTES.COLOR.NAME:
-                    
+                    // Set the color of the caption
                     this.captionElement.style.color = attributeValue;
                     break;
                 
                 case SIRIUS_LABEL.CAPTION_ATTRIBUTES.FONT.NAME:
-
+                    // Set the font family
                     this.captionElement.style.fontFamily = attributeValue.toLowerCase();
                     break;
-                
-                
-                
 
                 default:
                     // this.logger.log(`Unregistered attribute: ${attributeName}`);
@@ -128,6 +124,7 @@ export class SiriusLabel extends SiriusElement {
             }
         })
     }
+
     /** Lifecycle method called when the component is connected to the DOM
      */
     async connectedCallback() {
@@ -144,7 +141,6 @@ export class SiriusLabel extends SiriusElement {
         this.containerElement = this._templateContent.firstChild;
         this.captionElement = this.containerElement.firstElementChild;
 
-        
         this.shadowRoot.appendChild(this.containerElement);
 
         // Load attributes
