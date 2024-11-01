@@ -1,5 +1,5 @@
 import { SIRIUS_TYPES, SiriusElement } from "./SiriusElement.js";
-import { deepFreeze } from "./utils/deep-freeze.js";
+import deepFreeze from "./utils/deep-freeze.js";
 
 // Definición de constantes para el radio
 export const SIRIUS_RADIO = deepFreeze({
