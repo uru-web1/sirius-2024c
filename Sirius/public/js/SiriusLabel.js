@@ -1,4 +1,4 @@
-import {SIRIUS_TYPES, SiriusElement, SIRIUS_ELEMENT} from "./SiriusElement.js";
+import { SIRIUS_TYPES, SiriusElement, SIRIUS_ELEMENT } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 /** Sirius label constants */
@@ -6,7 +6,7 @@ export const SIRIUS_LABEL = deepFreeze({
     NAME: "SiriusLabel",
     TAG: "sirius-label",
     ATTRIBUTES: {
-        CAPTION: {NAME: "caption", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING},
+        CAPTION: { NAME: "caption", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING },
         CAPTION_STYLE: { NAME: "caption-style", DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING] },
     },
     CLASSES: {
@@ -36,7 +36,7 @@ export class SiriusLabel extends SiriusElement {
      * */
     #getTemplate() {
         return `<div class="${SIRIUS_LABEL.CLASSES.LABEL}">
-                    <span class ="${SIRIUS_LABEL.CLASSES.CAPTION}">${this.#getCaption()}</span>
+                    <span class="${SIRIUS_LABEL.CLASSES.CAPTION}" contenteditable="true">${this.#getCaption()}</span>
                 </div>`;
     }
 
@@ -47,7 +47,7 @@ export class SiriusLabel extends SiriusElement {
         return this._attributes[SIRIUS_LABEL.ATTRIBUTES.CAPTION.NAME];
     }
     #loadAttributes() {
-        
+
         // Check if the element has attributes
         if (!this._attributes)
             this.logger.log("No attributes");
@@ -60,9 +60,9 @@ export class SiriusLabel extends SiriusElement {
 
             // Check if the attribute value is null
             if (!attributeValue) return;
-            
+
             switch (attributeName) {
-                
+
                 case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
 
                     if (typeof attributeValue === SIRIUS_TYPES.STRING) {
@@ -74,7 +74,7 @@ export class SiriusLabel extends SiriusElement {
                         this.containerElement.style[styleName] = attributeValue[styleName];
                     }
                     break;
-                    
+
                 case SIRIUS_LABEL.ATTRIBUTES.CAPTION_STYLE.NAME:
 
                     if (typeof attributeValue === SIRIUS_TYPES.STRING) {
@@ -85,7 +85,7 @@ export class SiriusLabel extends SiriusElement {
                     for (let styleName in attributeValue) {
                         this.captionElement.style[styleName] = attributeValue[styleName];
                     }
-                break;
+                    break;
 
                 case SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME:
                     // TO BE IMPLEMENTED
@@ -116,6 +116,12 @@ export class SiriusLabel extends SiriusElement {
 
         // Load attributes
         this.#loadAttributes();
+
+        // hacer clic fuera del campo editable, se guarde el cambio automaticamente.
+        this.captionElement.addEventListener("blur", () => {
+            this._attributes[SIRIUS_LABEL.ATTRIBUTES.CAPTION.NAME] = this.captionElement.textContent;
+        });
+
     }
 }
 
