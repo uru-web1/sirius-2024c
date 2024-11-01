@@ -4,7 +4,7 @@ export const SIRIUS_ICONS = {
     DOUBLE_ARROW: 'double-arrow',
     STAR: 'star',
     INDETERMINATE: "indeterminate",
-    CHECK: "check",
+    CHECK_MARK: "check-mark",
     WARNING: 'warning',
     CLOSE: 'close',
     HOME: 'home',
@@ -16,6 +16,8 @@ export const SIRIUS_ICONS = {
     SETTINGS: 'settings',
     SEARCH: 'search',
     PERSON: 'person',
+    RADIO_CHECKED: 'radio-checked',
+    RADIO_UNCHECKED: 'radio-unchecked',
 }
 
 /** Sirius SVG Icons */
@@ -39,7 +41,7 @@ export const SIRIUS_SVG = {
         `<svg xmlns="http://www.w3.org/2000/svg" height="${height}" viewBox="0 -960 960 960" width="${width}" fill="${fill}"><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z"/></svg>`,
 
     // Check icon
-    [SIRIUS_ICONS.CHECK]: ({width, height, fill}) =>
+    [SIRIUS_ICONS.CHECK_MARK]: ({width, height, fill}) =>
         `<svg xmlns="http://www.w3.org/2000/svg" height="${height}" viewBox="0 -960 960 960" width="${width}" fill="${fill}"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`,
 
     // Warning icon
@@ -85,4 +87,12 @@ export const SIRIUS_SVG = {
     // Search icon
     [SIRIUS_ICONS.SEARCH]: ({width, height, fill}) => `
         <svg xmlns="http://www.w3.org/2000/svg" height="${height}" viewBox="0 -960 960 960" width="${width}" fill="${fill}"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>`,
+
+    // Radio unchecked icon
+    [SIRIUS_ICONS.RADIO_UNCHECKED]: ({width, height, fill}) => `
+        <svg xmlns="http://www.w3.org/2000/svg" height="${height}" viewBox="0 -960 960 960" width="${width}" fill="${fill}"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>`,
+
+    // Radio checked icon
+    [SIRIUS_ICONS.RADIO_CHECKED]: ({width, height, fill}) => `
+        <svg xmlns="http://www.w3.org/2000/svg" height="${height}" viewBox="0 -960 960 960" width="${width}" fill="${fill}"><path d="M480-280q83 0 141.5-58.5T680-480q0-83-58.5-141.5T480-680q-83 0-141.5 58.5T280-480q0 83 58.5 141.5T480-280Zm0 200q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>`,
 }

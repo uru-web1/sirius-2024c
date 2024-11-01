@@ -18,9 +18,9 @@ export const SIRIUS_ICON = deepFreeze({
         DISABLED: {NAME: 'disabled', DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
     },
     CLASSES: {
-        ICON: 'icon',
-        DISABLED: 'disabled',
+        ELEMENT_CONTAINER: 'element-container',
         ICON_CONTAINER: 'icon-container',
+        DISABLED: 'disabled',
     }
 })
 
@@ -113,7 +113,7 @@ export class SiriusIcon extends SiriusElement {
      */
     set iconName(name) {
         // Get icon name
-        this.#iconName = name || SIRIUS_ICONS.DEFAULT;
+        this.#iconName = name || SIRIUS_ICON.ICON_ATTRIBUTES.ICON.DEFAULT;
     }
 
     /** Get the icon rotation
@@ -166,7 +166,7 @@ export class SiriusIcon extends SiriusElement {
      * */
     #getIcon() {
         // Get the icon SVG function
-        const iconFn = SIRIUS_SVG[this.iconName];
+        const iconFn = SIRIUS_SVG[this.iconName]|| SIRIUS_SVG[SIRIUS_ICON.ICON_ATTRIBUTES.ICON.DEFAULT];
 
         // Return the icon SVG with the given attributes
         return iconFn({...this.iconAttributes});
@@ -177,20 +177,15 @@ export class SiriusIcon extends SiriusElement {
      * */
     #getTemplate() {
         // Get the icon classes
-        const containerClasses = [SIRIUS_ICON.CLASSES.ICON];
+        const containerClasses = [SIRIUS_ICON.CLASSES.ELEMENT_CONTAINER];
         const iconClasses = [SIRIUS_ICON.CLASSES.ICON_CONTAINER];
 
         // Check if the icon is being shown
         if (this.hidden)
             iconClasses.push(SIRIUS_ELEMENT.CLASSES.HIDDEN);
 
-        // Get icon width and height
-        const widthKey = SIRIUS_ICON.ICON_ATTRIBUTES.WIDTH.NAME
-        const heightKey = SIRIUS_ICON.ICON_ATTRIBUTES.HEIGHT.NAME
-        const {[widthKey]: width, [heightKey]: height} = this.iconAttributes;
-
         return `<div class='${containerClasses.join(' ')}'>
-                    <div width='${width}' height='${height}' class='${iconClasses.join(' ')}'>
+                    <div class='${iconClasses.join(' ')}'>
                         ${this.#getIcon()}
                     </div>
                 </div>`;

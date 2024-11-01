@@ -1,10 +1,11 @@
-.icon {
+.element-container {
     display: grid;
     place-items: center;
 }
 
-div {
-    height: 24px;
+.icon-container {
+    display: grid;
+    place-items: center;
 }
 
 .icon-container:not(.hidden) > svg {

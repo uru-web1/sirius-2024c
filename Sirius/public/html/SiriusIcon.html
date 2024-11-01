@@ -10,6 +10,8 @@
 
     <style>
         .svg-container {
+            display: grid;
+            place-items: center;
             width: 100px;
             height: 100px;
             overflow: hidden;
@@ -29,11 +31,11 @@
 <body>
 
 <div class="svg-container">
-    <sirius-icon fill="red" height="50" hide icon="check" id="icon-1" width="24"></sirius-icon>
+    <sirius-icon fill="red" height="50" hide icon="check-mark" id="icon-1" width="24"></sirius-icon>
 </div>
 
 <div class="svg-container">
-    <sirius-icon fill="blue" height="48" icon="check" id="icon-2" width="48"></sirius-icon>
+    <sirius-icon fill="blue" height="48" icon="check-mark" id="icon-2" width="48"></sirius-icon>
 </div>
 
 <div class="svg-container">
@@ -54,7 +56,6 @@
         const idName = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
         // const hideName = SIRIUS_ELEMENT.ATTRIBUTES.HIDE.NAME;
         const iconName = SIRIUS_ICON.ICON_ATTRIBUTES.ICON.NAME;
-
 
         // Create the icon
         const siriusIcon4 = new SiriusIcon({
