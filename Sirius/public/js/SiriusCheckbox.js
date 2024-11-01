@@ -1,7 +1,5 @@
 import {SIRIUS_ELEMENT, SIRIUS_TYPES, SiriusElement} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
-import { SIRIUS_LABEL } from "./SiriusLabel.js";
-import { SIRIUS_ICON} from "./SiriusIcon.js";
 
 /** Sirius checkbox constants */
 export const SIRIUS_CHECKBOX = deepFreeze({
@@ -46,7 +44,7 @@ export class SiriusCheckbox extends SiriusElement {
 
         //Get the attributes of the element
 
-        const idInstance= this._attributes[SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME].split('-')[1];
+        const idInstance = this._attributes[SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME].split('-')[1];
         const showLabel = this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.LABEL.NAME];
         const caption = this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.CAPTION.NAME];
         const checkmarkColor = this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.CHECKMARK_COLOR.NAME];
@@ -77,7 +75,7 @@ export class SiriusCheckbox extends SiriusElement {
 
             // Check if the attribute value is an object
             switch (attributeName) {
-                
+
                 case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
                     if (typeof attributeValue === SIRIUS_TYPES.STRING) {
                         this.containerElement.style.cssText = attributeValue;

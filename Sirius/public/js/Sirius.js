@@ -75,7 +75,7 @@ class Sirius {
      * @param callback - On loaded callback
      * */
     set onLoaded(callback) {
-        if (!this.#loaded){
+        if (!this.#loaded) {
             this.#onLoaded.push(callback);
             return;
         }

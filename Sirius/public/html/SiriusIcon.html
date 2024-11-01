@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Document</title>
-    <link rel="stylesheet" href="../css/Sirius.css">
+    <link href="../css/Sirius.css" rel="stylesheet">
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusIcon.js" type="module"></script>
 
@@ -29,7 +29,7 @@
 <body>
 
 <div class="svg-container">
-    <sirius-icon hide fill="red" height="50" icon="check" id="icon-1" width="24"></sirius-icon>
+    <sirius-icon fill="red" height="50" hide icon="check" id="icon-1" width="24"></sirius-icon>
 </div>
 
 <div class="svg-container">
@@ -47,6 +47,7 @@
     import sirius from '../js/Sirius.js'
     import {SiriusIcon, SIRIUS_ICON} from "../js/SiriusIcon.js";
     import {SIRIUS_ELEMENT} from "../js/SiriusElement.js";
+    import {SIRIUS_ICONS} from "../js/SiriusSvg.js";
 
     // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
@@ -58,7 +59,7 @@
         // Create the icon
         const siriusIcon4 = new SiriusIcon({
             [idName]: 'icon-4',
-            [iconName]: SIRIUS_ICON.ICONS.ARROW,
+            [iconName]: SIRIUS_ICONS.ARROW,
             // [hideName]: false
         })
 

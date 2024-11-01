@@ -1,4 +1,4 @@
-import {SIRIUS_TYPES, SiriusElement, SIRIUS_ELEMENT} from "./SiriusElement.js";
+import {SIRIUS_ELEMENT, SIRIUS_TYPES, SiriusElement} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 /** Sirius label constants */
@@ -10,8 +10,8 @@ export const SIRIUS_LABEL = deepFreeze({
     },
     CAPTION_ATTRIBUTES: {
         POSITION: {NAME: "caption-position", DEFAULT: "center", TYPE: SIRIUS_TYPES.STRING},
-        COLOR: {NAME:"caption-color", DEFAULT: "black", TYPE: SIRIUS_TYPES.STRING},
-        FONT: {NAME:"caption-font", DEFAULT: "Arial", TYPE: SIRIUS_TYPES.STRING}
+        COLOR: {NAME: "caption-color", DEFAULT: "black", TYPE: SIRIUS_TYPES.STRING},
+        FONT: {NAME: "caption-font", DEFAULT: "Arial", TYPE: SIRIUS_TYPES.STRING}
     },
     CLASSES: {
         LABEL: 'label-container',
@@ -96,10 +96,10 @@ export class SiriusLabel extends SiriusElement {
                         this.captionElement.addEventListener(event, attributeValue[event])
                     }
                     break;
-                
+
                 // case attributeName.startsWith("on"):
                 //     console.log("Event attribute: ", attributeName);
-                    
+
                 //     break;
 
                 case SIRIUS_LABEL.CAPTION_ATTRIBUTES.POSITION.NAME:
@@ -112,7 +112,7 @@ export class SiriusLabel extends SiriusElement {
                     // Set the color of the caption
                     this.captionElement.style.color = attributeValue;
                     break;
-                
+
                 case SIRIUS_LABEL.CAPTION_ATTRIBUTES.FONT.NAME:
                     // Set the font family
                     this.captionElement.style.fontFamily = attributeValue.toLowerCase();

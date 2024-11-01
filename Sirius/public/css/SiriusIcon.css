@@ -8,7 +8,7 @@ div {
 }
 
 .icon-container:not(.hidden) > svg {
-    animation: draw  var(--sirius-animation-duration) forwards;
+    animation: draw var(--sirius-animation-duration) forwards;
 }
 
 .icon-container.hiding > svg {

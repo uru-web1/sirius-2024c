@@ -117,6 +117,14 @@ export class SiriusElement extends HTMLElement {
         this.#onBuilt.push(callback);
     }
 
+    /** Added on built container element callback */
+    set _onBuiltContainerElement(callback) {
+        this.onBuilt = () => {
+            if (this._checkContainerElement())
+                callback()
+        }
+    }
+
     /** Check the container element
      * @returns {boolean} - True if the container element is set
      */
@@ -181,10 +189,10 @@ export class SiriusElement extends HTMLElement {
             let attributeValue = this.getAttribute(name)
             const [parsedTypes, hasBoolean] = this._hasAttributeType(htmlAttribute, SIRIUS_TYPES.BOOLEAN)
 
-            if (attributeValue===""&&hasBoolean)
+            if (attributeValue === "" && hasBoolean)
                 attributeValue = true
 
-            else if (attributeValue===null){
+            else if (attributeValue === null) {
                 // Check if the attribute is not set
                 if (properties?.[name] === undefined)
                     attributeValue = def
@@ -254,7 +262,7 @@ export class SiriusElement extends HTMLElement {
      */
     async _loadElementStyles(cssFilename = this.#elementName) {
         // Create the CSS style sheets and add them to the shadow DOM
-        const {element,general} = await this.#getElementStyles(cssFilename);
+        const {element, general} = await this.#getElementStyles(cssFilename);
         this.#loadStyles(element, general);
     }
 
@@ -282,14 +290,6 @@ export class SiriusElement extends HTMLElement {
         document.body.appendChild(this);
     }
 
-    /** Added on built container element callback */
-    set _onBuiltContainerElement(callback) {
-        this.onBuilt = () => {
-            if (this._checkContainerElement())
-                callback()
-        }
-    }
-
     /** Hide the element
      * @param {string} event - Event to wait for before hiding the element
      * @param {HTMLElement} element - Element to hide
@@ -299,7 +299,7 @@ export class SiriusElement extends HTMLElement {
 
         this._onBuiltContainerElement = () => {
             // Check if there is an event to wait for
-            if (!event){
+            if (!event) {
                 element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
                 this.logger.log('Element hidden');
                 return;
