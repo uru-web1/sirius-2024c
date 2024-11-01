@@ -18,12 +18,12 @@
     const title = SIRIUS_DIALOG.ATTRIBUTES.TITLE.NAME;
     const content = SIRIUS_DIALOG.ATTRIBUTES.CONTENT.NAME;
     let text = document.createElement("span");
-    text.textContent = "IM THE CONTENT\nIM THE CONTENT\nIM THE CONTENT\nIM THE CONTENT\nIM THE CONTENT\nIM THE CONTENT\n";
+    text.textContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
     sirius.onLoaded = async () => {
         const siriusDialog1 = new SiriusDialog({
             [id]: 'dialog-1',
-            [title]: 'La hamburguesa es buena',
+            [title]: 'DIALOG EXAMPLE',
             [content]: text
         });
         siriusDialog1.addToBody()
@@ -31,6 +31,6 @@
 
 </script>
 
-<sirius-dialog id="dialog-3" title="Hola"></sirius-dialog>
+<sirius-dialog id="dialog-3" title="SECOND DIALOG"></sirius-dialog>
 </body>
 </html>
