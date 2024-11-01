@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Sirius Dialog Example</title>
+    <script defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusDialog.js" type="module"></script>
+</head>
+<body>
+<script type="module">
+    import sirius from '../js/Sirius.js';
+    import {SIRIUS_DIALOG, SiriusDialog} from '../js/SiriusDialog.js';
+    import {SIRIUS_ELEMENT} from "../js/SiriusElement.js";
+
+    // Get the attributes keys
+    const id = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
+    const title = SIRIUS_DIALOG.ATTRIBUTES.TITLE.NAME;
+    const content = SIRIUS_DIALOG.ATTRIBUTES.CONTENT.NAME;
+    let text = document.createElement("span");
+    text.textContent = "IM THE CONTENT\nIM THE CONTENT\nIM THE CONTENT\nIM THE CONTENT\nIM THE CONTENT\nIM THE CONTENT\n";
+
+    sirius.onLoaded = async () => {
+        const siriusDialog1 = new SiriusDialog({
+            [id]: 'dialog-1',
+            [title]: 'La hamburguesa es buena',
+            [content]: text
+        });
+        siriusDialog1.addToBody()
+    };
+
+</script>
+
+<sirius-dialog id="dialog-3" title="Hola"></sirius-dialog>
+</body>
+</html>
