@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Sirius Menu Bar Example</title>
+    <script defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusElement.js" type="module"></script>
+    <script defer src="../js/SiriusMenuBar.js" type="module"></script>
+    <link rel="stylesheet" href="../css/SiriusMenuBar.css">
+</head>
+<body>
+<script type="module">
+    import sirius from '../js/Sirius.js';
+    import { SiriusMenuBar } from '../js/SiriusMenuBar.js';
+
+    sirius.onLoaded = async () => {
+        const siriusMenuBar = new SiriusMenuBar({
+            id: 'menu-bar-unique',
+            items: [
+                {
+                    label: 'Public profile',
+                    submenu: [{ label: 'Edit Profile' }, { label: 'Privacy Settings' }]
+                },
+                {
+                    label: 'Account',
+                    submenu: [{ label: 'Change Password' }, { label: 'Manage Subscriptions' }]
+                },
+                {
+                    label: 'Appearance',
+                    submenu: [{ label: 'Themes' }, { label: 'Customize Layout' }]
+                },
+                {
+                    label: 'Accessibility',
+                    submenu: [{ label: 'Screen Reader' }, { label: 'Keyboard Shortcuts' }]
+                },
+                {
+                    label: 'Notifications',
+                    submenu: [{ label: 'Email Notifications' }, { label: 'Push Notifications' }]
+                }
+            ]
+        });
+
+        siriusMenuBar.addToBody();
+    };
+</script>
+
+</body>
+</html>
