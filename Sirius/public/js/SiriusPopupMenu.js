@@ -1,101 +1,125 @@
-import { SIRIUS_TYPES, SiriusElement } from "./SiriusElement.js";
+import { SiriusElement } from "./SiriusElement.js";
+import { SiriusIcon } from "./SiriusIcon.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
-/** Sirius PopupMenu constants */
+/** Sirius PopupMenu Constants */
 export const SIRIUS_POPUP_MENU = deepFreeze({
     NAME: "SiriusPopupMenu",
-    TAG: "sirius-popup-menu",
+    TAG: "sirius-popupmenu",
     ATTRIBUTES: {
-        ICON: { NAME: "icon", DEFAULT: "☰", TYPE: SIRIUS_TYPES.STRING },
-        OPEN: { NAME: "open", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN },
-        MENU_OPTIONS: { NAME: "menuOptions", DEFAULT: [], TYPE: SIRIUS_TYPES.ARRAY }
+        OPTIONS: { NAME: "options", DEFAULT: [], TYPE: "array" },
     },
     CLASSES: {
-        CONTAINER: "popup-menu-container",
-        MENU: "popup-menu",
-        MENU_ITEM: "popup-menu-item",
-        ICON: "popup-menu-icon",
-        BACK_BUTTON: "popup-menu-back",
-        OPENED: "popup-menu-opened"
+        CONTAINER: "sirius-popupmenu-container",
+        MENU: "sirius-popupmenu",
+        OPTION: "sirius-popupmenu-option",
+        ICON: "sirius-popupmenu-icon",
+        BACK_BUTTON: "sirius-popupmenu-back"
     }
 });
 
-/** Sirius class that represents a popup menu component */
 export class SiriusPopupMenu extends SiriusElement {
-    /**
-     * Create a Sirius PopupMenu element
-     * @param {Object} props - The properties of the Sirius PopupMenu
-     */
-    constructor(props = {}) {  // Se asegura de que props tenga un valor por defecto
+    constructor(props) {
         super(props, SIRIUS_POPUP_MENU.NAME);
 
-        // Ensure menuOptions is set to an array if not provided
-        if (!Array.isArray(props[SIRIUS_POPUP_MENU.ATTRIBUTES.MENU_OPTIONS.NAME]) || 
-            props[SIRIUS_POPUP_MENU.ATTRIBUTES.MENU_OPTIONS.NAME].length === 0) {
-            throw new Error(`Invalid attribute value for '${SIRIUS_POPUP_MENU.ATTRIBUTES.MENU_OPTIONS.NAME}': Must be a non-empty array.`);
+        const options = props?.options || this.getAttribute(SIRIUS_POPUP_MENU.ATTRIBUTES.OPTIONS.NAME) || SIRIUS_POPUP_MENU.ATTRIBUTES.OPTIONS.DEFAULT;
+
+        try {
+            this._attributes[SIRIUS_POPUP_MENU.ATTRIBUTES.OPTIONS.NAME] = 
+                typeof options === "string" ? JSON.parse(options) : options;
+        } catch (error) {
+            console.error("Error al parsear las opciones: ", error);
+            this._attributes[SIRIUS_POPUP_MENU.ATTRIBUTES.OPTIONS.NAME] = SIRIUS_POPUP_MENU.ATTRIBUTES.OPTIONS.DEFAULT;
         }
 
-        // Load Sirius PopupMenu HTML attributes
-        this._loadAttributes({
-            htmlAttributes: SIRIUS_POPUP_MENU.ATTRIBUTES,
-            properties: props
-        });
-
-        // Bind event handlers
-        this._handleIconClick = this._handleIconClick.bind(this);
+        this._currentLevelOptions = this._attributes[SIRIUS_POPUP_MENU.ATTRIBUTES.OPTIONS.NAME];
+        this._navigationHistory = [];
+        
+        this._createPopupMenuTemplate();
     }
 
-    /** Toggle menu visibility */
-    _handleIconClick() {
-        this._attributes[SIRIUS_POPUP_MENU.ATTRIBUTES.OPEN.NAME] = !this._attributes[SIRIUS_POPUP_MENU.ATTRIBUTES.OPEN.NAME];
-        this._updateMenuDisplay();
-    }
+    _createPopupMenuTemplate() {
+        const optionsHTML = this._generateOptionsHTML(this._currentLevelOptions);
 
-    /** Get the template for the Sirius PopupMenu
-     * @returns {string} - Template
-     */
-    #getTemplate() {
-        return `<div class="${SIRIUS_POPUP_MENU.CLASSES.CONTAINER}">
-                    <span class="${SIRIUS_POPUP_MENU.CLASSES.ICON}" id="popupIcon">${this._attributes[SIRIUS_POPUP_MENU.ATTRIBUTES.ICON.NAME]}</span>
-                    <div class="${SIRIUS_POPUP_MENU.CLASSES.MENU}">
-                        ${this._generateMenuOptions()}
+        const popupMenuHTML = `
+            <div class="${SIRIUS_POPUP_MENU.CLASSES.CONTAINER}">
+                <div class="${SIRIUS_POPUP_MENU.CLASSES.MENU}">
+                    <div class="${SIRIUS_POPUP_MENU.CLASSES.BACK_BUTTON}" style="display: none;">
+                        <sirius-icon icon="arrow_back" class="${SIRIUS_POPUP_MENU.CLASSES.ICON}"></sirius-icon> Volver
                     </div>
-                </div>`;
+                    ${optionsHTML}
+                </div>
+            </div>
+        `;
+
+        this._createTemplate(popupMenuHTML);
+        console.log("Template creado: ", this.shadowRoot.innerHTML); // Confirmar contenido en Shadow DOM
+
+        const observer = new MutationObserver(() => {
+            this._addEventListeners();
+            observer.disconnect();
+        });
+        observer.observe(this.shadowRoot, { childList: true, subtree: true });
     }
 
-    /** Generate menu options from attributes
-     * @returns {string} - HTML string of menu items
-     */
-    _generateMenuOptions() {
-        const options = this._attributes[SIRIUS_POPUP_MENU.ATTRIBUTES.MENU_OPTIONS.NAME];
-        return options.map(option => `<div class="${SIRIUS_POPUP_MENU.CLASSES.MENU_ITEM}">${option}</div>`).join('');
+    _generateOptionsHTML(options) {
+        return options.map(option => `
+            <div class="${SIRIUS_POPUP_MENU.CLASSES.OPTION}" data-value="${option.value}">
+                ${option.label}
+            </div>
+        `).join("");
     }
 
-    /** Toggle menu display based on the "open" attribute */
-    _updateMenuDisplay() {
-        const menu = this.shadowRoot.querySelector(`.${SIRIUS_POPUP_MENU.CLASSES.MENU}`);
-        if (this._attributes[SIRIUS_POPUP_MENU.ATTRIBUTES.OPEN.NAME]) {
-            menu.classList.add(SIRIUS_POPUP_MENU.CLASSES.OPENED);
-        } else {
-            menu.classList.remove(SIRIUS_POPUP_MENU.CLASSES.OPENED);
+    _addEventListeners() {
+        const optionElements = this.shadowRoot.querySelectorAll(`.${SIRIUS_POPUP_MENU.CLASSES.OPTION}`);
+        if (optionElements.length) {
+            optionElements.forEach(option => {
+                option.addEventListener("click", (event) => this._handleOptionClick(event));
+            });
+        }
+
+        const backButton = this.shadowRoot.querySelector(`.${SIRIUS_POPUP_MENU.CLASSES.BACK_BUTTON}`);
+        if (backButton) {
+            backButton.addEventListener("click", () => {
+                this._navigateBack();
+            });
         }
     }
 
-    /** Lifecycle method called when the component is connected to the DOM */
-    async connectedCallback() {
-        await this._loadElementStyles();
-        const innerHTML = this.#getTemplate();
-        await this._createTemplate(innerHTML);
+    _handleOptionClick(event) {
+        const selectedOption = event.currentTarget.dataset.value;
+        const optionData = this._currentLevelOptions.find(opt => opt.value === selectedOption);
+        if (optionData?.subOptions) {
+            this._navigationHistory.push(this._currentLevelOptions);
+            this._currentLevelOptions = optionData.subOptions;
+            this._updateMenu();
+        } else {
+            this.dispatchEvent(new CustomEvent("option-selected", { detail: { selectedOption } }));
+        }
+    }
 
-        this.containerElement = this._templateContent.firstChild;
-        this.shadowRoot.appendChild(this.containerElement);
+    _navigateBack() {
+        if (this._navigationHistory.length > 0) {
+            this._currentLevelOptions = this._navigationHistory.pop();
+            this._updateMenu();
+        }
+    }
 
-        // Add event listeners
-        this.shadowRoot.getElementById("popupIcon").addEventListener("click", this._handleIconClick);
+    _updateMenu() {
+        const menuElement = this.shadowRoot.querySelector(`.${SIRIUS_POPUP_MENU.CLASSES.MENU}`);
+        menuElement.innerHTML = this._generateOptionsHTML(this._currentLevelOptions);
 
-        this.dispatchBuiltEvent();
+        const backButton = this.shadowRoot.querySelector(`.${SIRIUS_POPUP_MENU.CLASSES.BACK_BUTTON}`);
+        if (backButton) {
+            backButton.style.display = this._navigationHistory.length ? "block" : "none";
+        }
+
+        this._addEventListeners();
+    }
+
+    addToBody() {
+        document.body.appendChild(this);
     }
 }
 
-// Register custom element
 customElements.define(SIRIUS_POPUP_MENU.TAG, SiriusPopupMenu);

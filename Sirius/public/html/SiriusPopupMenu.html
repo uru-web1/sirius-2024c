@@ -3,85 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sirius Popup Menu Example</title>
+    <title>Sirius PopupMenu</title>
+    <link rel="stylesheet" href="../css/SiriusPopupMenu.css">
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusPopupMenu.js" type="module"></script>
-    <style>
-        /* Basic styles for the Popup Menu */
-        .popup-menu-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .popup-menu-icon {
-            cursor: pointer;
-            font-size: 24px;
-        }
-
-        .popup-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 200px;
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .popup-menu-opened {
-            display: block;
-            opacity: 1;
-        }
-
-        .popup-menu-item {
-            padding: 12px;
-            color: #333;
-            cursor: pointer;
-            font-size: 16px;
-            text-align: left;
-        }
-
-        .popup-menu-item:hover {
-            background-color: #f0f0f0;
-        }
-
-        .popup-menu-back {
-            padding: 10px;
-            cursor: pointer;
-            color: #007bff;
-            font-size: 16px;
-            text-align: center;
-            border-top: 1px solid #e0e0e0;
-        }
-    </style>
 </head>
 <body>
 <script type="module">
     import sirius from '../js/Sirius.js';
     import { SIRIUS_POPUP_MENU, SiriusPopupMenu } from '../js/SiriusPopupMenu.js';
-    import { SIRIUS_ELEMENT } from "../js/SiriusElement.js";
 
     sirius.onLoaded = async () => {
-        const existingInstance = document.getElementById('popup-menu-1');
-        if (!existingInstance) {
-            const siriusPopupMenu = new SiriusPopupMenu({
-                [SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME]: 'popup-menu-1', // Asegúrate de que el ID sea válido
-                [SIRIUS_POPUP_MENU.ATTRIBUTES.ICON.NAME]: '☰', // Icono por defecto
-                [SIRIUS_POPUP_MENU.ATTRIBUTES.MENU_OPTIONS.NAME]: ['Option 1', 'Option 2', 'Option 3'] // Opciones del menú
-            });
+        console.log("Sirius has loaded."); // Confirmar carga
+        const siriusPopupMenu = new SiriusPopupMenu({
+            id: 'popupmenu-1',
+            options: JSON.stringify([
+                { value: "option1", label: "Option 1", subOptions: [
+                    { value: "subOption1", label: "Sub Option 1" },
+                    { value: "subOption2", label: "Sub Option 2" }
+                ]},
+                { value: "option2", label: "Option 2" },
+                { value: "option3", label: "Option 3" }
+            ])
+        });
 
-            siriusPopupMenu.addToBody();
-        } else {
-            console.warn("Instance with ID 'popup-menu-1' already exists.");
-        }
+        siriusPopupMenu.addToBody(); // Añadir el menú al cuerpo del documento
     };
 </script>
 
-<sirius-popup-menu id="popup-menu-1" icon="☰"></sirius-popup-menu>
-
+<sirius-popupmenu id="popupmenu-2" options='[
+    {"value": "menu1", "label": "Menu 1", "subOptions": [
+        {"value": "sub1", "label": "Sub Menu 1"},
+        {"value": "sub2", "label": "Sub Menu 2"}
+    ]},
+    {"value": "menu2", "label": "Menu 2"}
+]'></sirius-popupmenu>
 </body>
 </html>

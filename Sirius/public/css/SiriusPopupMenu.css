@@ -1,0 +1,30 @@
+.sirius-popupmenu-container {
+    position: relative;
+    display: inline-block;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.sirius-popupmenu {
+    display: flex;
+    flex-direction: column;
+}
+
+.sirius-popupmenu-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.sirius-popupmenu-option:hover {
+    background-color: #f0f0f0;
+}
+
+.sirius-popupmenu-back {
+    padding: 5px;
+    color: #333;
+    cursor: pointer;
+}
