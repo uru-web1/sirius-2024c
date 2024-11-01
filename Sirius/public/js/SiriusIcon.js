@@ -226,7 +226,7 @@ export class SiriusIcon extends SiriusElement {
         const {[widthKey]: width, [heightKey]: height} = this.iconAttributes;
 
         return `<div class='${containerClasses.join(' ')}'>
-                    <div width="${width}" height="${height}" class=${iconClasses.join(' ')}>
+                    <div width='${width}' height='${height}' class='${iconClasses.join(' ')}'>
                         ${this.#getIcon()}
                     </div>
                 </div>`;

@@ -175,7 +175,7 @@ export class SiriusElement extends HTMLElement {
         Object.keys(htmlAttributes).forEach(attributeName => {
             // Get the attribute name and default value
             const htmlAttribute = htmlAttributes[attributeName]
-            const {NAME: name, DEFAULT: def, TYPE: types} = htmlAttribute
+            const {NAME: name, DEFAULT: def} = htmlAttribute
 
             // Get the attribute value
             let attributeValue = this.getAttribute(name)
@@ -321,6 +321,7 @@ export class SiriusElement extends HTMLElement {
 
             // Set hiding class
             this.logger.log('Element hiding');
+            element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
             element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDING);
         }
     }
