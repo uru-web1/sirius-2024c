@@ -1,5 +1,5 @@
 import {SIRIUS_ELEMENT, SIRIUS_TYPES, SiriusElement} from "./SiriusElement.js";
-import {SIRIUS_ICONS, SIRIUS_SVG} from "./SiriusSvg.js";
+import {getSvgElement, SIRIUS_ICONS} from "./SiriusSvg.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 /** Sirius icon constants */
@@ -36,6 +36,7 @@ export const SIRIUS_ROTATION = deepFreeze({
 export class SiriusIcon extends SiriusElement {
     #hidden = false
     #iconContainer
+    #svgElement
     #iconName
     #iconRotation
 
@@ -64,10 +65,21 @@ export class SiriusIcon extends SiriusElement {
         return this.#iconContainer;
     }
 
-    /** Set the icon attribute
+    /** Get icon SVG element */
+    get svgElement() {
+        return this.#svgElement;
+    }
+
+    /** Set icon SVG element */
+    set svgElement(svgElement) {
+        this.#iconContainer.innerHTML = svgElement
+        this.#svgElement = this.#iconContainer.firstElementChild
+    }
+
+    /** Change icon SVG
      * @param {string} name - Icon name
      * */
-    set iconAttribute(name) {
+    changeIcon(name) {
         // Get the icon key
         const iconKey = SIRIUS_ICON.ICON_ATTRIBUTES.ICON.NAME
 
@@ -83,6 +95,9 @@ export class SiriusIcon extends SiriusElement {
         // Get the icon rotation
         if (!this.iconRotation)
             this.iconRotation = iconFields[1];
+
+        // Update the SVG element
+        this.svgElement = this.#getSvgElement();
     }
 
     /** Get current icon attribute value
@@ -161,15 +176,16 @@ export class SiriusIcon extends SiriusElement {
         this.#setHiddenClass();
     }
 
-    /** Get the icon SVG
-     * @returns {string} - Icon SVG
+    /** Get the icon SVG element
+     * @returns {string} - Icon SVG element
      * */
-    #getIcon() {
-        // Get the icon SVG function
-        const iconFn = SIRIUS_SVG[this.iconName]|| SIRIUS_SVG[SIRIUS_ICON.ICON_ATTRIBUTES.ICON.DEFAULT];
+    #getSvgElement() {
+        // Get the icon SVG element options and the default icon SVG name
+        const options = {...this.iconAttributes}
+        const def = SIRIUS_ICON.ICON_ATTRIBUTES.ICON.DEFAULT;
 
-        // Return the icon SVG with the given attributes
-        return iconFn({...this.iconAttributes});
+        // Get the icon SVG element
+        return getSvgElement(this.iconName,options) || getSvgElement(def,options);
     }
 
     /** Get the template for the Sirius icon
@@ -186,21 +202,10 @@ export class SiriusIcon extends SiriusElement {
 
         return `<div class='${containerClasses.join(' ')}'>
                     <div class='${iconClasses.join(' ')}'>
-                        ${this.#getIcon()}
+                        ${this.#getSvgElement()}
                     </div>
                 </div>`;
     }
-
-    /** Change icon SVG
-     * @param {string} icon - Icon SVG name
-     */
-
-    /*
-    changeIcon(icon){
-        // Get icon SVG
-        this.#getIcon()
-    }
-    */
 
     /** Set the show icon as disabled */
     setDisabled() {
@@ -344,6 +349,7 @@ export class SiriusIcon extends SiriusElement {
         // Add icon to the shadow DOM
         this.containerElement = this._templateContent.firstChild;
         this.#iconContainer = this.containerElement.firstElementChild;
+        this.#svgElement = this.#iconContainer.firstElementChild;
         this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event

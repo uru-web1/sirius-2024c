@@ -67,9 +67,16 @@
         // Add the icon to the DOM
         siriusIcon4.addToBody()
 
-        // Link the button to the icon
+        // Change the icon
+        siriusIcon4.onBuilt = () => {
+            siriusIcon4.changeIcon(SIRIUS_ICONS.EDIT);
+        }
+
+        // Link the button to the icon and center it
         const icon = document.getElementById('icon-1');
         icon.centerScreen();
+
+        // Add an event listener to the button
         const click = document.getElementById('animateButton');
 
         click.addEventListener("click", () => {
