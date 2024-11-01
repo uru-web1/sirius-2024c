@@ -4,39 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sirius PopupMenu</title>
-    <link rel="stylesheet" href="../css/SiriusPopupMenu.css">
+    <!-- Importar los scripts necesarios -->
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusPopupMenu.js" type="module"></script>
 </head>
 <body>
 <script type="module">
     import sirius from '../js/Sirius.js';
-    import { SIRIUS_POPUP_MENU, SiriusPopupMenu } from '../js/SiriusPopupMenu.js';
+    import { SIRIUS_POPUPMENU, SiriusPopupMenu } from '../js/SiriusPopupMenu.js';
+    import { SIRIUS_ELEMENT } from "../js/SiriusElement.js";
+
+    // Definir atributos para el PopupMenu
+    const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
+    const menuOptionsKey = SIRIUS_POPUPMENU.ATTRIBUTES.MENU_OPTIONS.NAME;
 
     sirius.onLoaded = async () => {
-        console.log("Sirius has loaded."); // Confirmar carga
+        // Crear una instancia dinámica de SiriusPopupMenu
         const siriusPopupMenu = new SiriusPopupMenu({
-            id: 'popupmenu-1',
-            options: JSON.stringify([
-                { value: "option1", label: "Option 1", subOptions: [
-                    { value: "subOption1", label: "Sub Option 1" },
-                    { value: "subOption2", label: "Sub Option 2" }
+            [idKey]: 'popupmenu-1',
+            [menuOptionsKey]: JSON.stringify([
+                { label: "Home", action: "home" },
+                { label: "Profile", action: "profile" },
+                { label: "Settings", submenu: [
+                    { label: "Account", action: "account" },
+                    { label: "Notifications", action: "notifications" },
+                    { label: "Privacy", action: "privacy" }
                 ]},
-                { value: "option2", label: "Option 2" },
-                { value: "option3", label: "Option 3" }
+                { label: "Logout", action: "logout" }
             ])
         });
 
-        siriusPopupMenu.addToBody(); // Añadir el menú al cuerpo del documento
+        // Añadir el PopupMenu al body
+        siriusPopupMenu.addToBody();
+
+        // Escuchar el evento de acción en el PopupMenu
+        siriusPopupMenu.addEventListener("menu-action", (event) => {
+            console.log("Acción seleccionada:", event.detail.action);
+        });
     };
 </script>
 
-<sirius-popupmenu id="popupmenu-2" options='[
-    {"value": "menu1", "label": "Menu 1", "subOptions": [
-        {"value": "sub1", "label": "Sub Menu 1"},
-        {"value": "sub2", "label": "Sub Menu 2"}
+<!-- Instancia directa del PopupMenu en el HTML -->
+<sirius-popupmenu id="popupmenu-2" menuOptions='[
+    {"label": "Dashboard", "action": "dashboard"},
+    {"label": "Settings", "submenu": [
+        {"label": "Preferences", "action": "preferences"},
+        {"label": "Appearance", "action": "appearance"}
     ]},
-    {"value": "menu2", "label": "Menu 2"}
+    {"label": "Help", "action": "help"}
 ]'></sirius-popupmenu>
+
 </body>
 </html>
