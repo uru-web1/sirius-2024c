@@ -1,0 +1,36 @@
+  .dialog-container {
+    position: absolute;
+    box-sizing: border-box;
+    border: 5px solid gray;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    
+    min-height: 40px;
+    min-width: 10em;
+  }
+  .dialog-title-bar {
+    background-color: lightgray;
+    display: flex;
+    justify-content: space-between;
+
+  }
+  .dialog-title-text {
+    padding-left: 2px;
+    text-wrap: nowrap;
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dialog-window-close {
+    padding: 2px;
+    height: 1em;
+    width: auto;
+  }
+  .dialog-window-content {
+    flex-grow: 1;
+    overflow: scroll;
+  }
+
