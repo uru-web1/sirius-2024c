@@ -30,20 +30,19 @@
             [checkmarkKey]: 'blue',
             [styleKey]: 'position: absolute; top: 50px; left: 50px;'
         });
+        siriusCheckbox1.addToBody()
 
-        // Doesn't work
         const siriusCheckbox2 = new SiriusCheckbox({
             [idKey]: 'checkbox-2',
             [labelKey]: true,
             [captionKey]: 'La pizza es buena',
         });
-
-        siriusCheckbox1.addToBody()
+        siriusCheckbox2.addToBody()
     };
 
 </script>
 
-<sirius-checkbox caption="Holakease" id="checkbox-3" label=true></sirius-checkbox>
+<sirius-checkbox caption="La proteína es god" id="checkbox-3" label=true></sirius-checkbox>
 
 </body>
 </html>

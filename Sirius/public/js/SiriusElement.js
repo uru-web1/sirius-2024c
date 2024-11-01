@@ -22,9 +22,9 @@ export const SIRIUS_ELEMENT = deepFreeze({
         HIDE: 'hide',
     },
     ATTRIBUTES: {
-        ID: {NAME: "id", DEFAULT: null, TYPE: SIRIUS_TYPES.STRING},
-        STYLE: {NAME: 'custom-style', DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING]},
-        EVENTS: {NAME: 'custom-events', DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
+        ID: {NAME: "id", DEFAULT: null, TYPE: SIRIUS_TYPES.STRING, PARSE: false},
+        STYLE: {NAME: 'style', DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING], PARSE: true},
+        EVENTS: {NAME: 'events', DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT, PARSE: true},
     },
     CLASSES: {
         HIDDEN: 'hidden',
@@ -117,52 +117,65 @@ export class SiriusElement extends HTMLElement {
         this.#onBuilt.push(callback);
     }
 
-    /** Added on built container element callback */
+    /** Added on built element callback
+     * @param {HTMLElement} element - Element to check
+     * @param {(HTMLElement)=>{}} callback - On built callback
+     * */
+    set _onBuiltElement({element, callback}) {
+        this.onBuilt = () => {
+            if (this._checkElement(element))
+                callback(element)
+        }
+    }
+
+    /** Added on built container element callback
+     * @param {(HTMLElement)=>{}} callback - On built callback
+     */
     set _onBuiltContainerElement(callback) {
         this.onBuilt = () => {
-            if (this._checkContainerElement())
-                callback()
+            if (this._checkElement(this.containerElement))
+                callback(this.containerElement)
         }
     }
 
     /** Check the container element
+     * @param {HTMLElement} element - Element to check
      * @returns {boolean} - True if the container element is set
      */
-    _checkContainerElement() {
-        if (this.#containerElement)
+    _checkElement(element) {
+        if (!element) {
+            this.logger.error(`Element is not set: ${element}`);
+            return false
+        }
+
+        // Check if the element is an instance of HTMLElement
+        if (element instanceof HTMLElement)
             return true
 
-        this.logger.error('Container element is not set');
+        this.logger.error(`Invalid element: ${element}`);
         return false
     }
 
     /** Check if the attribute has the given type
-     * @param {object} attribute - Element attribute
+     * @param {string[]|string} types - Element types attribute
      * @param {string} type - Attribute type
-     * @returns {string[], boolean} - Valid types and true if the attribute has the given type
+     * @returns {{parsedTypes: string[], hasType: boolean}} - Parsed types and if the attribute has the given type
      */
-    _hasAttributeType(attribute, type) {
-        // Get the attribute valid types
-        let {TYPE: types} = attribute
-
+    _hasAttributeType(types, type) {
         // Check if the valid types are an array
-        types = Array.isArray(types) ? types : [types]
-
-        if (types.includes(type))
-            return [types, true]
-
-        return [types, false]
+        const parsedTypes = Array.isArray(types) ? types : [types]
+        return {parsedTypes, hasType: parsedTypes.includes(type)}
     }
 
     /** Validate the element attribute
      * @param {string} name - Attribute name
      * @param {any} value - Attribute value
-     * @param {string[]} types - Attribute valid types
+     * @param {string[]} parsedTypes - Attribute valid types
      * @param {object} def - Attribute default value
      */
-    _validateAttribute({name, value, types, def}) {
+    _validateAttribute({name, value, parsedTypes, def}) {
         // Check if the attribute has any type
-        if (types.includes(SIRIUS_TYPES.ANY))
+        if (parsedTypes.includes(SIRIUS_TYPES.ANY))
             return
 
         // Check if the default value is null
@@ -170,8 +183,8 @@ export class SiriusElement extends HTMLElement {
             return
 
         // Check if the attribute value is in the valid types array
-        if (!types.includes(typeof value))
-            throw new Error(`Invalid attribute value '${value}' for '${name}' attribute. Valid types: ${types.join(', ')}`)
+        if (!parsedTypes.includes(typeof value))
+            throw new Error(`Invalid attribute value '${value}' for '${name}' attribute. Valid types: ${parsedTypes.join(', ')}`)
     }
 
     /** Load HTML attributes and properties
@@ -183,17 +196,18 @@ export class SiriusElement extends HTMLElement {
         Object.keys(htmlAttributes).forEach(attributeName => {
             // Get the attribute name and default value
             const htmlAttribute = htmlAttributes[attributeName]
-            const {NAME: name, DEFAULT: def} = htmlAttribute
+            const {NAME: name, DEFAULT: def, TYPE: types} = htmlAttribute
 
             // Get the attribute value
             let attributeValue = this.getAttribute(name)
-            const [parsedTypes, hasBoolean] = this._hasAttributeType(htmlAttribute, SIRIUS_TYPES.BOOLEAN)
+            const {parsedTypes, hasType: hasBoolean} = this._hasAttributeType(types, SIRIUS_TYPES.BOOLEAN)
 
+            // Check if the attribute is a boolean and the value is an empty string
             if (attributeValue === "" && hasBoolean)
                 attributeValue = true
 
-            else if (attributeValue === null) {
-                // Check if the attribute is not set
+            // Check if the attribute is not set
+            else if (attributeValue === null)
                 if (properties?.[name] === undefined)
                     attributeValue = def
 
@@ -204,13 +218,12 @@ export class SiriusElement extends HTMLElement {
                     // Set the attribute value
                     this.setAttribute(name, attributeValue)
                 }
-            }
 
             // Validate the attribute
             this._validateAttribute({
                 name,
                 def,
-                types: parsedTypes,
+                parsedTypes,
                 value: attributeValue,
             })
 
@@ -285,6 +298,67 @@ export class SiriusElement extends HTMLElement {
         this._templateContent = this._template.content.cloneNode(true);
     }
 
+    /** Load style attribute
+     * @param {string|object|null} style - Style attribute value
+     * @param {HTMLElement} element - Element to add the style
+     */
+    _loadStyleAttribute(style, element) {
+        if (!style)
+            return
+
+        this._onBuiltElement = {
+            element: element || this.containerElement,
+            callback: (element) => {
+                // Check if the attribute value is a string
+                if (typeof style === SIRIUS_TYPES.STRING)
+                    element.style.cssText = style
+
+                // Check if the attribute value is an object
+                else if (typeof style === SIRIUS_TYPES.OBJECT)
+                    for (let styleName in style)
+                        element.style[styleName] = style[styleName];
+
+                else {
+                    this.logger.error('Invalid style attribute value');
+                    return;
+                }
+
+                // Remove the style attribute of the component
+                this.removeAttribute(SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME);
+            }
+        }
+    }
+
+    /** Load events attribute
+     * @param {object|null} events - Events attribute value
+     * @param {HTMLElement} element - Element to add the event listeners
+     */
+    _loadEventsAttribute(events, element) {
+        if (!events)
+            return
+
+        this._onBuiltElement = {
+            element: element || this.containerElement,
+            callback: (element) => {
+                // Check if the attribute value is an object
+                if (typeof events !== SIRIUS_TYPES.OBJECT) {
+                    this.logger.error('Invalid events attribute value');
+                    return;
+                }
+
+                // Get the target element
+                const targetElement = element || this.containerElement;
+
+                // Add event listeners
+                for (let event in events)
+                    targetElement.addEventListener(event, events[event])
+
+                // Remove the events attribute of the component
+                this.removeAttribute(SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME);
+            }
+        }
+    }
+
     /** Add the element to the body */
     addToBody() {
         document.body.appendChild(this);
@@ -295,34 +369,35 @@ export class SiriusElement extends HTMLElement {
      * @param {HTMLElement} element - Element to hide
      * */
     hide(event, element) {
-        element = element || this.containerElement;
+        this._onBuiltElement = {
+            element: element || this.containerElement,
+            callback: (element) => {
+                // Check if there is an event to wait for
+                if (!event) {
+                    element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                    this.logger.log('Element hidden');
+                    return;
+                }
 
-        this._onBuiltContainerElement = () => {
-            // Check if there is an event to wait for
-            if (!event) {
-                element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-                this.logger.log('Element hidden');
-                return;
+                // Get event handler
+                const eventHandler = () => {
+                    // Hide the element
+                    element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
+                    element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                    this.logger.log('Element hidden');
+
+                    // Remove event listener
+                    element.removeEventListener(event, eventHandler);
+                }
+
+                // Add event listener to hide the element
+                element.addEventListener(event, eventHandler);
+
+                // Set hiding class
+                this.logger.log('Element hiding');
+                element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDING);
             }
-
-            // Get event handler
-            const eventHandler = () => {
-                // Hide the element
-                element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
-                element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-                this.logger.log('Element hidden');
-
-                // Remove event listener
-                element.removeEventListener(event, eventHandler);
-            }
-
-            // Add event listener to hide the element
-            element.addEventListener(event, eventHandler);
-
-            // Set hiding class
-            this.logger.log('Element hiding');
-            element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-            element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDING);
         }
     }
 
@@ -330,26 +405,27 @@ export class SiriusElement extends HTMLElement {
      * @param {HTMLElement} element - Element to hide
      * */
     show(element) {
-        element = element || this.containerElement;
-
-        this._onBuiltContainerElement = () => {
-            element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-            this.logger.log('Element shown');
+        this._onBuiltElement = {
+            element: element || this.containerElement,
+            callback: (element) => {
+                element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                this.logger.log('Element shown');
+            }
         }
     }
 
     /** Center the element on the screen */
     centerScreen() {
-        this._onBuiltContainerElement = () => {
-            this.containerElement.classList.add(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
+        this._onBuiltContainerElement = (element) => {
+            element.classList.add(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
             this.logger.log('Element centered on the screen');
         }
     }
 
     /** Remove centering of the element */
     removeCenterScreen() {
-        this._onBuiltContainerElement = () => {
-            this.containerElement.classList.remove(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
+        this._onBuiltContainerElement = (element) => {
+            element.classList.remove(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
             this.logger.log('Element removed from center screen');
         }
     }

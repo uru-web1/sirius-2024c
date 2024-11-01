@@ -35,6 +35,18 @@ export const getSvgElement = (icon, {width, height, fill}) => {
     </svg>`
 }
 
+/** Change SVG element inner HTML
+ * @param {HTMLElement} element - SVG element
+ * @param {string} icon - Icon name
+ */
+export const changeSvgElementInnerHTML = (element, icon) => {
+    // Get the inner HTML of the SVG icon
+    const innerHtml = SIRIUS_SVG_INNER_HTML[icon];
+    if (!innerHtml) return;
+
+    element.innerHTML = innerHtml;
+}
+
 /** Sirius SVG Icons */
 export const SIRIUS_SVG_INNER_HTML = {
     // Arrow icon
