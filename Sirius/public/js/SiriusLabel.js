@@ -5,34 +5,28 @@ import deepFreeze from "./utils/deep-freeze.js";
 export const SIRIUS_LABEL = deepFreeze({
     NAME: "SiriusLabel",
     TAG: "sirius-label",
-    ATTRIBUTES: {
-        CAPTION: {NAME: "caption", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING},
-    },
     CAPTION_ATTRIBUTES: {
+        CAPTION: {NAME: "caption", DEFAULT: "Please enter a caption", TYPE: SIRIUS_TYPES.STRING},
         POSITION: {NAME: "caption-position", DEFAULT: "center", TYPE: SIRIUS_TYPES.STRING},
         COLOR: {NAME: "caption-color", DEFAULT: "black", TYPE: SIRIUS_TYPES.STRING},
         FONT: {NAME: "caption-font", DEFAULT: "Arial", TYPE: SIRIUS_TYPES.STRING}
     },
     CLASSES: {
-        LABEL: 'label-container',
-        CAPTION: 'caption',
+        LABEL_CONTAINER: 'label-container',
+        CAPTION_CONTAINER: 'caption-container',
     }
 });
 
 /** Sirius class that represents a label component */
 export class SiriusLabel extends SiriusElement {
+    #captionElement
+
     /**
      * Create a Sirius label element
      * @param {object} props - Element properties
      */
     constructor(props) {
         super(props, SIRIUS_LABEL.NAME);
-
-        // Load Sirius Label HTML attributes
-        this._loadAttributes({
-            htmlAttributes: SIRIUS_LABEL.ATTRIBUTES,
-            properties: props
-        });
 
         // Load Sirius Label caption attributes
         this._loadAttributes({
@@ -41,12 +35,21 @@ export class SiriusLabel extends SiriusElement {
         });
     }
 
+    /** Get the caption element
+     * @returns {HTMLElement} - Caption element
+     */
+    get captionElement() {
+        return this.#captionElement
+    }
+
     /** Get the template for the Sirius label
      * @returns {string} - Template
      * */
     #getTemplate() {
-        return `<div class="${SIRIUS_LABEL.CLASSES.LABEL}">
-                    <span class ="${SIRIUS_LABEL.CLASSES.CAPTION}">${this.#getCaption()}</span>
+        return `<div class="${SIRIUS_LABEL.CLASSES.LABEL_CONTAINER}">
+                    <span class ="${SIRIUS_LABEL.CLASSES.CAPTION_CONTAINER}">
+                        ${this.#getCaption()}
+                    </span>
                 </div>`;
     }
 
@@ -54,7 +57,7 @@ export class SiriusLabel extends SiriusElement {
      * @returns {*} - Label caption
      */
     #getCaption() {
-        return this._attributes[SIRIUS_LABEL.ATTRIBUTES.CAPTION.NAME];
+        return this._attributes[SIRIUS_LABEL.CAPTION_ATTRIBUTES.CAPTION.NAME];
     }
 
     /** Load the attributes of the Sirius label */
@@ -102,7 +105,7 @@ export class SiriusLabel extends SiriusElement {
                         break;
 
                     default:
-                        this.logger.log(`Unregistered attribute: ${attributeName}`);
+                        //this.logger.log(`Unregistered attribute: ${attributeName}`);
                         break;
                 }
             })
@@ -112,6 +115,9 @@ export class SiriusLabel extends SiriusElement {
     /** Lifecycle method called when the component is connected to the DOM
      */
     async connectedCallback() {
+        // Load attributes
+        this.#loadAttributes();
+
         // Create the CSS stylesheet and add it to the shadow DOM
         await this._loadElementStyles()
 
@@ -123,12 +129,11 @@ export class SiriusLabel extends SiriusElement {
 
         // Add label to the shadow DOM
         this.containerElement = this._templateContent.firstChild;
-        this.captionElement = this.containerElement.firstElementChild;
-
+        this.#captionElement = this.containerElement.firstElementChild;
         this.shadowRoot.appendChild(this.containerElement);
 
-        // Load attributes
-        this.#loadAttributes();
+        // Dispatch the built event
+        this.dispatchBuiltEvent();
     }
 }
 

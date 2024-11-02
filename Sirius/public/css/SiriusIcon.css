@@ -1,6 +1,7 @@
-.element-container {
-    display: grid;
-    place-items: center;
+:host {
+    --svg-width: 24px;
+    --svg-height: 24px;
+    --svg-fill: black;
 }
 
 .icon-container {
@@ -8,11 +9,16 @@
     place-items: center;
 }
 
-.icon-container:not(.hidden) > svg {
+.svg-container {
+    display: grid;
+    place-items: center;
+}
+
+.svg-container:not(.hidden) > svg {
     animation: show-animation var(--sirius-animation-duration) forwards;
 }
 
-.icon-container.hiding > svg {
+.svg-container.hiding > svg {
     animation: hiding-animation var(--sirius-animation-duration) forwards;
 }
 

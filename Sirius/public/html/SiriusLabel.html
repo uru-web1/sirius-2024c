@@ -19,10 +19,10 @@
 
         // Get the attributes keys
         const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
-        const captionKey = SIRIUS_LABEL.ATTRIBUTES.CAPTION.NAME;
-        const captionPositionKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.POSITION.NAME;
-        const captionColorKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.COLOR.NAME;
-        const captionFontKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.FONT.NAME;
+        const captionKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.CAPTION.NAME;
+        const positionKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.POSITION.NAME;
+        const colorKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.COLOR.NAME;
+        const fontKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.FONT.NAME;
         const eventsKey = SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME
         const styleKey = SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME;
 
@@ -41,9 +41,9 @@
                     console.log('Hizo mouseout en el Caption...');
                 }
             },
-            [captionPositionKey]: 'left',
-            [captionColorKey]: 'blue',
-            [captionFontKey]: 'fantasy',
+            [positionKey]: 'left',
+            [colorKey]: 'blue',
+            [fontKey]: 'fantasy',
             [styleKey]: {'border': '1px solid red', 'padding': '20px'}
 
         });

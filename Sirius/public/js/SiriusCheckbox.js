@@ -1,16 +1,30 @@
 import {SIRIUS_ELEMENT, SIRIUS_TYPES, SiriusElement} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
+import {SIRIUS_ICON} from "./SiriusIcon.js";
 
 /** Sirius checkbox constants */
 export const SIRIUS_CHECKBOX = deepFreeze({
     NAME: "SiriusCheckbox",
     TAG: "sirius-checkbox",
+    CHECKMARK_ATTRIBUTES:{
+        WIDTH: {NAME: "checkmark-width", DEFAULT: "24px", TYPE: SIRIUS_TYPES.STRING},
+        HEIGHT: {NAME: "checkmark-height", DEFAULT: "24px", TYPE: SIRIUS_TYPES.STRING},
+        FILL: {NAME: "checkmark-fill", DEFAULT: "black", TYPE: SIRIUS_TYPES.STRING},
+    },
+    CHECKBOX_ATTRIBUTES:{
+        BACKGROUND_COLOR: {NAME: "background-color", DEFAULT: "white", TYPE: SIRIUS_TYPES.STRING},
+        BORDER_COLOR: {NAME: "border-color", DEFAULT: "black", TYPE: SIRIUS_TYPES.STRING},
+        BORDER_PADDING: {NAME: "border-padding", DEFAULT: "2px", TYPE: SIRIUS_TYPES.STRING},
+        BORDER_RADIUS: {NAME: "border-radius", DEFAULT: "2px", TYPE: SIRIUS_TYPES.STRING},
+        BORDER_WIDTH: {NAME: "border-width", DEFAULT: "1px", TYPE: SIRIUS_TYPES.STRING},
+    },
+    LABEL_ATTRIBUTES:{
+        SHOW: {NAME: "show", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
+        CAPTION: {NAME: "caption", DEFAULT: "Please enter a caption", TYPE: SIRIUS_TYPES.STRING},
+    },
     ATTRIBUTES: {
-        LABEL: {NAME: "label", DEFAULT: false, TYPE: [SIRIUS_TYPES.BOOLEAN, SIRIUS_TYPES.STRING]},
-        CAPTION: {NAME: "caption", DEFAULT: "Valor", TYPE: SIRIUS_TYPES.STRING},
         CHECKED: {NAME: "checked", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
         DISABLED: {NAME: "disabled", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
-        CHECKMARK_COLOR: {NAME: "checkmark-color", DEFAULT: "black", TYPE: SIRIUS_TYPES.STRING},
     },
     CLASSES: {
         CONTENT: 'checkbox-content',
@@ -19,7 +33,7 @@ export const SIRIUS_CHECKBOX = deepFreeze({
         DISABLED: 'disabled',
         ICON: 'icon-container',
     }
-});
+})
 
 /** Sirius class that represents a checkbox component */
 export class SiriusCheckbox extends SiriusElement {
@@ -37,24 +51,39 @@ export class SiriusCheckbox extends SiriusElement {
         });
     }
 
+      /** Get dimensions
+     * @returns {object} - Icon dimensions
+     */
+    _getDimensions() {
+        // Get the width and height keys
+        const widthKey = SIRIUS_ICON.CHECKBOX_ATTRIBUTES.WIDTH.NAME;
+        const heightKey = SIRIUS_ICON.CHECKBOX_ATTRIBUTES.HEIGHT.NAME;
+
+        // Get attributes values
+        const width = this._attributes[widthKey];
+        const height = this._attributes[heightKey];
+
+        return {width, height};
+    }
+
     /** Get the template for the Sirius checkbox
      * @returns {string} - Template
      */
     #getTemplate() {
-
         //Get the attributes of the element
-
-        const idInstance = this._attributes[SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME].split('-')[1];
-        const showLabel = this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.LABEL.NAME];
+        const showLabel = this._attributes[SIRIUS_CHECKBOX.LABEL_ATTRIBUTES.SHOW.NAME];
         const caption = this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.CAPTION.NAME];
-        const checkmarkColor = this._attributes[SIRIUS_CHECKBOX.ATTRIBUTES.CHECKMARK_COLOR.NAME];
+        const checkmarkColor = this._attributes[SIRIUS_CHECKBOX.CHECKBOX_ATTRIBUTES.FILL.NAME];
+
+        // Get the width and height of the icon
+        const {width, height} = this._getDimensions();
 
         return `<div class="${SIRIUS_CHECKBOX.CLASSES.CONTAINER}">
                     <div class="${SIRIUS_CHECKBOX.CLASSES.CONTENT}">
                         <div class="${SIRIUS_CHECKBOX.CLASSES.ICON}">
-                            <sirius-icon fill="${checkmarkColor}" height="24" width="24" icon="check" id="icon-${idInstance}" onclick="toggleHidden()"></sirius-icon>
+                            <sirius-icon fill="${checkmarkColor}" height=${height} width=${width} icon="check" id="${this.elementId}__icon" onclick="toggleHidden()"></sirius-icon>
                         </div>
-                        ${showLabel ? `<sirius-label caption="${caption}" id="label-${idInstance}";"></sirius-label>` : ''}
+                        ${showLabel ? `<sirius-label caption="${caption}" id="${this.elementId}__label""></sirius-label>` : ''}
                     </div>
                 </div>`;
     }

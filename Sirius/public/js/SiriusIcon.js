@@ -1,4 +1,10 @@
-import {SIRIUS_ELEMENT, SIRIUS_TYPES, SiriusElement} from "./SiriusElement.js";
+import {
+    SIRIUS_ELEMENT,
+    SIRIUS_ELEMENT_ATTRIBUTES,
+    SIRIUS_ELEMENT_ATTRIBUTES_DETAILS,
+    SIRIUS_TYPES,
+    SiriusElement
+} from "./SiriusElement.js";
 import {changeSvgElementInnerHTML, getSvgElement, SIRIUS_ICONS} from "./SiriusSvg.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
@@ -6,43 +12,67 @@ import deepFreeze from "./utils/deep-freeze.js";
 export const SIRIUS_ICON = deepFreeze({
     NAME: "SiriusIcon",
     TAG: "sirius-icon",
-    ICON_ATTRIBUTES: {
-        ICON: {NAME: "icon", DEFAULT: SIRIUS_ICONS.WARNING, TYPE: SIRIUS_TYPES.STRING},
-        WIDTH: {NAME: "width", DEFAULT: "24px", TYPE: SIRIUS_TYPES.STRING},
-        HEIGHT: {NAME: "height", DEFAULT: "24px", TYPE: SIRIUS_TYPES.STRING},
-        FILL: {NAME: "fill", DEFAULT: "red", TYPE: SIRIUS_TYPES.STRING},
-        ROTATE: {NAME: "rotate", DEFAULT: "right", TYPE: SIRIUS_TYPES.STRING},
-    },
-    ATTRIBUTES: {
-        HIDE: {NAME: 'hide', DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
-        DISABLED: {NAME: 'disabled', DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
-    },
-    KEYFRAME_ATTRIBUTES: {
-        SHOW: {NAME: 'show-animation', DEFAULT: '', TYPE: SIRIUS_TYPES.STRING},
-        HIDING: {NAME: 'hiding-animation', DEFAULT: '', TYPE: SIRIUS_TYPES.STRING},
+    CSS_VARS: {
+        SVG_WIDTH: '--svg-width',
+        SVG_HEIGHT: '--svg-height',
+        SVG_FILL: '--svg-fill',
     },
     CLASSES: {
-        ELEMENT_CONTAINER: 'element-container',
         ICON_CONTAINER: 'icon-container',
+        SVG_CONTAINER: 'svg-container',
         DISABLED: 'disabled',
     }
 })
 
+/** Sirius icon attributes */
+export const SIRIUS_ICON_ATTRIBUTES = deepFreeze({
+    ICON: "icon",
+    ICON_WIDTH: "icon-width",
+    ICON_HEIGHT: "icon-height",
+    ICON_FILL: "icon-fill",
+    ICON_ROTATE: "icon-rotate",
+    SHOW_ANIMATION: 'show-animation',
+    HIDING_ANIMATION: 'hiding-animation',
+    HIDE: 'hide',
+    DISABLED: 'disabled'
+})
+
+/** Sirius icon attributes details */
+export const SIRIUS_ICON_ATTRIBUTES_DETAILS = deepFreeze({
+    [SIRIUS_ICON_ATTRIBUTES.ICON]: {DEFAULT: SIRIUS_ICONS.WARNING, TYPE: SIRIUS_TYPES.STRING},
+    [SIRIUS_ICON_ATTRIBUTES.ICON_WIDTH]: {DEFAULT: "24px", TYPE: SIRIUS_TYPES.STRING},
+    [SIRIUS_ICON_ATTRIBUTES.ICON_HEIGHT]: {DEFAULT: "24px", TYPE: SIRIUS_TYPES.STRING},
+    [SIRIUS_ICON_ATTRIBUTES.ICON_FILL]: {DEFAULT: "red", TYPE: SIRIUS_TYPES.STRING},
+    [SIRIUS_ICON_ATTRIBUTES.ICON_ROTATE]:  {DEFAULT: "right", TYPE: SIRIUS_TYPES.STRING},
+    [SIRIUS_ICON_ATTRIBUTES.SHOW_ANIMATION]: {DEFAULT: '', TYPE: SIRIUS_TYPES.STRING},
+    [SIRIUS_ICON_ATTRIBUTES.HIDING_ANIMATION]: {DEFAULT: '', TYPE: SIRIUS_TYPES.STRING},
+    [SIRIUS_ICON_ATTRIBUTES.HIDE]: {DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
+    [SIRIUS_ICON_ATTRIBUTES.DISABLED]: {DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
+})
+
 /** Sirius rotation constants */
-export const SIRIUS_ROTATION = deepFreeze({
-    RIGHT: {NAME: 'right', DEG: 0},
-    DOWN: {NAME: 'down', DEG: 90},
-    LEFT: {NAME: 'left', DEG: 180},
-    UP: {NAME: 'up', DEG: 270},
+export const SIRIUS_ICON_ROTATION = deepFreeze({
+    RIGHT: 'right',
+    DOWN: 'down',
+    LEFT: 'left',
+    UP: 'up'
+})
+
+/** Sirius rotation details */
+export const SIRIUS_ICON_ROTATION_DETAILS = deepFreeze({
+    [SIRIUS_ICON_ROTATION.RIGHT]: {DEG: 0},
+    [SIRIUS_ICON_ROTATION.DOWN]: {DEG: 90},
+    [SIRIUS_ICON_ROTATION.LEFT]: {DEG: 180},
+    [SIRIUS_ICON_ROTATION.UP]: {DEG: 270},
 })
 
 /** Sirius class that represents an icon component */
 export class SiriusIcon extends SiriusElement {
     #hidden = false
-    #iconContainerElement
-    #svgElement
-    #iconName
-    #iconRotation
+    #iconContainerElement = null
+    #svgElement = null
+    #iconName = null
+    #iconRotation = null
 
     /**
      * Create a Sirius icon element
@@ -51,14 +81,19 @@ export class SiriusIcon extends SiriusElement {
     constructor(props) {
         super(props, SIRIUS_ICON.NAME);
 
-        // Sirius icon HTML general attributes, icon-specific attributes and keyframe attributes
-        const htmlAttributes = {...SIRIUS_ICON.ICON_ATTRIBUTES, ...SIRIUS_ICON.ATTRIBUTES, ...SIRIUS_ICON.KEYFRAME_ATTRIBUTES}
-
         // Load attributes
         this._loadAttributes({
-            htmlAttributes,
+            attributes: SIRIUS_ICON_ATTRIBUTES,
+            attributesDetails: SIRIUS_ELEMENT_ATTRIBUTES_DETAILS,
             properties: props
         });
+    }
+
+    /** Define observed attributes
+     * @returns {string[]} - Observed attributes
+     * */
+    static get observedAttributes() {
+        return SIRIUS_ICON_ATTRIBUTES
     }
 
     /** Get icon container element */
@@ -74,67 +109,44 @@ export class SiriusIcon extends SiriusElement {
     /** Set icon SVG element */
     set svgElement(svgElement) {
         this.#iconContainerElement.innerHTML = svgElement
-        this.#svgElement = this.#iconContainerElement.firstElementChild
+        this.#svgElement = svgElement
     }
 
-    /** Get current icon attribute value
-     * @returns {string} - Icon name
-     * */
-    get iconName() {
-        if (this.#iconName)
-            return this.#iconName;
-
-        // Get the icon key
-        const iconKey = SIRIUS_ICON.ICON_ATTRIBUTES.ICON.NAME
+    /** Load icon name and rotation attributes */
+    _loadIconNameAndRotation() {
+         // Get the icon and rotate key
+        const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON
+        const rotateKey = SIRIUS_ICON_ATTRIBUTES.ICON_ROTATE
 
         // Check if the icon contains the rotation
         const iconFields = this._attributes[iconKey]?.split('--') || [];
 
         // Get the icon name
-        this.iconName = iconFields[0];
+        this.#iconName = iconFields[0] || SIRIUS_ICON_ATTRIBUTES_DETAILS[iconKey].DEFAULT;
 
         // Get the icon rotation
-        if (!this.iconRotation)
-            this.iconRotation = iconFields[1];
+        this.#iconRotation = iconFields[1] || SIRIUS_ICON_ATTRIBUTES_DETAILS[rotateKey].DEFAULT;
+    }
+
+    /** Get current icon attribute value
+     * @returns {string|null} - Icon name
+     * */
+    get iconName() {
+        // Check if the icon name and rotation are set
+        if (!this.#iconName)
+            this._loadIconNameAndRotation();
 
         return this.#iconName;
     }
 
-    /** Set the icon name
-     * @param {string} name - Icon name
-     */
-    set iconName(name) {
-        this.#iconName = name || SIRIUS_ICON.ICON_ATTRIBUTES.ICON.DEFAULT;
-    }
-
     /** Get the icon rotation
-     * @returns {string} - Rotation direction
+     * @returns {string|null} - Rotation direction
      */
     get iconRotation() {
+        if (!this.#iconRotation)
+            this._loadIconNameAndRotation()
+
         return this.#iconRotation;
-    }
-
-    /** Set the icon rotation
-     * @param {string} rotate - Rotation direction
-     */
-    set iconRotation(rotate) {
-        this.#iconRotation = rotate || SIRIUS_ICON.ICON_ATTRIBUTES.ROTATE.DEFAULT;
-        this.#setIconRotation(this.#iconRotation);
-    }
-
-    /** Get the icon attributes
-     * @returns {object} - Icon attributes
-     * */
-    get iconAttributes() {
-        const iconAttributes = {};
-
-        // Get the icon attributes
-        Object.keys(SIRIUS_ICON.ICON_ATTRIBUTES).forEach(attribute => {
-            const {NAME: attributeName} = SIRIUS_ICON.ICON_ATTRIBUTES[attribute]
-            iconAttributes[attributeName] = this._attributes[attributeName]
-        })
-
-        return iconAttributes
     }
 
     /** Get hidden icon state
@@ -162,12 +174,57 @@ export class SiriusIcon extends SiriusElement {
         }
     }
 
+    /** Get rotation degrees
+     * @param {string} rotate - Rotation direction
+     * @returns {number} - Rotation degrees
+     * */
+    #getRotationDegrees(rotate) {
+        // Get the rotation key and default value
+        const rotateKey = SIRIUS_ELEMENT_ATTRIBUTES.ICON_ROTATE
+        const def = SIRIUS_ICON_ATTRIBUTES_DETAILS[rotateKey].DEFAULT
+
+        // Check if the rotation is not set
+        if (!rotate)
+            return this.#getRotationDegrees(def);
+
+        // Get the rotation degrees based on the rotation direction
+        for (let rotationDetailsKey of Object.values(SIRIUS_ICON_ROTATION))
+            if (rotationDetailsKey === rotate)
+                return SIRIUS_ICON_ROTATION_DETAILS[rotate].DEG;
+
+        // Try to parse the rotation as a number
+        const degrees = parseInt(rotate)
+        if (!isNaN(degrees)) return degrees
+
+        // Log an error if the rotation is invalid
+        this.logger.error(`Invalid rotation: ${rotate}`)
+
+        // Return the default rotation degrees
+        return this.#getRotationDegrees(def)
+    }
+
+    /** Set icon rotation
+     * @param {string} rotate - Rotation direction
+     * */
+    #setIconRotation(rotate) {
+        // Get the icon
+        const degrees = this.#getRotationDegrees(rotate)
+
+        // Log the rotation
+        this.logger.log(`Setting rotation to ${degrees} degrees`)
+
+        // Set the icon direction
+        this._onBuiltContainerElement = (element) => {
+            element.style.transform = `rotate(${degrees}deg)`
+        }
+    }
+
     /** Set icon name and rotation attributes
      * @param {string} name - Icon name
      */
     _setIconNameAndRotation(name) {
         // Get the icon key
-        const iconKey = SIRIUS_ICON.ICON_ATTRIBUTES.ICON.NAME
+        const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON
 
         // Set icon attribute
         this.setAttribute(iconKey, name)
@@ -181,17 +238,6 @@ export class SiriusIcon extends SiriusElement {
         // Get the icon rotation
         if (!this.iconRotation)
             this.iconRotation = iconFields[1];
-    }
-
-    /** Change icon SVG
-     * @param {string} name - Icon name
-     * */
-    changeIcon(name) {
-        // Set the icon attributes
-        this._setIconNameAndRotation(name);
-
-        // Update the SVG element
-        this.svgElement = this.#getSvgElement();
     }
 
     /** Change icon SVG content
@@ -208,51 +254,55 @@ export class SiriusIcon extends SiriusElement {
         this.#setIconRotation(this.iconRotation);
     }
 
+    /** Get the SVG CSS variables
+     * @returns {object} - Icon attributes
+     * */
+    get iconCSSVariables() {
+        const cssVars=SIRIUS_ICON.CSS_VARS
+
+        return {
+            width:this._formatCSSVariable(cssVars.SVG_WIDTH),
+            height: this._formatCSSVariable(cssVars.SVG_HEIGHT),
+            fill: this._formatCSSVariable(cssVars.SVG_FILL),
+        }
+    }
+
     /** Get the icon SVG element
+     * @param {object} options - Icon options
+     * @param {string} options.width - Icon width
+     * @param {string} options.height - Icon height
+     * @param {string} options.fill - Icon fill
      * @returns {string} - Icon SVG element
      * */
-    #getSvgElement() {
-        // Get the icon SVG element options and the default icon SVG name
-        const options = {...this.iconAttributes}
-        const def = SIRIUS_ICON.ICON_ATTRIBUTES.ICON.DEFAULT;
+    #getSvgElement({width, height, fill} = this.iconCSSVariables) {
+        // Get the icon key, the default icon SVG name and the icon options
+        const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON;
+        const def = SIRIUS_ICON_ATTRIBUTES_DETAILS[iconKey].DEFAULT;
+        const options = {width, height, fill};
 
         // Get the icon SVG element
         return getSvgElement(this.iconName, options) || getSvgElement(def, options);
-    }
-
-    /** Get dimensions
-     * @returns {object} - Icon dimensions
-     */
-    _getDimensions() {
-        // Get the width and height keys
-        const widthKey = SIRIUS_ICON.ICON_ATTRIBUTES.WIDTH.NAME;
-        const heightKey = SIRIUS_ICON.ICON_ATTRIBUTES.HEIGHT.NAME;
-
-        // Get attributes values
-        const width = this._attributes[widthKey];
-        const height = this._attributes[heightKey];
-
-        return {width, height};
     }
 
     /** Get the template for the Sirius icon
      * @returns {string} - Template
      * */
     #getTemplate() {
+        // Get CSS variables
+        const {width, height, fill} = this.iconCSSVariables;
+
         // Get the icon classes
-        const containerClasses = [SIRIUS_ICON.CLASSES.ELEMENT_CONTAINER];
-        const iconClasses = [SIRIUS_ICON.CLASSES.ICON_CONTAINER];
+        const iconContainerClasses = [SIRIUS_ICON.CLASSES.ICON_CONTAINER];
+        const svgContainerClasses = [SIRIUS_ICON.CLASSES.SVG_CONTAINER];
 
         // Check if the icon is being shown
         if (this.hidden)
-            iconClasses.push(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+            svgContainerClasses.push(SIRIUS_ELEMENT.CLASSES.HIDDEN);
 
-        // Get width and height
-        const {width, height} = this._getDimensions();
 
-        return `<div class='${containerClasses.join(' ')}' height="${height}" width="${width}">
-                    <div class='${iconClasses.join(' ')}'>
-                        ${this.#getSvgElement()}
+        return `<div class='${iconContainerClasses.join(' ')}' height="${height}" width="${width}">
+                    <div class='${svgContainerClasses.join(' ')}'>
+                        ${this.#getSvgElement({width, height, fill})}
                     </div>
                 </div>`;
     }
@@ -289,119 +339,89 @@ export class SiriusIcon extends SiriusElement {
         this.#setHiddenClass();
     }
 
-    /** Get rotation degrees
-     * @param {string} rotate - Rotation direction
-     * @returns {number} - Rotation degrees
+    /** Attribute change callback
+     * @param {string} name - Attribute name
+     * @param {string} oldValue - Old attribute value
+     * @param {string} newValue - New attribute
      * */
-    #getRotationDegrees(rotate) {
-        // Check if the rotation is not set
-        if (!rotate) return this.#getRotationDegrees(SIRIUS_ICON.ICON_ATTRIBUTES.ROTATE.DEFAULT);
+    attributeChangeCallback(name, oldValue, newValue) {
+        if (oldValue === newValue)
+            return
 
-        // Get the rotation degrees based on the rotation direction
-        for (let rotationKey of Object.keys(SIRIUS_ROTATION)) {
-            const rotation = SIRIUS_ROTATION[rotationKey];
-            if (rotation.NAME === rotate) return rotation.DEG;
-        }
+        // Get attribute details
+        const details =SIRIUS_ICON_ATTRIBUTES_DETAILS[name]
 
-        // Try to parse the rotation as a number
-        const degrees = parseInt(rotate)
-        if (!isNaN(degrees)) return degrees
+        // Validate and set attribute
+        this._validateAndSetAttribute({
+            name,
+            value: newValue,
+            parsedTypes: this._parseTypes(details.TYPE),
+            def: details.DEFAULT,
+        })
 
-        // Log an error if the rotation is invalid
-        this.logger.error(`Invalid rotation: ${rotate}`)
+        switch (name) {
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLE:
+                this.style = {style: newValue, element: this.containerElement};
+                break;
 
-        // Return the default rotation degrees
-        return this.#getRotationDegrees(SIRIUS_ICON.ICON_ATTRIBUTES.ROTATE.DEFAULT)
-    }
+            case SIRIUS_ELEMENT_ATTRIBUTES.EVENTS:
+                this.events = {events: newValue, element: this.containerElement};
+                break;
 
-    /** Set icon rotation
-     * @param {string} rotate - Rotation direction
-     * */
-    #setIconRotation(rotate) {
-        // Get the icon
-        const degrees = this.#getRotationDegrees(rotate)
+            case SIRIUS_ICON_ATTRIBUTES.ICON:
+                // Update icon name
+                this._loadIconNameAndRotation()
+                break;
 
-        // Log the rotation
-        this.logger.log(`Setting rotation to ${degrees} degrees`)
+            case SIRIUS_ICON_ATTRIBUTES.ICON_ROTATE:
+                // Update icon rotation
+                this.#setIconRotation(newValue);
+                break;
 
-        // Set the icon direction
-        this._onBuiltContainerElement = (element) => {
-            element.style.transform = `rotate(${degrees}deg)`
-        }
-    }
+            case SIRIUS_ELEMENT_ATTRIBUTES.ICON_WIDTH:
+                this._updateCSSVariable(SIRIUS_ICON.CSS_VARS.SVG_WIDTH, newValue);
+                break;
 
-    /** Load dynamic properties and HTML attributes */
-    #loadAttributes() {
-        this.onBuilt = () => {
-            if (!this._attributes)
-                this.logger.log("No attributes");
+            case SIRIUS_ELEMENT_ATTRIBUTES.ICON_HEIGHT:
+                this._updateCSSVariable(SIRIUS_ICON.CSS_VARS.SVG_HEIGHT, newValue);
+                break;
 
-            Object.keys(this._attributes).forEach(attributeName => {
-                // Get the attribute value
-                const attributeValue = this._attributes[attributeName]
+            case SIRIUS_ELEMENT_ATTRIBUTES.ICON_FILL:
+                this._updateCSSVariable(SIRIUS_ICON.CSS_VARS.SVG_WIDTH, newValue);
+                break;
 
-                // Check if the attribute value is null
-                if (!attributeValue) return
+            case SIRIUS_ICON_ATTRIBUTES.HIDE:
+                this.hidden = newValue;
+                break;
 
-                switch (attributeName) {
-                    case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
-                        this._loadStyleAttribute(attributeValue, this.containerElement);
-                        break;
+            case SIRIUS_ICON_ATTRIBUTES.DISABLED:
+                if (newValue)
+                    this.setDisabled();
+                else
+                    this.setEnabled();
+                break;
 
-                    case SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME:
-                        this._loadStyleAttribute(attributeValue, this.containerElement);
-                        break;
-
-                    case SIRIUS_ICON.ATTRIBUTES.HIDE.NAME:
-                        this.hidden = attributeValue;
-                        break;
-
-                    case SIRIUS_ICON.ATTRIBUTES.DISABLED.NAME:
-                        // Add disabled class
-                        if (attributeValue)
-                            this.setDisabled();
-                        break;
-
-                    case SIRIUS_ICON.ICON_ATTRIBUTES.ROTATE.NAME:
-                        // Check if the direction is the default value
-                        if (attributeValue === SIRIUS_ICON.ICON_ATTRIBUTES.ROTATE.DEFAULT) return;
-
-                        // Set the icon rotation
-                        this.iconRotation = attributeValue;
-                        break;
-
-                    case SIRIUS_ICON.KEYFRAME_ATTRIBUTES.SHOW.NAME:
-                        // Set the show animation keyframe
-                        this._changeKeyframeRules(SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT, SIRIUS_ICON.KEYFRAME_ATTRIBUTES.SHOW.NAME, attributeValue);
-
-                        // Remove the attribute
-                        this.removeAttribute(SIRIUS_ICON.KEYFRAME_ATTRIBUTES.SHOW.NAME);
-                        break;
-
-                    case SIRIUS_ICON.KEYFRAME_ATTRIBUTES.HIDING.NAME:
-                        // Set the hiding animation keyframe
-                        this._changeKeyframeRules(SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT, SIRIUS_ICON.KEYFRAME_ATTRIBUTES.HIDING.NAME, attributeValue);
-
-                        // Remove the attribute
-                        this.removeAttribute(SIRIUS_ICON.KEYFRAME_ATTRIBUTES.HIDING.NAME);
-                        break;
-
-                    default:
-                        //this.logger.log(`Unregistered attribute: ${attributeName}`);
-                        break;
+            case SIRIUS_ICON_ATTRIBUTES.SHOW_ANIMATION:
+            case SIRIUS_ICON_ATTRIBUTES.HIDING_ANIMATION:
+                // Set the show/hiding animation keyframe
+                this.keyframeRules = {
+                    styleSheetName: SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT,
+                    keyframeName: name,
+                    keyframeRules: newValue
                 }
-            })
+                break;
+
+            default:
+                this.logger.log(`Unregistered attribute: ${newValue}`);
+                break;
         }
     }
 
     /** Lifecycle method called when the component is connected to the DOM
      */
     async connectedCallback() {
-        // Load attributes
-        this.#loadAttributes();
-
-        // Create the CSS style sheets and add them to the shadow DOM
-        await this._loadElementStyles();
+        // Load the CSS style sheets and add them to the shadow DOM
+        await this._loadAndAdoptStyles();
 
         // Get HTML inner content
         const innerHTML = this.#getTemplate();

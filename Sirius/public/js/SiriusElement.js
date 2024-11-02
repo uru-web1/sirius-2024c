@@ -25,16 +25,25 @@ export const SIRIUS_ELEMENT = deepFreeze({
         BUILT: 'built',
         HIDE: 'hide',
     },
-    ATTRIBUTES: {
-        ID: {NAME: "id", DEFAULT: null, TYPE: SIRIUS_TYPES.STRING},
-        STYLE: {NAME: 'style', DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING]},
-        EVENTS: {NAME: 'events', DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
-    },
     CLASSES: {
         HIDDEN: 'hidden',
         HIDING: 'hiding',
         CENTER_SCREEN: 'center-screen'
     }
+})
+
+/** Sirius element attributes */
+export const SIRIUS_ELEMENT_ATTRIBUTES = deepFreeze({
+    ID: 'id',
+    STYLE: 'style',
+    EVENTS: 'events',
+})
+
+/** Sirius element attributes details */
+export const SIRIUS_ELEMENT_ATTRIBUTES_DETAILS = deepFreeze({
+    [SIRIUS_ELEMENT_ATTRIBUTES.ID]: {DEFAULT: null, TYPE: SIRIUS_TYPES.STRING},
+    [SIRIUS_ELEMENT_ATTRIBUTES.STYLE]: {DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING]},
+    [SIRIUS_ELEMENT_ATTRIBUTES.EVENTS]: {DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
 })
 
 /** Sirius class that represents an element component */
@@ -43,6 +52,7 @@ export class SiriusElement extends HTMLElement {
     _styleSheets ={}
     #containerElement = null
     #elementName = 'UNDEFINED'
+    #elementId = ''
     #logger = null
     #isBuilt = false
     #onBuilt = []
@@ -59,14 +69,15 @@ export class SiriusElement extends HTMLElement {
         this.#elementName = elementName;
 
         // Load Sirius element HTML attributes
-        this._loadAttributes({htmlAttributes: SIRIUS_ELEMENT.ATTRIBUTES, properties: props});
+        this._loadAttributes({attributes: SIRIUS_ELEMENT_ATTRIBUTES, attributesDetails: SIRIUS_ELEMENT_ATTRIBUTES_DETAILS, properties: props});
 
         // Check if the element has an ID
-        if (!this._attributes?.id)
+        if (!this._attributes[SIRIUS_ELEMENT_ATTRIBUTES.ID])
             throw new Error('Element ID is required');
 
-        // Set instance ID
+        // Set instance ID and element ID
         sirius.setInstance(this._attributes.id, this);
+        this.#elementId = this._attributes.id;
 
         // Inject logger
         this.#logger = new SiriusLogger({
@@ -90,6 +101,13 @@ export class SiriusElement extends HTMLElement {
         });
     }
 
+    /** Get element ID
+     * @returns {string} - Element ID
+     */
+    get elementId() {
+        return this.#elementId
+    }
+
     /** Get Sirius logger
      * @returns {SiriusLogger} - Sirius logger
      * */
@@ -109,6 +127,14 @@ export class SiriusElement extends HTMLElement {
      */
     set containerElement(containerElement) {
         this.#containerElement = containerElement
+    }
+
+
+    /** Get style element
+     * @returns {HTMLElement} - Style element
+     * */
+    get styleElement(){
+        return this.shadowRoot.querySelector('style')
     }
 
     /** Set Sirius Element on built callback
@@ -161,6 +187,14 @@ export class SiriusElement extends HTMLElement {
         return false
     }
 
+    /** Parse attribute types
+     * @param {string[]|string} types - Element types attribute
+     * @returns {string[]} - Parsed types
+     */
+    _parseTypes(types){
+        return Array.isArray(types) ? types : [types]
+    }
+
     /** Check if the attribute has the given type
      * @param {string[]|string} types - Element types attribute
      * @param {string} type - Attribute type
@@ -168,17 +202,24 @@ export class SiriusElement extends HTMLElement {
      */
     _hasAttributeType(types, type) {
         // Check if the valid types are an array
-        const parsedTypes = Array.isArray(types) ? types : [types]
+        const parsedTypes = this._parseTypes(types)
         return {parsedTypes, hasType: parsedTypes.includes(type)}
     }
 
-    /** Validate the element attribute
+    /** Validate and set the element attribute
      * @param {string} name - Attribute name
      * @param {any} value - Attribute value
-     * @param {string[]} parsedTypes - Attribute valid types
+     * @param {string[]|string} types - Attribute valid types
      * @param {object} def - Attribute default value
      */
-    _validateAttribute({name, value, parsedTypes, def}) {
+    _validateAndSetAttribute({name, value, types, def}) {
+        // Parse types
+        const {parsedTypes, hasType: hasBoolean} = this._hasAttributeType(types, SIRIUS_TYPES.BOOLEAN)
+
+        // Check if the attribute is a boolean and the value is an empty string
+        if (value === "" && hasBoolean)
+            value = true
+
         // Check if the attribute has any type
         if (parsedTypes.includes(SIRIUS_TYPES.ANY))
             return
@@ -190,62 +231,58 @@ export class SiriusElement extends HTMLElement {
         // Check if the attribute value is in the valid types array
         if (!parsedTypes.includes(typeof value))
             throw new Error(`Invalid attribute value '${value}' for '${name}' attribute. Valid types: ${parsedTypes.join(', ')}`)
+
+        // Set the attribute value
+        this._attributes[name] = value
     }
 
     /** Load HTML attributes and properties
-     * @param {object} htmlAttributes - Element HTML attributes to load
+     * @param {object} attributes - Element HTML attributes to load
+     * @param {object} attributesDetails - Element HTML attributes details to load
      * @param {object} properties - Element properties
      * */
-    _loadAttributes({htmlAttributes, properties}) {
+    _loadAttributes({attributes, attributesDetails, properties}) {
         // Iterate over the attributes
-        Object.keys(htmlAttributes).forEach(attributeName => {
+        Object.values(attributes).forEach(name => {
             // Get the attribute name and default value
-            const htmlAttribute = htmlAttributes[attributeName]
-            const {NAME: name, DEFAULT: def, TYPE: types} = htmlAttribute
+            const {DEFAULT: def, TYPE: types} = attributesDetails[name]
 
             // Get the attribute value
-            let attributeValue = this.getAttribute(name)
-            const {parsedTypes, hasType: hasBoolean} = this._hasAttributeType(types, SIRIUS_TYPES.BOOLEAN)
-
-            // Check if the attribute is a boolean and the value is an empty string
-            if (attributeValue === "" && hasBoolean)
-                attributeValue = true
+            let value = this.getAttribute(name)
 
             // Check if the attribute is not set
-            else if (attributeValue === null)
+            else if (value === null) {
                 if (properties?.[name] === undefined)
-                    attributeValue = def
+                    value = def
 
                 else {
                     // Get the attribute value from the properties
-                    attributeValue = properties[name]
+                    value = properties[name]
 
                     // Set the attribute value
-                    this.setAttribute(name, attributeValue)
+                    this.setAttribute(name, value)
                 }
+            }
 
             // Validate the attribute
-            this._validateAttribute({
+            this._validateAndSetAttribute({
                 name,
                 def,
-                parsedTypes,
-                value: attributeValue,
+                types,
+                value,
             })
-
-            // Set the attribute value
-            this._attributes[name] = attributeValue
         })
     }
 
-    /** Get a given stylesheet file content
+    /** Load a given CSS style sheet file content
      * @param {string} cssFilename - CSS filename
      */
-    async #getStyles(cssFilename) {
+    async #loadCSSStyleSheet(cssFilename) {
         // Create the CSS stylesheet
         const sheet = new CSSStyleSheet();
 
         // Load the CSS file content
-        const css = await sirius.getStylesFile(cssFilename);
+        const css = await sirius.loadCSSStyleSheetFile(cssFilename);
 
         // Add the CSS content to the stylesheet
         sheet.replaceSync(css);
@@ -254,22 +291,22 @@ export class SiriusElement extends HTMLElement {
     }
 
     /**
-     * Get the Sirius element stylesheets
+     * Get the Sirius element style sheets
      * @param {string} cssFilename - CSS filename
      * @returns {Promise<{element: CSSStyleSheet, general: CSSStyleSheet}>} - Stylesheets
      */
-    async #getElementStyles(cssFilename) {
+    async #loadStyles(cssFilename) {
         // Get the element and the general stylesheets
-        const elementStylesheet = await this.#getStyles(cssFilename);
-        const generalStylesheet = await this.#getStyles(SIRIUS_ELEMENT.NAME);
+        const elementStylesheet = await this.#loadCSSStyleSheet(cssFilename);
+        const generalStylesheet = await this.#loadCSSStyleSheet(SIRIUS_ELEMENT.NAME);
 
         // Update the stylesheets
         this._styleSheets = {[SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT]: elementStylesheet, [SIRIUS_ELEMENT.STYLE_SHEETS.GENERAL]: generalStylesheet};
     }
 
-    /** Load style sheets to the shadow DOM
+    /** Adopt style sheets by the shadow DOM
      */
-    async #loadStyles() {
+    #adoptStyles() {
         // Get style sheets
         const element = this._styleSheets[SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT];
         const general = this._styleSheets[SIRIUS_ELEMENT.STYLE_SHEETS.GENERAL];
@@ -277,22 +314,36 @@ export class SiriusElement extends HTMLElement {
         // Add the style sheets to the shadow DOM
         this.shadowRoot.adoptedStyleSheets = [element, general];
     }
-
     /**
-     * Load element styles sheets to the shadow DOM
+     * Load element styles sheets and adopt them by the shadow DOM
      * @param {string} cssFilename - CSS filename
      */
-    async _loadElementStyles(cssFilename = this.#elementName) {
+    async _loadAndAdoptStyles(cssFilename = this.#elementName) {
         // Create the CSS style sheets and add them to the shadow DOM
-        await this.#getElementStyles(cssFilename);
-        await this.#loadStyles();
+        await this.#loadStyles(cssFilename);
+        this.#adoptStyles();
+    }
+
+    /** Format CSS variables
+     * @param {string} name - Variable name
+     */
+    _formatCSSVariable(name) {
+        return `var(${name})`
+    }
+
+    /** Update shadow DOM variable
+     * @param {string} name - Variable name
+     * @param {string} value - Variable value
+     * */
+    _updateCSSVariable(name, value){
+        this.styleElement.sheet.rules[0].style.setProperty(name, value)
     }
 
     /**
      * Create a template from the inner HTML
      * @param {string} innerHTML - Inner HTML
      */
-    async _createTemplate(innerHTML) {
+    _createTemplate(innerHTML) {
         // Check if the inner HTML is empty
         if (!innerHTML) {
             this.logger.error('Failed to create template');
@@ -311,7 +362,7 @@ export class SiriusElement extends HTMLElement {
      * @param {string|object|null} style - Style attribute value
      * @param {HTMLElement} element - Element to add the style
      */
-    _loadStyleAttribute(style, element) {
+    set style({style, element}) {
         if (!style)
             return
 
@@ -327,13 +378,8 @@ export class SiriusElement extends HTMLElement {
                     for (let styleName in style)
                         element.style[styleName] = style[styleName];
 
-                else {
+                else
                     this.logger.error('Invalid style attribute value');
-                    return;
-                }
-
-                // Remove the style attribute of the component
-                this.removeAttribute(SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME);
             }
         }
     }
@@ -342,7 +388,7 @@ export class SiriusElement extends HTMLElement {
      * @param {object|null} events - Events attribute value
      * @param {HTMLElement} element - Element to add the event listeners
      */
-    _loadEventsAttribute(events, element) {
+    set events({events, element}) {
         if (!events)
             return
 
@@ -361,9 +407,6 @@ export class SiriusElement extends HTMLElement {
                 // Add event listeners
                 for (let event in events)
                     targetElement.addEventListener(event, events[event])
-
-                // Remove the events attribute of the component
-                this.removeAttribute(SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME);
             }
         }
     }
@@ -373,7 +416,7 @@ export class SiriusElement extends HTMLElement {
      * @param {string} keyframeName - Keyframe name
      * @param {string} keyframeRules - Keyframe content
      */
-    _changeKeyframeRules(styleSheetName, keyframeName, keyframeRules) {
+     set keyframeRules({styleSheetName, keyframeName, keyframeRules}) {
         if (!keyframeRules || keyframeRules === "")
             return
 
@@ -411,7 +454,7 @@ export class SiriusElement extends HTMLElement {
                 rule.deleteRule(rule.cssRules[0].keyText);
 
             // Add the keyframe rules
-            for (let keyframeRule of keyframeContent.split('}'))
+            for (let keyframeRule of keyframeRules.split('}'))
             rule.appendRule(keyframeRule+'}');
 
             // Log the keyframe content change

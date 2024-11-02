@@ -94,12 +94,12 @@ class Sirius {
         this.#instancesId.set(id, instance);
     }
 
-    /** Get CSS styles file
+    /** Load CSS style sheet file
      * @param {string} cssFilename - CSS filename
      * @param {string} cssRoute - CSS route
      * @returns {Promise<any|string>} - CSS file
      */
-    async getStylesFile(cssFilename, cssRoute = SIRIUS.ROUTES.CSS(cssFilename)) {
+    async loadCSSStyleSheetFile(cssFilename, cssRoute = SIRIUS.ROUTES.CSS(cssFilename)) {
         // Check if the CSS file is already loaded
         if (this.#cssFiles.has(cssFilename)) {
             this.logger.log(`CSS file '${cssFilename}' already loaded`);
@@ -154,9 +154,10 @@ class Sirius {
     /** Get Sirius Script file
      * @param {string} jsFilename - JavaScript filename
      * @param {string} jsClass - JavaScript class
+     * @param {string} jsRoute - CSS route
      * @returns {Promise<Class | null>} - JavaScript class
      * */
-    async getClass(jsFilename, jsClass) {
+    async getClass(jsFilename, jsClass, jsRoute = SIRIUS.ROUTES.CSS(jsFilename)) {
         // Check if script has been loaded
         if (this.#jsModules.has(jsFilename)) {
             const jsModule = this.#jsModules.get(jsFilename);
@@ -181,7 +182,7 @@ class Sirius {
         const jsModule = this.#jsModules.get(jsFilename);
 
         // Load the script
-        const importedScript = await import(SIRIUS.ROUTES.JS(jsFilename));
+        const importedScript = await import(jsRoute);
         if (!importedScript) {
             this.logger.error(`Error loading script '${jsFilename}'`);
             return null;
