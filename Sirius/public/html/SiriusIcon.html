@@ -55,14 +55,26 @@
     // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
         const idName = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
-        // const hideName = SIRIUS_ELEMENT.ATTRIBUTES.HIDE.NAME;
         const iconName = SIRIUS_ICON.ICON_ATTRIBUTES.ICON.NAME;
+        const showAnimationName = SIRIUS_ICON.KEYFRAME_ATTRIBUTES.SHOW.NAME;
+        // const hideName = SIRIUS_ELEMENT.ATTRIBUTES.HIDE.NAME;
 
         // Create the icon
         const siriusIcon4 = new SiriusIcon({
             [idName]: 'icon-4',
             [iconName]: SIRIUS_ICONS.ARROW,
+            [showAnimationName]: `
+                0% {
+                    transform: scale(0);
+                    fill: red;
+                }
+                100% {
+                    transform: scale(1);
+                    fill: blue;
+                }
+            `,
             // [hideName]: false
+
         })
 
         // Add the icon to the DOM
@@ -74,7 +86,7 @@
         }
 
         // Link the button to the icon and center it
-        const icon = document.getElementById('icon-1');
+        const icon = document.getElementById('icon-4');
         icon.centerScreen();
 
         // Add an event listener to the button

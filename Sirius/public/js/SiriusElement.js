@@ -17,6 +17,10 @@ export const SIRIUS_TYPES = deepFreeze({
 /** Sirius element constants */
 export const SIRIUS_ELEMENT = deepFreeze({
     NAME: 'SiriusElement',
+    STYLE_SHEETS: {
+        ELEMENT: 'element',
+        GENERAL: 'general'
+    },
     EVENTS: {
         BUILT: 'built',
         HIDE: 'hide',
@@ -36,6 +40,7 @@ export const SIRIUS_ELEMENT = deepFreeze({
 /** Sirius class that represents an element component */
 export class SiriusElement extends HTMLElement {
     _attributes = {}
+    _styleSheets ={}
     #containerElement = null
     #elementName = 'UNDEFINED'
     #logger = null
@@ -258,15 +263,19 @@ export class SiriusElement extends HTMLElement {
         const elementStylesheet = await this.#getStyles(cssFilename);
         const generalStylesheet = await this.#getStyles(SIRIUS_ELEMENT.NAME);
 
-        return {element: elementStylesheet, general: generalStylesheet};
+        // Update the stylesheets
+        this._styleSheets = {[SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT]: elementStylesheet, [SIRIUS_ELEMENT.STYLE_SHEETS.GENERAL]: generalStylesheet};
     }
 
-    /**
-     * Load style sheets to the shadow DOM
-     * @param {CSSStyleSheet[]} styleSheets - Stylesheets
+    /** Load style sheets to the shadow DOM
      */
-    async #loadStyles(...styleSheets) {
-        this.shadowRoot.adoptedStyleSheets = styleSheets;
+    async #loadStyles() {
+        // Get style sheets
+        const element = this._styleSheets[SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT];
+        const general = this._styleSheets[SIRIUS_ELEMENT.STYLE_SHEETS.GENERAL];
+
+        // Add the style sheets to the shadow DOM
+        this.shadowRoot.adoptedStyleSheets = [element, general];
     }
 
     /**
@@ -275,8 +284,8 @@ export class SiriusElement extends HTMLElement {
      */
     async _loadElementStyles(cssFilename = this.#elementName) {
         // Create the CSS style sheets and add them to the shadow DOM
-        const {element, general} = await this.#getElementStyles(cssFilename);
-        this.#loadStyles(element, general);
+        await this.#getElementStyles(cssFilename);
+        await this.#loadStyles();
     }
 
     /**
@@ -357,6 +366,61 @@ export class SiriusElement extends HTMLElement {
                 this.removeAttribute(SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME);
             }
         }
+    }
+
+    /** Change keyframe animation content
+     * @param {string} styleSheetName - Stylesheet name
+     * @param {string} keyframeName - Keyframe name
+     * @param {string} keyframeRules - Keyframe content
+     */
+    _changeKeyframeRules(styleSheetName, keyframeName, keyframeRules) {
+        if (!keyframeRules || keyframeRules === "")
+            return
+
+        let styleSheet = null;
+
+        // Check if the style sheet name is valid
+        if (styleSheetName === SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT)
+            styleSheet = this._styleSheets[SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT];
+
+        else if (styleSheetName === SIRIUS_ELEMENT.STYLE_SHEETS.GENERAL)
+            styleSheet = this._styleSheets[SIRIUS_ELEMENT.STYLE_SHEETS.GENERAL];
+
+        else {
+            this.logger.error('Invalid style sheet name');
+            return;
+        }
+
+        // Get the rules
+        const rules = styleSheet.cssRules || styleSheet.rules;
+
+        // Iterate over the rules
+        for (let i = 0; i < rules.length; i++) {
+            const rule = rules[i];
+
+            // Check if the rule is a keyframe rule
+            if (rule.type !== CSSRule.KEYFRAMES_RULE)
+                continue;
+
+            // Check the keyframe name
+            if (rule.name !== keyframeName)
+                continue;
+
+            // Delete the keyframe rule
+            while (rule.cssRules.length > 0)
+                rule.deleteRule(rule.cssRules[0].keyText);
+
+            // Add the keyframe rules
+            for (let keyframeRule of keyframeContent.split('}'))
+            rule.appendRule(keyframeRule+'}');
+
+            // Log the keyframe content change
+            this.logger.log(`Changed keyframe content: ${keyframeName}`);
+            return
+        }
+
+        // Log that the keyframe was not found
+        this.logger.error(`Keyframe not found: ${keyframeName}`);
     }
 
     /** Add the element to the body */

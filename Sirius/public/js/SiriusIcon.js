@@ -17,6 +17,10 @@ export const SIRIUS_ICON = deepFreeze({
         HIDE: {NAME: 'hide', DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
         DISABLED: {NAME: 'disabled', DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
     },
+    KEYFRAME_ATTRIBUTES: {
+        SHOW: {NAME: 'show-animation', DEFAULT: '', TYPE: SIRIUS_TYPES.STRING},
+        HIDING: {NAME: 'hiding-animation', DEFAULT: '', TYPE: SIRIUS_TYPES.STRING},
+    },
     CLASSES: {
         ELEMENT_CONTAINER: 'element-container',
         ICON_CONTAINER: 'icon-container',
@@ -47,15 +51,12 @@ export class SiriusIcon extends SiriusElement {
     constructor(props) {
         super(props, SIRIUS_ICON.NAME);
 
-        // Load Sirius Icon HTML general attributes
-        this._loadAttributes({
-            htmlAttributes: SIRIUS_ICON.ATTRIBUTES,
-            properties: props
-        });
+        // Sirius icon HTML general attributes, icon-specific attributes and keyframe attributes
+        const htmlAttributes = {...SIRIUS_ICON.ICON_ATTRIBUTES, ...SIRIUS_ICON.ATTRIBUTES, ...SIRIUS_ICON.KEYFRAME_ATTRIBUTES}
 
-        // Load Sirius Icon HTML attributes icon-specific attributes
+        // Load attributes
         this._loadAttributes({
-            htmlAttributes: SIRIUS_ICON.ICON_ATTRIBUTES,
+            htmlAttributes,
             properties: props
         });
     }
@@ -367,6 +368,22 @@ export class SiriusIcon extends SiriusElement {
 
                         // Set the icon rotation
                         this.iconRotation = attributeValue;
+                        break;
+
+                    case SIRIUS_ICON.KEYFRAME_ATTRIBUTES.SHOW.NAME:
+                        // Set the show animation keyframe
+                        this._changeKeyframeRules(SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT, SIRIUS_ICON.KEYFRAME_ATTRIBUTES.SHOW.NAME, attributeValue);
+
+                        // Remove the attribute
+                        this.removeAttribute(SIRIUS_ICON.KEYFRAME_ATTRIBUTES.SHOW.NAME);
+                        break;
+
+                    case SIRIUS_ICON.KEYFRAME_ATTRIBUTES.HIDING.NAME:
+                        // Set the hiding animation keyframe
+                        this._changeKeyframeRules(SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT, SIRIUS_ICON.KEYFRAME_ATTRIBUTES.HIDING.NAME, attributeValue);
+
+                        // Remove the attribute
+                        this.removeAttribute(SIRIUS_ICON.KEYFRAME_ATTRIBUTES.HIDING.NAME);
                         break;
 
                     default:

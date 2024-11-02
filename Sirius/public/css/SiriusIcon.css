@@ -9,14 +9,14 @@
 }
 
 .icon-container:not(.hidden) > svg {
-    animation: draw var(--sirius-animation-duration) forwards;
+    animation: show-animation var(--sirius-animation-duration) forwards;
 }
 
 .icon-container.hiding > svg {
-    animation: erase var(--sirius-animation-duration) forwards;
+    animation: hiding-animation var(--sirius-animation-duration) forwards;
 }
 
-@keyframes draw {
+@keyframes show-animation {
     0% {
         width: 0;
     }
@@ -25,7 +25,7 @@
     }
 }
 
-@keyframes erase {
+@keyframes hiding-animation {
     0% {
         width: 100%;
     }
