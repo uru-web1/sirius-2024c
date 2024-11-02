@@ -95,10 +95,11 @@ class Sirius {
     }
 
     /** Get CSS styles file
-     * @param cssFilename - CSS filename
+     * @param {string} cssFilename - CSS filename
+     * @param {string} cssRoute - CSS route
      * @returns {Promise<any|string>} - CSS file
      */
-    async getStylesFile(cssFilename) {
+    async getStylesFile(cssFilename, cssRoute = SIRIUS.ROUTES.CSS(cssFilename)) {
         // Check if the CSS file is already loaded
         if (this.#cssFiles.has(cssFilename)) {
             this.logger.log(`CSS file '${cssFilename}' already loaded`);
@@ -121,7 +122,6 @@ class Sirius {
         this.#lockedCSSFiles.add(cssFilename);
 
         // Create CSS promise and store it
-        const cssRoute = SIRIUS.ROUTES.CSS(cssFilename);
         const cssPromise = (async () => {
             // Load the CSS file
             const response = await fetch(cssRoute)

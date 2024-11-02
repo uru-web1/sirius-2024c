@@ -7,9 +7,9 @@ export const SIRIUS_ICON = deepFreeze({
     NAME: "SiriusIcon",
     TAG: "sirius-icon",
     ICON_ATTRIBUTES: {
-        ICON: {NAME: "icon", DEFAULT: SIRIUS_ICONS.WARNING, TYPE: SIRIUS_TYPES.STRING, PARSE: true},
-        WIDTH: {NAME: "width", DEFAULT: "24px", TYPE: [SIRIUS_TYPES.STRING], LOAD: true},
-        HEIGHT: {NAME: "height", DEFAULT: "24px", TYPE: [SIRIUS_TYPES.STRING]},
+        ICON: {NAME: "icon", DEFAULT: SIRIUS_ICONS.WARNING, TYPE: SIRIUS_TYPES.STRING},
+        WIDTH: {NAME: "width", DEFAULT: "24px", TYPE: SIRIUS_TYPES.STRING},
+        HEIGHT: {NAME: "height", DEFAULT: "24px", TYPE: SIRIUS_TYPES.STRING},
         FILL: {NAME: "fill", DEFAULT: "red", TYPE: SIRIUS_TYPES.STRING},
         ROTATE: {NAME: "rotate", DEFAULT: "right", TYPE: SIRIUS_TYPES.STRING},
     },
