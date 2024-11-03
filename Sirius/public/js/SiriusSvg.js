@@ -23,6 +23,9 @@ export const SIRIUS_ICONS = {
 /** Get the SVG icon
  * @param {string} icon - Icon name
  * @param {object} options - Icon options
+ * @param {number} options.width - Icon width
+ * @param {number} options.height - Icon height
+ * @param {string} options.fill - Icon fill color
  * @returns {string | null} - SVG icon element or null
  * */
 export const getSvgElement = (icon, {width, height, fill}) => {
@@ -31,6 +34,27 @@ export const getSvgElement = (icon, {width, height, fill}) => {
     if (!innerHtml) return null;
 
     return `<svg xmlns="http://www.w3.org/2000/svg" height="${height}" viewBox="0 -960 960 960" width="${width}" fill="${fill}">
+        ${innerHtml}
+    </svg>`
+}
+
+/** Get the SVG icon
+ * @param {string} icon - Icon name
+ * @param {object} options - Icon options
+ * @param {string} options.width - Icon CSS width
+ * @param {string} options.height - Icon CSS height
+ * @param {string} options.fill - Icon CSS fill color
+ * @returns {string | null} - SVG icon element or null
+ * */
+export const getSvgElementWithCSS = (icon, {width, height, fill}) => {
+    // Get the inner HTML of the SVG icon
+    const innerHtml = SIRIUS_SVG_INNER_HTML[icon];
+    if (!innerHtml) return null;
+
+    // Generate the SVG icon style
+    const style = `height: ${height}; width: ${width}; fill: ${fill};`;
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" style="${style}" viewBox="0 -960 960 960">
         ${innerHtml}
     </svg>`
 }

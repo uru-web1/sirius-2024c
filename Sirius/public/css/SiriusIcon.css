@@ -1,7 +1,8 @@
 :host {
     --svg-width: 24px;
     --svg-height: 24px;
-    --svg-fill: black;
+    --svg-fill: grey;
+    --animation-duration: 500ms;
 }
 
 .icon-container {
@@ -15,11 +16,11 @@
 }
 
 .svg-container:not(.hidden) > svg {
-    animation: show-animation var(--sirius-animation-duration) forwards;
+    animation: show-animation var(--animation-duration) forwards;
 }
 
 .svg-container.hiding > svg {
-    animation: hiding-animation var(--sirius-animation-duration) forwards;
+    animation: hiding-animation var(--animation-duration) forwards;
 }
 
 @keyframes show-animation {
