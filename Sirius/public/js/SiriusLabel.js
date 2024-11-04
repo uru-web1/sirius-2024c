@@ -5,6 +5,14 @@ import deepFreeze from "./utils/deep-freeze.js";
 export const SIRIUS_LABEL = deepFreeze({
     NAME: "SiriusLabel",
     TAG: "sirius-label",
+    CSS_VARS:{
+        CAPTION_TEXT_ALIGN: "--text-align",
+        CAPTION_BACKGROUND_COLOR: "--background-color",
+        CAPTION_COLOR: "--color",
+        CAPTION_FONT_FAMILY: "--font-family",
+        CAPTION_FONT_SIZE: "--font-size",
+        CAPTION_PADDING: "--padding"
+    },
     CLASSES: {
         LABEL_CONTAINER: 'label-container',
         CAPTION_CONTAINER: 'caption-container',
@@ -14,17 +22,17 @@ export const SIRIUS_LABEL = deepFreeze({
 /** Sirius label attributes */
 export const SIRIUS_LABEL_ATTRIBUTES = deepFreeze({
     CAPTION: "caption",
-    CAPTION_POSITION: "caption-position",
+    CAPTION_TEXT_ALIGN: "caption-text-align",
+    CAPTION_BACKGROUND_COLOR: "caption-background-color",
     CAPTION_COLOR: "caption-color",
-    CAPTION_FONT: "caption-font"
+    CAPTION_FONT_FAMILY: "caption-font-family",
+    CAPTION_FONT_SIZE: "caption-font-size",
+    CAPTION_PADDING: "caption-padding"
 })
 
 /** Sirius label attributes default values */
 export const SIRIUS_LABEL_ATTRIBUTES_DEFAULT = deepFreeze({
     [SIRIUS_LABEL_ATTRIBUTES.CAPTION]: "Please enter a caption",
-    [SIRIUS_LABEL_ATTRIBUTES.CAPTION_POSITION]: "center",
-    [SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR]: "black",
-    [SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT]: "Arial"
 })
 
 /** Sirius class that represents a label component */
@@ -61,18 +69,32 @@ export class SiriusLabel extends SiriusElement {
         this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION, caption);
     }
 
-    /** Get the caption position
-     * @returns {string} - Position
+    /** Get the caption text align
+     * @returns {string} - Text alignment
      */
-    get captionPosition() {
-        return this.getAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_POSITION);
+    get captionTextAlign() {
+        return this.getAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_TEXT_ALIGN);
     }
 
-    /** Set the caption position
-     * @param {string} position - Position
+    /** Set the caption text align
+     * @param {string} textAlignment - Text alignment
      */
-    set captionPosition(position) {
-        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_POSITION, position);
+    set captionTextAlign(textAlignment) {
+        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_TEXT_ALIGN,textAlignment);
+    }
+
+    /** Get the caption background color
+     * @returns {string} - Background color
+     */
+    get captionBackgroundColor() {
+        return this.getAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_BACKGROUND_COLOR);
+    }
+
+    /** Set the caption background color
+     * @param {string} bgColor - Background color
+     */
+    set captionBackgroundColor(bgColor) {
+        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_BACKGROUND_COLOR, bgColor);
     }
 
     /** Get the caption color
@@ -89,18 +111,47 @@ export class SiriusLabel extends SiriusElement {
         this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR, color);
     }
 
-    /** Get the caption font
-     * @returns {string} - Font
+    /** Get the caption font family
+     * @returns {string} - Font family
      */
-    get captionFont() {
-        return this.getAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT);
+    get captionFontFamily() {
+        return this.getAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_FAMILY);
     }
 
-    /** Set the caption font
-     * @param {string} font - Font
+    /** Set the caption font family
+     * @param {string} fontFamily - Font family
      */
-    set captionFont(font) {
-        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT, font);
+    set captionFontFamily(fontFamily) {
+        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_FAMILY, fontFamily);
+    }
+
+    /** Get the caption font family
+     * @returns {string} - Font family
+     */
+    get captionFontSize() {
+        return this.getAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_SIZE);
+    }
+
+    /** Set the caption font size
+     * @param {string} fontSize - Font size
+     */
+    set captionFontSize(fontSize) {
+        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_SIZE, fontSize);
+    }
+
+
+    /** Get the caption padding
+     * @returns {string} - Padding
+     */
+    get captionPadding() {
+        return this.getAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_PADDING);
+    }
+
+    /** Set the caption padding
+     * @param {string} padding - Padding
+     */
+    set captionPadding(padding) {
+        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_PADDING, padding);
     }
 
     /** Get the label container element
@@ -141,32 +192,57 @@ export class SiriusLabel extends SiriusElement {
      * @param {string} caption - Caption
      */
     #setCaption(caption) {
-        this._onBuiltCaptionContainerElement = element =>
-            element.innerHTML = caption;
+        if (caption)
+            this._onBuiltCaptionContainerElement = element =>
+                element.innerHTML = caption;
     }
 
-    /** Private method to set the caption position
-     * @param {string} position - Position
+    /** Private method to set the caption text align
+     * @param {string} textAlignment - Text alignment
      */
-    #setCaptionPosition(position) {
-        this._onBuiltCaptionContainerElement = element =>
-            element.style.textAlign = position;
+    #setCaptionTextAlign(textAlignment) {
+        if (textAlignment)
+            this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_TEXT_ALIGN, textAlignment)
+    }
+
+    /** Private method to set the caption background color
+     * @param {string} bgColor - Background color
+     */
+    #setCaptionBackgroundColor(bgColor) {
+        if (bgColor)
+            this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_BACKGROUND_COLOR, bgColor)
     }
 
     /** Private method to set the caption color
      * @param {string} color - Color
      */
     #setCaptionColor(color) {
-        this._onBuiltCaptionContainerElement = element =>
-            element.style.color = color;
+        if (color)
+            this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_COLOR, color)
     }
 
-    /** Private method to set the caption font
-     * @param {string} font - Font
+    /** Private method to set the caption font family
+     * @param {string} fontFamily - Font family
      */
-    #setCaptionFont(font) {
-        this._onBuiltCaptionContainerElement = element =>
-            element.style.fontFamily = font;
+    #setCaptionFontFamily(fontFamily) {
+        if (fontFamily)
+            this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_FONT_FAMILY, fontFamily)
+    }
+
+    /** Private method to set the caption font size
+     * @param {string} fontSize - Font size
+     */
+    #setCaptionFontSize(fontSize) {
+        if (fontSize)
+            this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_FONT_SIZE, fontSize)
+    }
+
+    /** Private method to set the caption padding
+     * @param {string} padding - Padding
+     */
+    #setCaptionPadding(padding) {
+        if (padding)
+            this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_PADDING, padding)
     }
 
     /** Private method to set style attribute
@@ -198,9 +274,9 @@ export class SiriusLabel extends SiriusElement {
      * */
     #getTemplate() {
         return `<div class="${SIRIUS_LABEL.CLASSES.LABEL_CONTAINER}">
-                    <span class ="${SIRIUS_LABEL.CLASSES.CAPTION_CONTAINER}">
+                    <div class ="${SIRIUS_LABEL.CLASSES.CAPTION_CONTAINER}">
                         ${this.caption}
-                    </span>
+                    </div>
                 </div>`;
     }
 
@@ -228,16 +304,28 @@ export class SiriusLabel extends SiriusElement {
                 this.#setCaption(formattedValue);
                 break;
 
-            case SIRIUS_LABEL_ATTRIBUTES.CAPTION_POSITION:
-                this.#setCaptionPosition(formattedValue);
+            case SIRIUS_LABEL_ATTRIBUTES.CAPTION_TEXT_ALIGN:
+                this.#setCaptionTextAlign(formattedValue);
+                break;
+
+                case SIRIUS_LABEL_ATTRIBUTES.CAPTION_BACKGROUND_COLOR:
+                this.#setCaptionBackgroundColor(formattedValue);
                 break;
 
             case SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR:
                 this.#setCaptionColor(formattedValue);
                 break;
 
-            case SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT:
-                this.#setCaptionFont(formattedValue);
+            case SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_FAMILY:
+                this.#setCaptionFontFamily(formattedValue);
+                break;
+
+                case SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_SIZE:
+                this.#setCaptionFontSize(formattedValue);
+                break;
+
+                case SIRIUS_LABEL_ATTRIBUTES.CAPTION_PADDING:
+                this.#setCaptionPadding(formattedValue);
                 break;
 
             default:

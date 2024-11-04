@@ -607,22 +607,15 @@ export class SiriusElement extends HTMLElement {
             }
 
             // Check if the attribute is set on the instance properties
-            if (instanceProperties && instanceProperties[name] !== undefined)
-                value = instanceProperties[name];
+            if (instanceProperties)
+                value = instanceProperties?.[name];
 
-            else {
-                // Get the attribute default value
-                value = attributesDefault[name]
-
-                // Check if the default value is not set
-                if (value === undefined) {
-                    this.logger.error(`Default value is not set for '${name}' attribute`);
-                    return;
-                }
-            }
+            // Get the attribute default value
+            else
+                value = attributesDefault?.[name]
 
             // Check if the value is null
-            if (value === null) return;
+            if (value === null||value ===undefined) return;
 
             // Set the attribute default value
             this.setAttribute(name, value.trim())
