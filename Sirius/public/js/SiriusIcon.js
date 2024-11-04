@@ -403,8 +403,7 @@ export class SiriusIcon extends SiriusElement {
         if (!events)
             return
 
-        // Add the events property to the element when built
-        this._onBuiltIconContainerElement = (element) => this._setEvents(events, element);
+        this._setEvents(events, this);
     }
 
     /** Get the icon SVG element
