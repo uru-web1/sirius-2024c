@@ -64,7 +64,10 @@ export class SiriusElement extends HTMLElement {
     _properties = {}
     _styleSheets = {}
     _elementStyleSheetRules = new Map()
+    _containerElement = null
     _applyingStyle = false;
+    _hidden = false;
+    _hiding= false;
     #elementName = ''
     #logger = null
     #isBuilt = false
@@ -134,16 +137,12 @@ export class SiriusElement extends HTMLElement {
             attribute => attribute !== SIRIUS_ELEMENT_ATTRIBUTES.ID)
     }
 
-    _containerElement = null
-
     /** Get the element container
      * @returns {HTMLElement} - Element container
      */
     get containerElement() {
         return this._containerElement
     }
-
-    _hidden = false;
 
     /** Get hidden icon state
      * @returns {string} - Icon hidden state
@@ -282,27 +281,31 @@ export class SiriusElement extends HTMLElement {
             element: element || this.containerElement,
             callback: (element) => {
                 // Check if the element is already hidden
-                if (this._hidden) {
-                    this.logger.log('Element already hidden');
+                if (this._hidden|| this._hiding) {
+                    this.logger.log('Element already hidden or hiding');
                     return;
                 }
-
-                // Set the element as hidden
-                this._hidden = true
 
                 // Check if there is an event to wait for
                 if (!event) {
                     element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                    this._hidden = true;
                     this.logger.log('Element hidden');
                     return;
                 }
 
                 // Get event handler
                 const eventHandler = () => {
-                    // Hide the element
-                    element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
-                    element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-                    this.logger.log('Element hidden');
+                    // Check if the event hasn't been stopped
+                    if (this._hiding) {
+                        // Hide the element
+                        element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
+                        element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                        this._hiding = false
+                        this._hidden = true;
+
+                        this.logger.log('Element hidden');
+                    }
 
                     // Remove event listener
                     element.removeEventListener(event, eventHandler);
@@ -314,6 +317,7 @@ export class SiriusElement extends HTMLElement {
                 // Remove the hidden class and add the hiding class
                 element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
                 element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDING);
+                this._hiding = true;
 
                 this.logger.log('Element hiding');
             }
@@ -329,16 +333,20 @@ export class SiriusElement extends HTMLElement {
             element: element || this.containerElement,
             callback: (element) => {
                 // Check if the element is already shown
-                if (!this._hidden) {
+                if (!this._hidden&&!this._hiding) {
                     this.logger.log('Element already shown');
                     return;
                 }
 
-                // Set the element as shown
-                this._hidden = false;
+                // Check if the element is hiding
+                if (this._hiding) {
+                    this._hiding= false;
+                    element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
+                }
 
                 // Show the element
                 element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                this._hidden = false;
                 this.logger.log('Element shown');
             }
         }

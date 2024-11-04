@@ -77,7 +77,7 @@ export class SiriusIcon extends SiriusElement {
     constructor(properties) {
         super(properties, SIRIUS_ICON.NAME);
 
-        // Load attributes
+        // Load SiriusIcon attributes
         this._loadAttributes({
             instanceProperties: properties,
             attributes: SIRIUS_ICON_ATTRIBUTES,
