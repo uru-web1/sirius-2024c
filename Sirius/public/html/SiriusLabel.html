@@ -39,17 +39,6 @@
         const siriusLabel2 = new SiriusLabel({
             [idKey]: 'label-1',
             [captionKey]: 'Hello world con JS',
-            [eventsKey]: {
-                'click': () => {
-                    console.log('Hizo click en el Caption...');
-                },
-                'mouseover': () => {
-                    console.log('Hizo mouseover en el Caption...');
-                },
-                'mouseout': () => {
-                    console.log('Hizo mouseout en el Caption...');
-                }
-            },
             [positionKey]: 'left',
             [colorKey]: 'blue',
             [fontKey]: 'fantasy',
@@ -58,6 +47,13 @@
 
         // Add the label to the DOM
         siriusLabel2.addToBody()
+
+        // Add an events to the label
+        siriusLabel2.events = {
+            'click': () => siriusLabel2.logger.log('click'),
+            'mouseover': () => siriusLabel2.logger.log('mouseover'),
+            'mouseout': () => siriusLabel2.logger.log('mouseout')
+        }
     }
 </script>
 </body>

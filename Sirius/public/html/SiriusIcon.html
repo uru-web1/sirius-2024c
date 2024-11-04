@@ -73,18 +73,25 @@
         // Change the icon
         siriusIcon4.iconName = SIRIUS_ICONS.HOME;
 
+        // Add events to the icon
+        siriusIcon4.events = {
+            'click': () => siriusIcon4.logger.log('click'),
+            'mouseover': () => siriusIcon4.logger.log('mouseover'),
+            'mouseout': () => siriusIcon4.logger.log('mouseout')
+        }
+
         // Link the button to the icon and center it
-        const icon = document.getElementById('icon-4');
-        icon.centerScreen();
+        const icon1 = document.getElementById('icon-1');
+        icon1.centerScreen();
 
         // Add an event listener to the button
         const click = document.getElementById('animateButton');
 
         click.addEventListener("click", () => {
-            if (!icon)
+            if (!icon1)
                 return
 
-            icon.toggleHidden();
+            icon1.toggleHidden();
         });
     }
 </script>

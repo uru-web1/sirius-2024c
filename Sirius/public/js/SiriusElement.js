@@ -170,31 +170,6 @@ export class SiriusElement extends HTMLElement {
         return this._properties[SIRIUS_ELEMENT_PROPERTIES.EVENTS]
     }
 
-    /** Load events attribute to the container element
-     * @param {object} events - Events attribute value
-     */
-    set events(events) {
-        if (!events)
-            return
-
-        // Add the events attribute to the element when built
-        this._onBuiltContainerElement = (element) => {
-            // Get the events key
-            const eventsKey = SIRIUS_ELEMENT_ATTRIBUTES.EVENTS
-
-            // Validate the element property
-            this._updateProperty({
-                name: eventsKey,
-                value: events,
-                propertiesDetails: SIRIUS_ELEMENT_PROPERTIES_DETAILS[eventsKey]
-            })
-
-            // Add event listeners
-            for (let event in events)
-                element.addEventListener(event, events[event])
-        }
-    }
-
     /** Get Sirius logger
      * @returns {SiriusLogger} - Sirius logger
      * */
@@ -388,6 +363,32 @@ export class SiriusElement extends HTMLElement {
             // Set the style attribute
             element.style.setProperty(name.trim(), value.trim());
         })
+    }
+
+    /** Protected method to set events property to the given element
+     * @param {object} events - Events attribute value
+     * @param {HTMLElement} element - Element to set the events
+     */
+    _setEvents(events, element) {
+        // Check if the events or element is not set
+        if (!events || !element) {
+            this.logger.error('Events or element is not set');
+            return
+        }
+
+        // Get the events key
+        const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
+
+        // Validate the element property
+        this._updateProperty({
+            name: eventsKey,
+            value: events,
+            propertiesDetails: SIRIUS_ELEMENT_PROPERTIES_DETAILS
+        })
+
+        // Add event listeners
+        for (let event in events)
+            element.addEventListener(event, events[event])
     }
 
     /** Check the container element
@@ -697,35 +698,6 @@ export class SiriusElement extends HTMLElement {
         this._properties[name] = value
     }
 
-    /** Load the element properties
-     * @param {object} instanceProperties - Element instance properties
-     * @param {object} properties - Element properties
-     * @param {object} propertiesDetails - Element properties details
-     */
-    _loadProperties({instanceProperties, properties, propertiesDetails}) {
-        // Iterate over the properties
-        Object.values(properties).forEach(name => {
-            // Get the property value
-            let value = instanceProperties?.[name]
-
-            // Check if the property is not set
-            if (value === undefined) {
-                // Get the property default value
-                const {DEFAULT: def} = propertiesDetails[name]
-
-                // Check if the default value is not set
-                if (def === undefined) {
-                    this.logger.error(`Default value is not set for '${name}' property`);
-                    return;
-                }
-                value = def
-            }
-
-            // Validate and update the property
-            this._updateProperty({name, value, propertiesDetails})
-        })
-    }
-
     /** Load a given CSS style sheet file content
      * @param {string} cssFilename - CSS filename
      */
@@ -939,14 +911,6 @@ export class SiriusElement extends HTMLElement {
             instanceProperties: this._properties,
             attributes: SIRIUS_ELEMENT_ATTRIBUTES,
             attributesDefault: SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT,
-        });
-
-        // Load Sirius element JS properties
-        const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
-        this._loadProperties({
-            instanceProperties: {[eventsKey]: this._properties?.[eventsKey]},
-            properties: SIRIUS_ELEMENT_PROPERTIES,
-            propertiesDetails: SIRIUS_ELEMENT_PROPERTIES_DETAILS,
         });
 
         // Attach shadow DOM

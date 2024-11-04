@@ -396,6 +396,17 @@ export class SiriusIcon extends SiriusElement {
         }
     }
 
+    /** Set the events property
+     * @param {object} events - Events property
+     */
+    set events(events) {
+        if (!events)
+            return
+
+        // Add the events property to the element when built
+        this._onBuiltIconContainerElement = (element) => this._setEvents(events, element);
+    }
+
     /** Get the icon SVG element
      * @param {string} fill - Icon fill color CSS variable
      * @returns {string} - Icon SVG element

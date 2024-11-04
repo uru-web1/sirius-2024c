@@ -182,6 +182,17 @@ export class SiriusLabel extends SiriusElement {
         })
     }
 
+    /** Set the events property
+     * @param {object} events - Events property
+     */
+    set events(events) {
+        if (!events)
+            return
+
+        // Add the events property to the element when built
+        this._onBuiltCaptionContainerElement = (element) => this._setEvents(events, element);
+    }
+
     /** Get the template for the Sirius label
      * @returns {string} - Template
      * */
