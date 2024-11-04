@@ -1,25 +1,3 @@
-/** Sirius SVG Icons */
-export const SIRIUS_ICONS = {
-    ARROW: 'arrow',
-    DOUBLE_ARROW: 'double-arrow',
-    STAR: 'star',
-    INDETERMINATE: "indeterminate",
-    CHECK_MARK: "check-mark",
-    WARNING: 'warning',
-    CLOSE: 'close',
-    HOME: 'home',
-    EDIT: 'edit',
-    MENU: 'menu',
-    HELP: 'help',
-    INFO: 'info',
-    LOCATION: 'location',
-    SETTINGS: 'settings',
-    SEARCH: 'search',
-    PERSON: 'person',
-    RADIO_CHECKED: 'radio-checked',
-    RADIO_UNCHECKED: 'radio-unchecked',
-}
-
 /** Get the SVG icon
  * @param {string} icon - Icon name
  * @param {object} options - Icon options
@@ -69,6 +47,28 @@ export const changeSvgElementInnerHTML = (element, icon) => {
     if (!innerHtml) return;
 
     element.innerHTML = innerHtml;
+}
+
+/** Sirius SVG Icons */
+export const SIRIUS_ICONS = {
+    ARROW: 'arrow',
+    DOUBLE_ARROW: 'double-arrow',
+    STAR: 'star',
+    INDETERMINATE: "indeterminate",
+    CHECK_MARK: "check-mark",
+    WARNING: 'warning',
+    CLOSE: 'close',
+    HOME: 'home',
+    EDIT: 'edit',
+    MENU: 'menu',
+    HELP: 'help',
+    INFO: 'info',
+    LOCATION: 'location',
+    SETTINGS: 'settings',
+    SEARCH: 'search',
+    PERSON: 'person',
+    RADIO_CHECKED: 'radio-checked',
+    RADIO_UNCHECKED: 'radio-unchecked',
 }
 
 /** Sirius SVG Icons */

@@ -101,6 +101,20 @@ class Sirius {
         this.#instancesId.set(id, instance);
     }
 
+    /** Remove instance by ID
+     * @param id - Instance ID
+     */
+    removeInstance(id) {
+        if (!id) return;
+
+        // Check if the instance exists
+        if (!this.#instancesId.has(id))
+            throw new Error(`Instance with ID '${id}' does not exist`);
+
+        // Remove the instance
+        this.#instancesId.delete(id);
+    }
+
     /** Get Sirius element by ID
      * @param id - Element ID
      * @returns {HTMLElement | null} - Element

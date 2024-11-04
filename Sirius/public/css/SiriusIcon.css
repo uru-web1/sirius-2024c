@@ -3,6 +3,7 @@
     --svg-height: 24px;
     --svg-fill: grey;
     --animation-duration: 500ms;
+    --icon-rotation: 0deg;
 }
 
 .icon-container {
@@ -13,9 +14,10 @@
 .svg-container {
     display: grid;
     place-items: center;
+    transform: rotate(var(--icon-rotation));
 }
 
-.svg-container:not(.hidden) > svg {
+.svg-container:not(.hidden,.hiding) > svg {
     animation: show-animation var(--animation-duration) forwards;
 }
 

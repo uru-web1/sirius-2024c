@@ -1,6 +1,7 @@
 import {SiriusLogger} from "./SiriusLogger.js";
 import sirius from "./Sirius.js";
 import deepFreeze from "./utils/deep-freeze.js";
+import {SIRIUS_ICON_ATTRIBUTES} from "./SiriusIcon.js";
 
 /** Sirius types */
 export const SIRIUS_TYPES = deepFreeze({
@@ -36,37 +37,45 @@ export const SIRIUS_ELEMENT = deepFreeze({
 export const SIRIUS_ELEMENT_ATTRIBUTES = deepFreeze({
     ID: 'id',
     STYLE: 'style',
-    EVENTS: 'events',
     HIDE: 'hide',
+    DISABLED: 'disabled'
 })
 
-/** Sirius element attributes details */
-export const SIRIUS_ELEMENT_ATTRIBUTES_DETAILS = deepFreeze({
-    [SIRIUS_ELEMENT_ATTRIBUTES.ID]: {DEFAULT: null, TYPE: SIRIUS_TYPES.STRING},
-    [SIRIUS_ELEMENT_ATTRIBUTES.STYLE]: {DEFAULT: null, TYPE: [SIRIUS_TYPES.OBJECT, SIRIUS_TYPES.STRING]},
-    [SIRIUS_ELEMENT_ATTRIBUTES.EVENTS]: {DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
-    [SIRIUS_ELEMENT_ATTRIBUTES.HIDE]: {DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN},
+/** Sirius element attributes default values */
+export const SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT = deepFreeze({
+    [SIRIUS_ELEMENT_ATTRIBUTES.ID]: null,
+    [SIRIUS_ELEMENT_ATTRIBUTES.STYLE]: null,
+    [SIRIUS_ELEMENT_ATTRIBUTES.HIDE]: null,
+    [SIRIUS_ELEMENT_ATTRIBUTES.DISABLED]: null
+})
+
+/** Sirius element properties */
+export const SIRIUS_ELEMENT_PROPERTIES = deepFreeze({
+    EVENTS: 'events',
+})
+
+/** Sirius element properties details */
+export const SIRIUS_ELEMENT_PROPERTIES_DETAILS = deepFreeze({
+    [SIRIUS_ELEMENT_PROPERTIES.EVENTS]: {DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
 })
 
 /** Sirius class that represents an element component */
 export class SiriusElement extends HTMLElement {
-    _hidden = false
-    _attributes = {}
+    _properties = {}
     _styleSheets = {}
-    _elementStyleSheetRules= new Map()
-    #containerElement = null
-    #elementName = 'UNDEFINED'
-    #elementId = ''
+    _elementStyleSheetRules = new Map()
+    _applyingStyle = false;
+    #elementName = ''
     #logger = null
     #isBuilt = false
     #onBuilt = []
 
     /**
      * Create a Sirius element
-     * @param {object} props - Element properties
+     * @param {object} properties - Element properties
      * @param {string} elementName - Element name
      */
-    constructor(props, elementName) {
+    constructor(properties, elementName) {
         super();
 
         // Add element name
@@ -74,23 +83,31 @@ export class SiriusElement extends HTMLElement {
 
         // Load Sirius element HTML attributes
         this._loadAttributes({
+            instanceProperties: properties,
             attributes: SIRIUS_ELEMENT_ATTRIBUTES,
-            attributesDetails: SIRIUS_ELEMENT_ATTRIBUTES_DETAILS,
-            properties: props
+            attributesDefault: SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT,
+        });
+
+        // Load Sirius element JS properties
+        const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
+        this._loadProperties({
+            instanceProperties: {[eventsKey]: properties?.[eventsKey]},
+            properties: SIRIUS_ELEMENT_PROPERTIES,
+            propertiesDetails: SIRIUS_ELEMENT_PROPERTIES_DETAILS,
         });
 
         // Check if the element has an ID
-        if (!this._attributes[SIRIUS_ELEMENT_ATTRIBUTES.ID])
+        const id = this.id
+        if (!id)
             throw new Error('Element ID is required');
 
         // Set instance ID and element ID
-        sirius.setInstance(this._attributes.id, this);
-        this.#elementId = this._attributes.id;
+        sirius.setInstance(id, this);
 
         // Inject logger
         this.#logger = new SiriusLogger({
             name: this.#elementName,
-            elementId: this._attributes.id
+            elementId: this.id
         });
 
         // Attach shadow DOM
@@ -109,11 +126,111 @@ export class SiriusElement extends HTMLElement {
         });
     }
 
-    /** Get element ID
+    /** Define observed attributes
+     * @returns {string[]} - Observed attributes
+     * */
+    static get observedAttributes() {
+        return Object.values(SIRIUS_ELEMENT_ATTRIBUTES).filter(
+            attribute => attribute !== SIRIUS_ELEMENT_ATTRIBUTES.ID)
+    }
+
+    _containerElement = null
+
+    /** Get the element container
+     * @returns {HTMLElement} - Element container
+     */
+    get containerElement() {
+        return this._containerElement
+    }
+
+    _hidden = false;
+
+    /** Get hidden icon state
+     * @returns {string} - Icon hidden state
+     */
+    get hidden() {
+        return this.getAttribute(SIRIUS_ELEMENT_ATTRIBUTES.HIDE);
+    }
+
+    /** Set hidden icon state
+     * @param {string} hide - Icon hidden state
+     */
+    set hidden(hide) {
+        this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.HIDE, hide);
+    }
+
+    /** Get the icon disabled state
+     * @returns {string} - Icon disabled state
+     */
+    get disabled() {
+        return this.getAttribute(SIRIUS_ICON_ATTRIBUTES.DISABLED);
+    }
+
+    /** Set the icon disabled state
+     * @param {string} disable - Icon disabled state
+     * */
+    set disabled(disable) {
+        this.setAttribute(SIRIUS_ICON_ATTRIBUTES.DISABLED, disable);
+    }
+
+    /** Get element ID attribute
      * @returns {string} - Element ID
      */
-    get elementId() {
-        return this.#elementId
+    get id() {
+        return this.getAttribute(SIRIUS_ELEMENT_ATTRIBUTES.ID)
+    }
+
+    /** Set element ID attribute
+     * @param {string} id - Element ID
+     */
+    set id(id) {
+        this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.ID, id)
+    }
+
+    /** Get style attribute
+     * @returns {string} - Style attribute value
+     */
+    get style() {
+        return this.getAttribute(SIRIUS_ELEMENT_ATTRIBUTES.STYLE)
+    }
+
+    /** Set style attribute
+     * @param {string} style - Style attribute value
+     */
+    set style(style) {
+        this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.STYLE, style)
+    }
+
+    /** Get the element events
+     * @returns {object} - Element events
+     */
+    get events() {
+        return this._properties[SIRIUS_ELEMENT_PROPERTIES.EVENTS]
+    }
+
+    /** Load events attribute to the container element
+     * @param {object} events - Events attribute value
+     */
+    set events(events) {
+        if (!events)
+            return
+
+        // Add the events attribute to the element when built
+        this._onBuiltContainerElement = (element) => {
+            // Get the events key
+            const eventsKey = SIRIUS_ELEMENT_ATTRIBUTES.EVENTS
+
+            // Validate the element property
+            this._updateProperty({
+                name: eventsKey,
+                value: events,
+                propertiesDetails: SIRIUS_ELEMENT_PROPERTIES_DETAILS[eventsKey]
+            })
+
+            // Add event listeners
+            for (let event in events)
+                element.addEventListener(event, events[event])
+        }
     }
 
     /** Get Sirius logger
@@ -121,20 +238,6 @@ export class SiriusElement extends HTMLElement {
      * */
     get logger() {
         return this.#logger
-    }
-
-    /** Get the element container
-     * @returns {HTMLElement} - Element container
-     */
-    get containerElement() {
-        return this.#containerElement
-    }
-
-    /** Set the element container
-     * @param {HTMLElement} containerElement - Element container
-     */
-    set containerElement(containerElement) {
-        this.#containerElement = containerElement
     }
 
     /** Set Sirius Element on built callback
@@ -169,120 +272,107 @@ export class SiriusElement extends HTMLElement {
         this.onBuilt = () => this._onBuiltElement = {element: this.containerElement, callback}
     }
 
-    /** Load style attribute
-     * @param {string|object|null} style - Style attribute value
-     * @param {HTMLElement} element - Element to add the style
-     */
-    set style({style, element}) {
-        if (!style)
-            return
-
-        // Add the style attribute to the element when built
+    /** Hide the element
+     * @param {string} event - Event to wait for before hiding the element
+     * @param {HTMLElement} element - Element to hide
+     * */
+    _hide(event, element) {
+        // Hide the element when built
         this._onBuiltElement = {
             element: element || this.containerElement,
             callback: (element) => {
-                // Check if the attribute value is a string
-                if (typeof style === SIRIUS_TYPES.STRING)
-                    element.style.cssText = style
-
-                // Check if the attribute value is an object
-                else if (typeof style === SIRIUS_TYPES.OBJECT)
-                    for (let styleName in style)
-                        element.style[styleName] = style[styleName];
-
-                else
-                    this.logger.error('Invalid style attribute value');
-            }
-        }
-    }
-
-    /** Load events attribute
-     * @param {object|null} events - Events attribute value
-     * @param {HTMLElement} element - Element to add the event listeners
-     */
-    set events({events, element}) {
-        if (!events)
-            return
-
-        // Add the events attribute to the element when built
-        this._onBuiltElement = {
-            element: element || this.containerElement,
-            callback: (element) => {
-                // Check if the attribute value is an object
-                if (typeof events !== SIRIUS_TYPES.OBJECT) {
-                    this.logger.error('Invalid events attribute value');
+                // Check if the element is already hidden
+                if (this._hidden) {
+                    this.logger.log('Element already hidden');
                     return;
                 }
 
-                // Get the target element
-                const targetElement = element || this.containerElement;
+                // Set the element as hidden
+                this._hidden = true
 
-                // Add event listeners
-                for (let event in events)
-                    targetElement.addEventListener(event, events[event])
+                // Check if there is an event to wait for
+                if (!event) {
+                    element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                    this.logger.log('Element hidden');
+                    return;
+                }
+
+                // Get event handler
+                const eventHandler = () => {
+                    // Hide the element
+                    element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
+                    element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                    this.logger.log('Element hidden');
+
+                    // Remove event listener
+                    element.removeEventListener(event, eventHandler);
+                }
+
+                // Add event listener to hide the element
+                element.addEventListener(event, eventHandler);
+
+                // Remove the hidden class and add the hiding class
+                element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDING);
+
+                this.logger.log('Element hiding');
             }
         }
     }
 
-    /** Get element style sheet CSS rule
-     * @param {string} ruleName - Rule name
-     * @returns {CSSRule} - CSS rule
-     */
-    _getElementStyleSheetCSSRule(ruleName) {
-         // Check if the rule has been found
-        if (this._elementStyleSheetRules.has(ruleName))
-            return this._elementStyleSheetRules.get(ruleName);
+    /** Show the element
+     * @param {HTMLElement} element - Element to hide
+     * */
+    _show(element) {
+        // Show the element when built
+        this._onBuiltElement = {
+            element: element || this.containerElement,
+            callback: (element) => {
+                // Check if the element is already shown
+                if (!this._hidden) {
+                    this.logger.log('Element already shown');
+                    return;
+                }
 
-        // Get the element style sheet
-        const styleSheet = this.#getElementStyleSheet();
+                // Set the element as shown
+                this._hidden = false;
 
-        const rules = styleSheet.cssRules;
-
-        // Iterate over the rules
-        for (let i = 0; i < rules.length; i++) {
-            const rule = rules[i];
-
-            // Check the rule name
-            if (rule.name === ruleName)
-            {
-                this._elementStyleSheetRules.set(ruleName, rule);
-                return rule;
+                // Show the element
+                element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                this.logger.log('Element shown');
             }
         }
-        return null
     }
 
-    /** Change element style sheet keyframe animation content
-     * @param {string} styleSheetName - Stylesheet name
-     * @param {string} keyframeName - Keyframe name
-     * @param {string} keyframeRules - Keyframe content
+    /** Private method to set element ID attribute
+     * @param {string} id - Element ID
      */
-    set keyframeRules({keyframeName, keyframeRules}) {
-        this.onBuilt = ()=> {
-            // Check if the keyframe rules are not set
-            if (!keyframeRules || keyframeRules === "")
-                return
+    #setId(id) {
+        // Get the current element ID
+        const currentId = this.getAttribute(SIRIUS_ELEMENT_ATTRIBUTES.ID);
 
-            // Get the rules
-            const rule = this._getElementStyleSheetCSSRule(keyframeName);
-
-            // Check if the rule is not found
-            if (!rule) {
-                this.logger.error(`Rule not found: ${keyframeName}`);
-                return;
-            }
-
-            // Delete the keyframe rule
-            while (rule.cssRules.length > 0)
-                rule.deleteRule(rule.cssRules[0].keyText);
-
-            // Add the keyframe rules
-            for (let keyframeRule of keyframeRules.split('}'))
-                rule.appendRule(keyframeRule + '}');
-
-            // Log the keyframe content change
-            this.logger.log(`Changed keyframe content: ${keyframeName}`);
+        // Set the element ID attribute
+        try {
+            sirius.setInstance(id, this);
+        } catch (error) {
+            this.logger.error(error);
+            return;
         }
+
+        // Remove the old element ID
+        sirius.removeInstance(currentId)
+
+        // Set the element ID attribute
+        this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.ID, id)
+    }
+
+    /** Protected method to set style attribute
+     * @param {function(): void} callback - Callback to apply the style
+     */
+    _setStyle(callback) {
+        this._applyingStyle = true;
+        this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.STYLE, '');
+        callback();
     }
 
     /** Check the container element
@@ -303,106 +393,275 @@ export class SiriusElement extends HTMLElement {
         return false
     }
 
-    /** typedef {Object.<string, string>} Attributes
-     * @property {string} [key] - Attribute snake case capitalized name
-     * @property {string} [value] - Attribute camel case name
+    /** Check SVG element
+     * @param {HTMLElement} element - Element to check
      */
+    _checkSVGElement(element) {
+        if (!element) {
+            this.logger.error(`Element is not set: ${element}`);
+            return false
+        }
 
-    /** typedef {Object} AttributeDetails
-     * @property {string} NAME - Attribute camel case name
-     * @property {any} DEFAULT - Attribute default value
+        // Check if the element is an instance of SVGElement
+        if (element instanceof SVGElement)
+            return true;
+
+        this.logger.error(`Invalid SVG element: ${element}`);
+        return false;
+    }
+
+    /** Get element style sheet CSS rule
+     * @param {string} ruleName - Rule name
+     * @returns {CSSRule|null} - CSS rule or null if not found
      */
+    _getElementStyleSheetCSSRule(ruleName) {
+        // Check if the rule name is not set
+        if (!ruleName || ruleName === "")
+            return null
 
-    /**
-     * @typedef {Object.<string, AttributeDetails>} AttributesDetails
-     * @property {string} [key] - Attribute camel case name
-     * @property {AttributeDetails} [value] - Attribute details
+        // Check if the rule has been found
+        if (this._elementStyleSheetRules.has(ruleName))
+            return this._elementStyleSheetRules.get(ruleName);
+
+        // Get the element style sheet
+        const styleSheet = this._getElementStyleSheet();
+
+        const rules = styleSheet.cssRules;
+
+        // Iterate over the rules
+        for (let i = 0; i < rules.length; i++) {
+            const rule = rules[i];
+
+            // Check the rule name or selector text
+            if (rule.name === ruleName || rule.selectorText === ruleName) {
+                this._elementStyleSheetRules.set(ruleName, rule);
+                return rule;
+            }
+        }
+        return null
+    }
+
+    /** Change element style sheet keyframe animation rules
+     * @param {string} name - Keyframe name
+     * @param {string} rules - Keyframe rules
      */
+    _setKeyframeRules(name, rules) {
+        this.onBuilt = () => {
+            // Check if the keyframe name is not set
+            if (!name || name === "") {
+                this.logger.error('Keyframe name is not set');
+                return
+            }
 
-    /** Parse attribute types
-     * @param {string[]|string} types - Element types attribute
+            // Check if the keyframe rules are not set
+            if (!rules || rules === "") {
+                this.logger.error('Keyframe rules are not set');
+                return
+            }
+
+            // Get the rules
+            const rule = this._getElementStyleSheetCSSRule(name);
+
+            // Check if the rule was not found
+            if (!rule) {
+                this.logger.error(`Rule not found: ${name}`);
+                return;
+            }
+
+            // Delete the keyframe rule
+            while (rule.cssRules.length > 0)
+                rule.deleteRule(rule.cssRules[0].keyText);
+
+            // Add the keyframe rules
+            for (let keyframeRule of rules.split('}'))
+                rule.appendRule(keyframeRule + '}');
+
+            // Log the keyframe rules change
+            this.logger.log(`Changed keyframe rules: ${name}`);
+        }
+    }
+
+    /** Format CSS variables
+     * @param {string} name - Variable name
+     * @returns {string} - Formatted CSS variable
+     */
+    _formatCSSVariable(name) {
+        return `var(${name})`
+    }
+
+    /** Format attribute value
+     * @param {string} value - Attribute value to format
+     * @returns {string} - Formatted attribute value
+     */
+    _formatAttributeValue(value) {
+        return value.replace(/\n|\t|\s/g, '');
+    }
+
+    /** Set shadow DOM CSS variable
+     * @param {string} name - Variable name
+     * @param {string} value - Variable value
+     * */
+    _setCSSVariable(name, value) {
+        this.onBuilt = () => {
+            // Check if the variable name is not set
+            if (!name || name === "") {
+                this.logger.error('Variable name is not set');
+                return
+            }
+
+            // Check if the variable value is not set
+            if (!value || value === "") {
+                this.logger.error('Variable value is not set');
+                return
+            }
+
+            // Get the rules from shadow DOM :host
+            const rule = this._getElementStyleSheetCSSRule(":host");
+
+            // Check if the rule was not found
+            if (!rule) {
+                this.logger.error(`Rule not found: :host`);
+                return;
+            }
+
+            // Set the CSS variable
+            rule.style.setProperty(name, value);
+        }
+    }
+
+    /** Load HTML attributes
+     * @param {object} instanceProperties - Element instance properties
+     * @param {object} attributes - Element HTML attributes to load
+     * @param {object} attributesDetails - Element HTML attributes default values
+     * */
+    _loadAttributes({instanceProperties, attributes, attributesDefault}) {
+        // Iterate over the attributes
+        Object.values(attributes).forEach(name => {
+            // Get the attribute value
+            let value = this.getAttribute(name)
+
+            // Check if the attribute is set
+            if (value !== null && value !== "")
+                return;
+
+            // Check if the attribute is set on the instance properties
+            if (instanceProperties && instanceProperties[name] !== undefined)
+                value = instanceProperties[name];
+
+            else {
+                // Get the attribute default value
+                value = attributesDefault[name]
+
+                // Check if the default value is not set
+                if (value === undefined) {
+                    this.logger.error(`Default value is not set for '${name}' attribute`);
+                    return;
+                }
+            }
+
+            // Check if the value is null
+            if (value === null) return;
+
+            // Set the attribute default value
+            this.setAttribute(name, value)
+        })
+    }
+
+    /** Parse property types
+     * @param {string[]|string} types - Property valid types
      * @returns {string[]} - Parsed types
      */
     _parseTypes(types) {
         return Array.isArray(types) ? types : [types]
     }
 
-    /** Check if the attribute has the given type
-     * @param {string[]|string} types - Element types attribute
-     * @param {string} type - Attribute type
-     * @returns {{parsedTypes: string[], hasType: boolean}} - Parsed types and if the attribute has the given type
+    /** Check if the property has the given type
+     * @param {string[]|string} types - Property valid types
+     * @param {string} type - Property type
+     * @returns {{parsedTypes: string[], hasType: boolean}} - Parsed types and if the property has the given type
      */
-    _hasAttributeType(types, type) {
+    _hasPropertyType(types, type) {
         // Check if the valid types are an array
         const parsedTypes = this._parseTypes(types)
         return {parsedTypes, hasType: parsedTypes.includes(type)}
     }
 
-    /** Validate the element attribute
-     * @param {string} name - Attribute name
-     * @param {any} value - Attribute value
-     * @param {string[]|string} types - Attribute valid types
-     * @param {any} def - Attribute default value
+    /** Validate and update the element property
+     * @param {string} name - Property name
+     * @param {any} value - Property value
+     * @param {object} propertiesDetails - Properties details
      */
-    _validateAttribute({name, value, types, def}) {
-        // Parse types
-        const {parsedTypes, hasType: hasBoolean} = this._hasAttributeType(types, SIRIUS_TYPES.BOOLEAN)
+    _updateProperty({name, value, propertiesDetails}) {
+        // Check if the property name is not set
+        if (name === undefined) {
+            this.logger.error(`Property '${name}' is not set`);
+            return;
+        }
 
-        // Check if the attribute is a boolean and the value is an empty string
-        if (value === "" && hasBoolean)
-            value = true
+        // Check if the property value is not set
+        if (value === undefined) {
+            this.logger.error(`Property value is not set for '${name}' property`);
+            return;
+        }
 
-        // Check if the attribute has any type
+        // Check if the property details for the given property are not set
+        if (!propertiesDetails[name]) {
+            this.logger.error(`Property details are not set for '${name}' property`);
+            return
+        }
+
+        // Get the property default value and types
+        const {DEFAULT: def, TYPE: types} = propertiesDetails[name]
+
+        // Get the property parsed types and check if the property has the given type
+        const {parsedTypes, hasType: hasBoolean} = this._hasPropertyType(types, SIRIUS_TYPES.BOOLEAN)
+
+        // Check if the property has any type
         if (parsedTypes.includes(SIRIUS_TYPES.ANY))
             return
+
+        // Check if the property is a boolean and the value is an empty string
+        if (value === "" && hasBoolean)
+            value = true
 
         // Check if the default value is null
         if (def === null && value === null)
             return
 
-        // Check if the attribute value is in the valid types array
+        // Check if the property value is in the valid types array
         if (!parsedTypes.includes(typeof value))
-            throw new Error(`Invalid attribute value '${value}' for '${name}' attribute. Valid types: ${parsedTypes.join(', ')}`)
+            throw new Error(`Invalid property value '${value}' for '${name}' property. Valid types: ${parsedTypes.join(', ')}`)
 
-        // Set the attribute value
-        this._attributes[name] = value
+        // Set the property value
+        this._properties[name] = value
     }
 
-    /** Load HTML attributes and properties
-     * @param {Attributes} attributes - Element HTML attributes to load
-     * @param {AttributeDetails} attributesDetails - Element HTML attributes details to load
+    /** Load the element properties
+     * @param {object} instanceProperties - Element instance properties
      * @param {object} properties - Element properties
-     * */
-    _loadAttributes({attributes, attributesDetails, properties}) {
-        // Iterate over the attributes
-        Object.values(attributes).forEach(name => {
-            // Get the attribute name and default value
-            const {DEFAULT: def, TYPE: types} = attributesDetails[name]
+     * @param {object} propertiesDetails - Element properties details
+     */
+    _loadProperties({instanceProperties, properties, propertiesDetails}) {
+        // Iterate over the properties
+        Object.values(properties).forEach(name => {
+            // Get the property value
+            let value = instanceProperties?.[name]
 
-            // Get the attribute value
-            let value = this.getAttribute(name)
+            // Check if the property is not set
+            if (value === undefined) {
+                // Get the property default value
+                const {DEFAULT: def} = propertiesDetails[name]
 
-            // Check if the attribute is not set
-            if (value === null) {
-                if (properties?.[name] === undefined)
-                    value = def
-
-                // Get the attribute value from the properties
-                else
-                    value = properties[name]
-
-                // Set the attribute value
-                if (value !== null && value !== undefined && value !== "")
-                    this.setAttribute(name, value)
+                // Check if the default value is not set
+                if (def === undefined) {
+                    this.logger.error(`Default value is not set for '${name}' property`);
+                    return;
+                }
+                value = def
             }
 
-            // Validate the attribute
-            this._validateAttribute({
-                name,
-                def,
-                types,
-                value,
-            })
+            // Validate and update the property
+            this._updateProperty({name, value, propertiesDetails})
         })
     }
 
@@ -442,14 +701,14 @@ export class SiriusElement extends HTMLElement {
     /** Get the Sirius element style sheet
      * @returns {CSSStyleSheet} - Element style sheet
      */
-    #getElementStyleSheet() {
+    _getElementStyleSheet() {
         return this._styleSheets[SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT];
     }
 
     /** Get the Sirius element general style sheet
      * @returns {CSSStyleSheet} - General style sheet
      */
-    #getGeneralStyleSheet() {
+    _getGeneralStyleSheet() {
         return this._styleSheets[SIRIUS_ELEMENT.STYLE_SHEETS.GENERAL];
     }
 
@@ -457,8 +716,8 @@ export class SiriusElement extends HTMLElement {
      */
     #adoptStyles() {
         // Get style sheets
-        const element = this.#getElementStyleSheet();
-        const general = this.#getGeneralStyleSheet();
+        const element = this._getElementStyleSheet();
+        const general = this._getGeneralStyleSheet();
 
         // Check if the style sheets are not set
         if (!element || !general) {
@@ -478,32 +737,6 @@ export class SiriusElement extends HTMLElement {
         // Create the CSS style sheets and add them to the shadow DOM
         await this.#loadStyles(cssFilename);
         this.#adoptStyles();
-    }
-
-    /** Format CSS variables
-     * @param {string} name - Variable name
-     * @returns {string} - Formatted CSS variable
-     */
-    _formatCSSVariable(name) {
-        return `var(${name})`
-    }
-
-    /** Format attribute value
-     * @param {string} value - Attribute value to format
-     */
-    _formatAttributeValue(value) {
-        return value.replace(/\n|\t|\s/g, '');
-    }
-
-    /** Update shadow DOM variable
-     * @param {string} name - Variable name
-     * @param {string} value - Variable value
-     * */
-    _updateCSSVariable(name, value) {
-        this.onBuilt = () => {
-            console.log(this.#getElementStyleSheet());
-            //.sheet.rules[0].style.setProperty(name, value)
-        }
     }
 
     /**
@@ -528,76 +761,6 @@ export class SiriusElement extends HTMLElement {
     /** Add the element to the body */
     addToBody() {
         document.body.appendChild(this);
-    }
-
-    /** Hide the element
-     * @param {string} event - Event to wait for before hiding the element
-     * @param {HTMLElement} element - Element to hide
-     * */
-    hide(event, element) {
-        // Hide the element when built
-        this._onBuiltElement = {
-            element: element || this.containerElement,
-            callback: (element) => {
-                // Check if the element is already hidden
-                if (this._hidden) {
-                    this.logger.log('Element already hidden');
-                    return;
-                }
-
-                // Set the element as hidden
-                this._hidden = true
-
-                // Check if there is an event to wait for
-                if (!event) {
-                    element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-                    this.logger.log('Element hidden');
-                    return;
-                }
-
-                // Get event handler
-                const eventHandler = () => {
-                    // Hide the element
-                    element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
-                    element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-                    this.logger.log('Element hidden');
-
-                    // Remove event listener
-                    element.removeEventListener(event, eventHandler);
-                }
-
-                // Add event listener to hide the element
-                element.addEventListener(event, eventHandler);
-
-                // Set hiding class
-                this.logger.log('Element hiding');
-                element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-                element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDING);
-            }
-        }
-    }
-
-    /** Show the element
-     * @param {HTMLElement} element - Element to hide
-     * */
-    show(element) {
-        // Show the element when built
-        this._onBuiltElement = {
-            element: element || this.containerElement,
-            callback: (element) => {
-                // Check if the element is already shown
-                if (!this._hidden) {
-                    this.logger.log('Element already shown');
-                    return;
-                }
-
-                // Set the element as shown
-                this._hidden = false;
-
-                element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-                this.logger.log('Element shown');
-            }
-        }
     }
 
     /** Center the element on the screen */
@@ -628,10 +791,5 @@ export class SiriusElement extends HTMLElement {
     /** Dispatch the built event */
     dispatchBuiltEvent() {
         this.dispatchEventName(SIRIUS_ELEMENT.EVENTS.BUILT);
-    }
-
-    /** Dispatch hide event */
-    dispatchHideEvent() {
-        this.dispatchEventName(SIRIUS_ELEMENT.EVENTS.HIDE);
     }
 }
