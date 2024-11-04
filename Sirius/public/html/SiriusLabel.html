@@ -3,28 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Sirius Label Example</title>
+    <title>SiriusLabel Examples</title>
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusLabel.js" type="module"></script>
 </head>
 <body>
 
+<sirius-label caption="Hello world HTML" caption-color="red" caption-font="monospace"
+              caption-position="center" id="label-2" style="border: 1px solid green; width: 100px;"></sirius-label>
+
 <script type="module">
     import sirius from '../js/Sirius.js';
-    import {SIRIUS_LABEL, SiriusLabel} from "../js/SiriusLabel.js";
-    import {SIRIUS_ELEMENT} from "../js/SiriusElement.js";
+    import {SiriusLabel, SIRIUS_LABEL_ATTRIBUTES} from "../js/SiriusLabel.js";
+    import {
+        SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
+        SIRIUS_ELEMENT_ATTRIBUTES,
+        SIRIUS_ELEMENT_PROPERTIES
+    } from "../js/SiriusElement.js";
 
     // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
 
         // Get the attributes keys
-        const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
-        const captionKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.CAPTION.NAME;
-        const positionKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.POSITION.NAME;
-        const colorKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.COLOR.NAME;
-        const fontKey = SIRIUS_LABEL.CAPTION_ATTRIBUTES.FONT.NAME;
-        const eventsKey = SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME
-        const styleKey = SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME;
+        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+        const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+        const captionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION;
+        const positionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_POSITION;
+        const colorKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR;
+        const fontKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT;
+
+        // Get the properties keys
+        const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
 
         // Create the label
         const siriusLabel2 = new SiriusLabel({
@@ -44,17 +53,12 @@
             [positionKey]: 'left',
             [colorKey]: 'blue',
             [fontKey]: 'fantasy',
-            [styleKey]: {'border': '1px solid red', 'padding': '20px'}
-
+            [styleKey]: "{'border': '1px solid red', 'padding': '20px'}"
         });
 
         // Add the label to the DOM
         siriusLabel2.addToBody()
     }
 </script>
-
-<sirius-label caption="Hello world HTML" caption-color="red" caption-font="monospace"
-              caption-position="center" id="label-2" style="border: 1px solid green; width: 100px;"></sirius-label>
-
 </body>
 </html>

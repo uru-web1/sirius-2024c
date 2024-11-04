@@ -1,7 +1,6 @@
 import {SiriusLogger} from "./SiriusLogger.js";
 import sirius from "./Sirius.js";
 import deepFreeze from "./utils/deep-freeze.js";
-import {SIRIUS_ICON_ATTRIBUTES} from "./SiriusIcon.js";
 
 /** Sirius types */
 export const SIRIUS_TYPES = deepFreeze({
@@ -25,6 +24,7 @@ export const SIRIUS_ELEMENT = deepFreeze({
     EVENTS: {
         BUILT: 'built',
         HIDE: 'hide',
+        INJECTED_LOGGER: 'injected-logger'
     },
     CLASSES: {
         HIDDEN: 'hidden',
@@ -33,9 +33,13 @@ export const SIRIUS_ELEMENT = deepFreeze({
     }
 })
 
+/** Sirius element required attributes */
+export const SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES = deepFreeze({
+    ID: 'id'
+})
+
 /** Sirius element attributes */
 export const SIRIUS_ELEMENT_ATTRIBUTES = deepFreeze({
-    ID: 'id',
     STYLE: 'style',
     HIDE: 'hide',
     DISABLED: 'disabled'
@@ -43,7 +47,6 @@ export const SIRIUS_ELEMENT_ATTRIBUTES = deepFreeze({
 
 /** Sirius element attributes default values */
 export const SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT = deepFreeze({
-    [SIRIUS_ELEMENT_ATTRIBUTES.ID]: null,
     [SIRIUS_ELEMENT_ATTRIBUTES.STYLE]: null,
     [SIRIUS_ELEMENT_ATTRIBUTES.HIDE]: null,
     [SIRIUS_ELEMENT_ATTRIBUTES.DISABLED]: null
@@ -64,14 +67,16 @@ export class SiriusElement extends HTMLElement {
     _properties = {}
     _styleSheets = {}
     _elementStyleSheetRules = new Map()
-    _containerElement = null
-    _applyingStyle = false;
+    _applyingAttribute = new Map();
     _hidden = false;
-    _hiding= false;
+    _hiding = false;
+    _containerElement = null
     #elementName = ''
     #logger = null
     #isBuilt = false
     #onBuilt = []
+    #isLoggerInjected = false
+    #onInjectedLogger = []
 
     /**
      * Create a Sirius element
@@ -84,57 +89,15 @@ export class SiriusElement extends HTMLElement {
         // Add element name
         this.#elementName = elementName;
 
-        // Load Sirius element HTML attributes
-        this._loadAttributes({
-            instanceProperties: properties,
-            attributes: SIRIUS_ELEMENT_ATTRIBUTES,
-            attributesDefault: SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT,
-        });
-
-        // Load Sirius element JS properties
-        const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
-        this._loadProperties({
-            instanceProperties: {[eventsKey]: properties?.[eventsKey]},
-            properties: SIRIUS_ELEMENT_PROPERTIES,
-            propertiesDetails: SIRIUS_ELEMENT_PROPERTIES_DETAILS,
-        });
-
-        // Check if the element has an ID
-        const id = this.id
-        if (!id)
-            throw new Error('Element ID is required');
-
-        // Set instance ID and element ID
-        sirius.setInstance(id, this);
-
-        // Inject logger
-        this.#logger = new SiriusLogger({
-            name: this.#elementName,
-            elementId: this.id
-        });
-
-        // Attach shadow DOM
-        this.attachShadow({mode: "open"});
-
-        // Built event listener
-        this.addEventListener(SIRIUS_ELEMENT.EVENTS.BUILT, async () => {
-            // Set the element as built
-            this.#isBuilt = true;
-
-            // Call the initialization callbacks
-            for (const callback of this.#onBuilt) await callback();
-
-            // Clear the initialization callbacks
-            this.#onBuilt = [];
-        });
+        // Add properties
+        this._properties = properties;
     }
 
     /** Define observed attributes
      * @returns {string[]} - Observed attributes
      * */
     static get observedAttributes() {
-        return Object.values(SIRIUS_ELEMENT_ATTRIBUTES).filter(
-            attribute => attribute !== SIRIUS_ELEMENT_ATTRIBUTES.ID)
+        return [...Object.values(SIRIUS_ELEMENT_ATTRIBUTES), ...Object.values(SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES)];
     }
 
     /** Get the element container
@@ -162,28 +125,28 @@ export class SiriusElement extends HTMLElement {
      * @returns {string} - Icon disabled state
      */
     get disabled() {
-        return this.getAttribute(SIRIUS_ICON_ATTRIBUTES.DISABLED);
+        return this.getAttribute(SIRIUS_ELEMENT_ATTRIBUTES.DISABLED);
     }
 
     /** Set the icon disabled state
      * @param {string} disable - Icon disabled state
      * */
     set disabled(disable) {
-        this.setAttribute(SIRIUS_ICON_ATTRIBUTES.DISABLED, disable);
+        this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.DISABLED, disable);
     }
 
     /** Get element ID attribute
      * @returns {string} - Element ID
      */
     get id() {
-        return this.getAttribute(SIRIUS_ELEMENT_ATTRIBUTES.ID)
+        return this.getAttribute(SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID)
     }
 
     /** Set element ID attribute
      * @param {string} id - Element ID
      */
     set id(id) {
-        this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.ID, id)
+        this.setAttribute(SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID, id)
     }
 
     /** Get style attribute
@@ -243,7 +206,7 @@ export class SiriusElement extends HTMLElement {
      * @param callback - On built callback
      * */
     set onBuilt(callback) {
-        // Check if the element is built
+        // Check if the element has been built
         if (this.#isBuilt) {
             callback();
             return;
@@ -271,6 +234,20 @@ export class SiriusElement extends HTMLElement {
         this.onBuilt = () => this._onBuiltElement = {element: this.containerElement, callback}
     }
 
+    /** On injected logger
+     * @param {function(SiriusLogger): void} callback - On injected logger callback
+     */
+    set _onInjectedLogger(callback) {
+        // Check if the logger has been injected
+        if (this.#isLoggerInjected) {
+            callback(this.logger);
+            return;
+        }
+
+        // Add the callback to the list
+        this.#onInjectedLogger.push(callback);
+    }
+
     /** Hide the element
      * @param {string} event - Event to wait for before hiding the element
      * @param {HTMLElement} element - Element to hide
@@ -281,7 +258,7 @@ export class SiriusElement extends HTMLElement {
             element: element || this.containerElement,
             callback: (element) => {
                 // Check if the element is already hidden
-                if (this._hidden|| this._hiding) {
+                if (this._hidden || this._hiding) {
                     this.logger.log('Element already hidden or hiding');
                     return;
                 }
@@ -333,14 +310,14 @@ export class SiriusElement extends HTMLElement {
             element: element || this.containerElement,
             callback: (element) => {
                 // Check if the element is already shown
-                if (!this._hidden&&!this._hiding) {
+                if (!this._hidden && !this._hiding) {
                     this.logger.log('Element already shown');
                     return;
                 }
 
                 // Check if the element is hiding
                 if (this._hiding) {
-                    this._hiding= false;
+                    this._hiding = false;
                     element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
                 }
 
@@ -355,9 +332,14 @@ export class SiriusElement extends HTMLElement {
     /** Private method to set element ID attribute
      * @param {string} id - Element ID
      */
-    #setId(id) {
+    _setId(id) {
+        if (!id) {
+            this.logger.error('Element ID is required');
+            return;
+        }
+
         // Get the current element ID
-        const currentId = this.getAttribute(SIRIUS_ELEMENT_ATTRIBUTES.ID);
+        const currentId = this.getAttribute(SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID);
 
         // Set the element ID attribute
         try {
@@ -371,16 +353,41 @@ export class SiriusElement extends HTMLElement {
         sirius.removeInstance(currentId)
 
         // Set the element ID attribute
-        this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.ID, id)
+        this.setAttribute(SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID, id)
     }
 
     /** Protected method to set style attribute
      * @param {function(): void} callback - Callback to apply the style
      */
     _setStyle(callback) {
-        this._applyingStyle = true;
-        this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.STYLE, '');
+        // Set the applying attribute flag and set the style attribute
+        this._applyingAttribute.set(SIRIUS_ELEMENT_ATTRIBUTES.STYLE, true);
+        this.removeAttribute(SIRIUS_ELEMENT_ATTRIBUTES.STYLE);
+
+        // Call the callback
         callback();
+    }
+
+    /** Protected method to set style attributes without overriding the existing ones
+     * @param {string} style - Style attributes
+     * @param {HTMLElement} element - Element to set the style attributes
+     */
+    _setStyleAttributes(style, element) {
+        if (!style || !element) {
+            this.logger.error('Style or element is not set');
+            return
+        }
+
+        style.split(';').forEach(attribute => {
+            const [name, value] = attribute.split(':');
+
+            // Check if the name or value is undefined
+            if (!name || !value)
+                return
+
+            // Set the style attribute
+            element.style.setProperty(name.trim(), value.trim());
+        })
     }
 
     /** Check the container element
@@ -502,7 +509,7 @@ export class SiriusElement extends HTMLElement {
      * @returns {string} - Formatted attribute value
      */
     _formatAttributeValue(value) {
-        return value.replace(/\n|\t|\s/g, '');
+        return String(value).trim();
     }
 
     /** Set shadow DOM CSS variable
@@ -537,6 +544,43 @@ export class SiriusElement extends HTMLElement {
         }
     }
 
+    /** Load required HTML attributes
+     * @param {object} instanceProperties - Element instance properties
+     * @param {object} attributes - Element required HTML attributes to load
+     * */
+    _loadRequiredAttributes({instanceProperties, attributes}) {
+        // Iterate over the attributes
+        Object.values(attributes).forEach(name => {
+            // Get the attribute value
+            let value = this.getAttribute(name)
+
+            // Check if the attribute is set
+            if (value !== null && value !== "") {
+                const trimmedValue = value.trim();
+
+                if (trimmedValue === value)
+                    return;
+
+                // Set the attribute value and the applied attribute flag
+                this._applyingAttribute.set(name, true);
+                this.setAttribute(name, trimmedValue);
+                return
+            }
+
+            if (instanceProperties && instanceProperties[name] !== undefined)
+                value = instanceProperties[name];
+
+            else
+                throw new Error(`Value is not set for '${name}' attribute`);
+
+            // Check if the value is null
+            if (value === null) return;
+
+            // Set the attribute default value
+            this.setAttribute(name, value.trim())
+        })
+    }
+
     /** Load HTML attributes
      * @param {object} instanceProperties - Element instance properties
      * @param {object} attributes - Element HTML attributes to load
@@ -549,8 +593,17 @@ export class SiriusElement extends HTMLElement {
             let value = this.getAttribute(name)
 
             // Check if the attribute is set
-            if (value !== null && value !== "")
-                return;
+            if (value !== null && value !== "") {
+                const trimmedValue = value.trim();
+
+                if (trimmedValue === value)
+                    return;
+
+                // Set the attribute value and the applied attribute flag
+                this._applyingAttribute.set(name, true);
+                this.setAttribute(name, trimmedValue)
+                return
+            }
 
             // Check if the attribute is set on the instance properties
             if (instanceProperties && instanceProperties[name] !== undefined)
@@ -571,7 +624,7 @@ export class SiriusElement extends HTMLElement {
             if (value === null) return;
 
             // Set the attribute default value
-            this.setAttribute(name, value)
+            this.setAttribute(name, value.trim())
         })
     }
 
@@ -799,5 +852,116 @@ export class SiriusElement extends HTMLElement {
     /** Dispatch the built event */
     dispatchBuiltEvent() {
         this.dispatchEventName(SIRIUS_ELEMENT.EVENTS.BUILT);
+    }
+
+    /** Dispatch on injected logger event */
+    dispatchInjectedLoggerEvent() {
+        this.dispatchEventName(SIRIUS_ELEMENT.EVENTS.INJECTED_LOGGER);
+    }
+
+    /** Log attribute change
+     * @param {string} name - Attribute name
+     * @param {string} oldValue - Old attribute value
+     * @param {string} newValue - New attribute value
+     */
+    _logAttributeChange(name, oldValue, newValue) {
+        this._onInjectedLogger = (logger) =>
+            logger.log(`'${name}' attribute changed: ${oldValue} -> ${newValue}`);
+    }
+
+    /** Pre attribute changed callback
+     * @param {string} name - Attribute name
+     * @param {string} oldValue - Old attribute value
+     * @param {string} newValue - New attribute value
+     * @returns {{formattedValue: string, shouldContinue: boolean}} - Formatted attribute value and if the attribute change should continue
+     */
+    _preAttributeChangedCallback(name, oldValue, newValue) {
+        // Format the attribute value
+        const formattedValue = this._formatAttributeValue(newValue);
+
+        // Check if the attribute value has changed
+        if (oldValue === newValue)
+            return {formattedValue, shouldContinue: false}
+
+        // Check if the attribute is being applied
+        if (this._applyingAttribute.has(name) && this._applyingAttribute.get(name)) {
+            this._applyingAttribute.set(name, false);
+            return {formattedValue, shouldContinue: false}
+        }
+
+        // Compare the old value and the new formatted value
+        const shouldContinue = oldValue !== formattedValue;
+
+        // Log the attribute change
+        if (shouldContinue)
+            this._logAttributeChange(name, oldValue, formattedValue);
+
+        // Check if the formatted value and the new value are the same
+        if (formattedValue !== newValue) {
+            this._applyingAttribute.set(name, true);
+            this.setAttribute(name, formattedValue);
+        }
+
+        return {formattedValue, shouldContinue: oldValue !== formattedValue}
+    }
+
+    /** Connected callback */
+    async connectedCallback() {
+        // Inject logger event listener
+        this.addEventListener(SIRIUS_ELEMENT.EVENTS.INJECTED_LOGGER, async () => {
+            // Set the logger as injected
+            this.#isLoggerInjected = true;
+
+            // Call the injected logger callbacks
+            for (const callback of this.#onInjectedLogger) await callback(this.logger);
+
+            // Clear the injected logger callbacks
+            this.#onInjectedLogger = [];
+        });
+
+        // Load Sirius element required HTML attributes
+        this._loadRequiredAttributes({
+            instanceProperties: this._properties,
+            attributes: SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
+        });
+
+        // Inject logger
+        this.#logger = new SiriusLogger({
+            name: this.#elementName,
+            elementId: this.id
+        });
+
+        // Dispatch injected logger event
+        this.dispatchInjectedLoggerEvent();
+
+        // Load Sirius element HTML attributes
+        this._loadAttributes({
+            instanceProperties: this._properties,
+            attributes: SIRIUS_ELEMENT_ATTRIBUTES,
+            attributesDefault: SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT,
+        });
+
+        // Load Sirius element JS properties
+        const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
+        this._loadProperties({
+            instanceProperties: {[eventsKey]: this._properties?.[eventsKey]},
+            properties: SIRIUS_ELEMENT_PROPERTIES,
+            propertiesDetails: SIRIUS_ELEMENT_PROPERTIES_DETAILS,
+        });
+
+        // Attach shadow DOM
+        this.attachShadow({mode: "open"});
+
+        // Built event listener
+        this.addEventListener(SIRIUS_ELEMENT.EVENTS.BUILT, async () => {
+            // Set the element as built
+            this.#isBuilt = true;
+
+            // Call the initialization callbacks
+            for (const callback of this.#onBuilt) await callback();
+
+            // Clear the initialization callbacks
+            this.#onBuilt = [];
+        });
     }
 }

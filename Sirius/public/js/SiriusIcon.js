@@ -1,4 +1,4 @@
-import {SIRIUS_ELEMENT_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
+import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
 import {changeSvgElementInnerHTML, getSvgElementWithCSS, SIRIUS_ICONS} from "./SiriusSvg.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
@@ -76,13 +76,6 @@ export class SiriusIcon extends SiriusElement {
      */
     constructor(properties) {
         super(properties, SIRIUS_ICON.NAME);
-
-        // Load SiriusIcon attributes
-        this._loadAttributes({
-            instanceProperties: properties,
-            attributes: SIRIUS_ICON_ATTRIBUTES,
-            attributesDefault: SIRIUS_ICON_ATTRIBUTES_DEFAULT
-        });
     }
 
     /** Define observed attributes
@@ -366,7 +359,7 @@ export class SiriusIcon extends SiriusElement {
             this._setKeyframeRules(SIRIUS_ICON_ATTRIBUTES.HIDING_ANIMATION, rules);
     }
 
-    /** Protected method to set style attribute
+    /** Private method to set style attribute
      * @param {string} style - Style attribute value
      */
     #setStyle(style) {
@@ -375,7 +368,7 @@ export class SiriusIcon extends SiriusElement {
 
         // Add the style attribute to the element when built
         this._setStyle(() => {
-            this._onBuiltSvgContainerElement = (element) => element.style.cssText = String(style)
+            this._onBuiltSvgContainerElement = (element) => this._setStyleAttributes(style, element);
         })
     }
 
@@ -453,70 +446,61 @@ export class SiriusIcon extends SiriusElement {
      * @param {string} newValue - New attribute
      * */
     attributeChangedCallback(name, oldValue, newValue) {
-        // Check if the attribute value has changed
-        if (oldValue === newValue)
-            return
-
-        // Check if is the style attribute and the style is being applied
-        if (name === SIRIUS_ELEMENT_ATTRIBUTES.STYLE && this._applyingStyle) {
-            this._applyingStyle = false;
-            return;
-        }
-
-        // Log the attribute change
-        this.logger.log(`'${name}' attribute changed: ${oldValue} -> ${newValue}`);
+        // Call the pre-attribute changed callback
+        const {formattedValue, shouldContinue} = this._preAttributeChangedCallback(name, oldValue, newValue);
+        if (!shouldContinue) return;
 
         switch (name) {
+            case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
+                this._setId(formattedValue);
+                break;
+
             case SIRIUS_ELEMENT_ATTRIBUTES.STYLE:
-                this.#setStyle(newValue);
+                this.#setStyle(formattedValue);
                 break;
 
             case SIRIUS_ELEMENT_ATTRIBUTES.HIDE:
-                this.#setHidden(newValue);
+                this.#setHidden(formattedValue);
                 break;
 
             case SIRIUS_ELEMENT_ATTRIBUTES.DISABLED:
-                this.#setDisabled(newValue);
+                this.#setDisabled(formattedValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.ICON:
-                this.#setIconName(newValue);
+                this.#setIconName(formattedValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.ICON_ROTATION:
-                this.#setIconRotation(newValue);
+                this.#setIconRotation(formattedValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.ICON_WIDTH:
-                this.#setIconWidth(newValue);
+                this.#setIconWidth(formattedValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.ICON_HEIGHT:
-                this.#setIconHeight(newValue);
+                this.#setIconHeight(formattedValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.ICON_FILL:
-                this.#setIconFill(newValue);
-                break;
-
-            case SIRIUS_ICON_ATTRIBUTES.HIDE:
-                this.#setHidden(newValue);
+                this.#setIconFill(formattedValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.DISABLED:
-                this.#setDisabled(newValue);
+                this.#setDisabled(formattedValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.SHOW_ANIMATION:
-                this.#setShowAnimation(newValue);
+                this.#setShowAnimation(formattedValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.HIDING_ANIMATION:
-                this.#setHidingAnimation(newValue);
+                this.#setHidingAnimation(formattedValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.ANIMATION_DURATION:
-                this.#setAnimationDuration(newValue);
+                this.#setAnimationDuration(formattedValue);
                 break;
 
             default:
@@ -528,6 +512,16 @@ export class SiriusIcon extends SiriusElement {
     /** Lifecycle method called when the component is connected to the DOM
      */
     async connectedCallback() {
+        // Call the parent connected callback
+        await super.connectedCallback();
+
+        // Load SiriusIcon attributes
+        this._loadAttributes({
+            instanceProperties: this._properties,
+            attributes: SIRIUS_ICON_ATTRIBUTES,
+            attributesDefault: SIRIUS_ICON_ATTRIBUTES_DEFAULT
+        });
+
         // Load the CSS style sheets and add them to the shadow DOM
         await this._loadAndAdoptStyles();
 

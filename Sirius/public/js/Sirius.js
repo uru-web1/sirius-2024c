@@ -73,12 +73,12 @@ class Sirius {
     }
 
     /** Set Sirius on loaded callback
-     * @param {Function} callback - Callback
+     * @param {function(): Promise<void>} callback - Callback
      * */
     set onLoaded(callback) {
         // Check if the framework is loaded
         if (this.#loaded) {
-            callback();
+            callback().then();
             return;
         }
 

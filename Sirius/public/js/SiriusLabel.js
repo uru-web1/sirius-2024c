@@ -1,45 +1,185 @@
-import {SIRIUS_ELEMENT, SIRIUS_TYPES, SiriusElement} from "./SiriusElement.js";
+import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 /** Sirius label constants */
 export const SIRIUS_LABEL = deepFreeze({
     NAME: "SiriusLabel",
     TAG: "sirius-label",
-    CAPTION_ATTRIBUTES: {
-        CAPTION: {NAME: "caption", DEFAULT: "Please enter a caption", TYPE: SIRIUS_TYPES.STRING},
-        POSITION: {NAME: "caption-position", DEFAULT: "center", TYPE: SIRIUS_TYPES.STRING},
-        COLOR: {NAME: "caption-color", DEFAULT: "black", TYPE: SIRIUS_TYPES.STRING},
-        FONT: {NAME: "caption-font", DEFAULT: "Arial", TYPE: SIRIUS_TYPES.STRING}
-    },
     CLASSES: {
         LABEL_CONTAINER: 'label-container',
         CAPTION_CONTAINER: 'caption-container',
     }
 });
 
+/** Sirius label attributes */
+export const SIRIUS_LABEL_ATTRIBUTES = deepFreeze({
+    CAPTION: "caption",
+    CAPTION_POSITION: "caption-position",
+    CAPTION_COLOR: "caption-color",
+    CAPTION_FONT: "caption-font"
+})
+
+/** Sirius label attributes default values */
+export const SIRIUS_LABEL_ATTRIBUTES_DEFAULT = deepFreeze({
+    [SIRIUS_LABEL_ATTRIBUTES.CAPTION]: "Please enter a caption",
+    [SIRIUS_LABEL_ATTRIBUTES.CAPTION_POSITION]: "center",
+    [SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR]: "black",
+    [SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT]: "Arial"
+})
+
 /** Sirius class that represents a label component */
 export class SiriusLabel extends SiriusElement {
-    #captionElement
+    #labelContainerElement = null
+    #captionContainerElement = null
 
     /**
      * Create a Sirius label element
-     * @param {object} props - Element properties
+     * @param {object} properties - Element properties
      */
-    constructor(props) {
-        super(props, SIRIUS_LABEL.NAME);
-
-        // Load Sirius Label caption attributes
-        this._loadAttributes({
-            htmlAttributes: SIRIUS_LABEL.CAPTION_ATTRIBUTES,
-            properties: props
-        });
+    constructor(properties) {
+        super(properties, SIRIUS_LABEL.NAME);
     }
 
-    /** Get the caption element
-     * @returns {HTMLElement} - Caption element
+    /** Define observed attributes
+     * @returns {string[]} - Observed attributes
+     * */
+    static get observedAttributes() {
+        return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_LABEL_ATTRIBUTES)];
+    }
+
+    /** Get the caption
+     * @returns {string} - Caption
      */
-    get captionElement() {
-        return this.#captionElement
+    get caption() {
+        return this.getAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION);
+    }
+
+    /** Set the caption
+     * @param {string} caption - Caption
+     */
+    set caption(caption) {
+        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION, caption);
+    }
+
+    /** Get the caption position
+     * @returns {string} - Position
+     */
+    get captionPosition() {
+        return this.getAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_POSITION);
+    }
+
+    /** Set the caption position
+     * @param {string} position - Position
+     */
+    set captionPosition(position) {
+        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_POSITION, position);
+    }
+
+    /** Get the caption color
+     * @returns {string} - Color
+     */
+    get captionColor() {
+        return this.getAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR);
+    }
+
+    /** Set the caption color
+     * @param {string} color - Color
+     */
+    set captionColor(color) {
+        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR, color);
+    }
+
+    /** Get the caption font
+     * @returns {string} - Font
+     */
+    get captionFont() {
+        return this.getAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT);
+    }
+
+    /** Set the caption font
+     * @param {string} font - Font
+     */
+    set captionFont(font) {
+        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT, font);
+    }
+
+    /** Get the label container element
+     * @returns {HTMLElement} - Label container element
+     */
+    get labelContainerElement() {
+        return this.#labelContainerElement
+    }
+
+    /** Get the caption container element
+     * @returns {HTMLElement} - Caption container element
+     */
+    get captionContainerElement() {
+        return this.#captionContainerElement
+    }
+
+    /** Set on built label container element callback
+     * @param {function(HTMLElement): void} callback - Callback
+     */
+    set _onBuiltLabelContainerElement(callback) {
+        this.onBuilt = () => {
+            if (this._checkElement(this.labelContainerElement))
+                callback(this.labelContainerElement);
+        }
+    }
+
+    /** Set on built caption container element callback
+     * @param {function(HTMLElement): void} callback - Callback
+     */
+    set _onBuiltCaptionContainerElement(callback) {
+        this.onBuilt = () => {
+            if (this._checkElement(this.captionContainerElement))
+                callback(this.captionContainerElement);
+        }
+    }
+
+    /** Private method to set the caption
+     * @param {string} caption - Caption
+     */
+    #setCaption(caption) {
+        this._onBuiltCaptionContainerElement = element =>
+            element.innerHTML = caption;
+    }
+
+    /** Private method to set the caption position
+     * @param {string} position - Position
+     */
+    #setCaptionPosition(position) {
+        this._onBuiltCaptionContainerElement = element =>
+            element.style.textAlign = position;
+    }
+
+    /** Private method to set the caption color
+     * @param {string} color - Color
+     */
+    #setCaptionColor(color) {
+        this._onBuiltCaptionContainerElement = element =>
+            element.style.color = color;
+    }
+
+    /** Private method to set the caption font
+     * @param {string} font - Font
+     */
+    #setCaptionFont(font) {
+        this._onBuiltCaptionContainerElement = element =>
+            element.style.fontFamily = font;
+    }
+
+    /** Private method to set style attribute
+     * @param {string} style - Style attribute value
+     */
+    #setStyle(style) {
+        if (!style)
+            return
+
+        // Add the style attribute to the element when built
+        this._setStyle(() => {
+            this._onBuiltCaptionContainerElement = (element) => this._setStyleAttributes(style, element);
+        })
     }
 
     /** Get the template for the Sirius label
@@ -48,78 +188,68 @@ export class SiriusLabel extends SiriusElement {
     #getTemplate() {
         return `<div class="${SIRIUS_LABEL.CLASSES.LABEL_CONTAINER}">
                     <span class ="${SIRIUS_LABEL.CLASSES.CAPTION_CONTAINER}">
-                        ${this.#getCaption()}
+                        ${this.caption}
                     </span>
                 </div>`;
     }
 
-    /** Get the caption of the label
-     * @returns {*} - Label caption
+    /** Attribute change callback
+     * @param {string} name - Attribute name
+     * @param {string} oldValue - Old value
+     * @param {string} newValue - New value
      */
-    #getCaption() {
-        return this._attributes[SIRIUS_LABEL.CAPTION_ATTRIBUTES.CAPTION.NAME];
-    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        // Call the pre-attribute changed callback
+        const {formattedValue, shouldContinue} = this._preAttributeChangedCallback(name, oldValue, newValue);
+        if (!shouldContinue) return;
 
-    /** Load the attributes of the Sirius label */
-    #loadAttributes() {
-        this.onBuilt = () => {
-            // Check if the element has attributes
-            if (!this._attributes)
-                this.logger.log("No attributes");
 
-            Object.keys(this._attributes).forEach(attributeName => {
-                // Get the attribute value
-                const attributeValue = this._attributes[attributeName]
+        switch (name) {
+            case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
+                this._setId(formattedValue);
+                break;
 
-                // Check if the attribute value is null
-                if (!attributeValue) return;
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLE:
+                this.#setStyle(formattedValue);
+                break;
 
-                // Check if the attribute value is an object
-                switch (attributeName) {
+            case SIRIUS_LABEL_ATTRIBUTES.CAPTION:
+                this.#setCaption(formattedValue);
+                break;
 
-                    case SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME:
-                        this._loadStyleAttribute(attributeValue, this.containerElement);
-                        break;
+            case SIRIUS_LABEL_ATTRIBUTES.CAPTION_POSITION:
+                this.#setCaptionPosition(formattedValue);
+                break;
 
-                    case SIRIUS_ELEMENT.ATTRIBUTES.EVENTS.NAME:
-                        this._loadEventsAttribute(attributeValue, this.captionElement);
-                        break;
+            case SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR:
+                this.#setCaptionColor(formattedValue);
+                break;
 
-                    // case attributeName.startsWith("on"):
-                    //     console.log("Event attribute: ", attributeName);
-                    //     break;
+            case SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT:
+                this.#setCaptionFont(formattedValue);
+                break;
 
-                    case SIRIUS_LABEL.CAPTION_ATTRIBUTES.POSITION.NAME:
-                        // Set the text alignment of the caption
-                        this.containerElement.style.textAlign = attributeValue;
-                        break;
-
-                    case SIRIUS_LABEL.CAPTION_ATTRIBUTES.COLOR.NAME:
-                        // Set the color of the caption
-                        this.captionElement.style.color = attributeValue;
-                        break;
-
-                    case SIRIUS_LABEL.CAPTION_ATTRIBUTES.FONT.NAME:
-                        // Set the font family
-                        this.captionElement.style.fontFamily = attributeValue.toLowerCase();
-                        break;
-
-                    default:
-                        //this.logger.log(`Unregistered attribute: ${attributeName}`);
-                        break;
-                }
-            })
+            default:
+                this.logger.error(`Unregistered attribute: ${name}`);
+                break;
         }
     }
 
     /** Lifecycle method called when the component is connected to the DOM
      */
     async connectedCallback() {
-        // Load attributes
-        this.#loadAttributes();
+        // Call the parent connected callback
+        await super.connectedCallback()
+
+        // Load Sirius Label attributes
+        this._loadAttributes({
+            instanceProperties: this._properties,
+            attributes: SIRIUS_LABEL_ATTRIBUTES,
+            defaultValues: SIRIUS_LABEL_ATTRIBUTES_DEFAULT
+        });
 
         // Create the CSS stylesheet and add it to the shadow DOM
-        await this._loadElementStyles()
+        await this._loadAndAdoptStyles()
 
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
@@ -128,8 +258,9 @@ export class SiriusLabel extends SiriusElement {
         await this._createTemplate(innerHTML);
 
         // Add label to the shadow DOM
-        this.containerElement = this._templateContent.firstChild;
-        this.#captionElement = this.containerElement.firstElementChild;
+        this._containerElement = this._templateContent.firstChild;
+        this.#labelContainerElement = this._containerElement
+        this.#captionContainerElement = this._containerElement.firstElementChild;
         this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event
