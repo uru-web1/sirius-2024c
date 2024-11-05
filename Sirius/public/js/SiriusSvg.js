@@ -75,11 +75,11 @@ export const SIRIUS_ICONS = {
 export const SIRIUS_SVG_INNER_HTML = {
     // Arrow icon
     [SIRIUS_ICONS.ARROW]:
-        `<path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/>`,
+        `<path d="M480-528 296-344l-56-56 240-240 240 240-56 56-184-184Z"/>`,
 
     // Double arrow icon
     [SIRIUS_ICONS.DOUBLE_ARROW]:
-        `<path d="M383-480 200-664l56-56 240 240-240 240-56-56 183-184Zm264 0L464-664l56-56 240 240-240 240-56-56 183-184Z"/>`,
+        `<path d="m296-224-56-56 240-240 240 240-56 56-184-183-184 183Zm0-240-56-56 240-240 240 240-56 56-184-183-184 183Z"/>`,
 
     // Indeterminate icon
     [SIRIUS_ICONS.INDETERMINATE]:

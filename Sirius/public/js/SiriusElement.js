@@ -46,11 +46,7 @@ export const SIRIUS_ELEMENT_ATTRIBUTES = deepFreeze({
 })
 
 /** Sirius element attributes default values */
-export const SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT = deepFreeze({
-    [SIRIUS_ELEMENT_ATTRIBUTES.STYLE]: null,
-    [SIRIUS_ELEMENT_ATTRIBUTES.HIDE]: null,
-    [SIRIUS_ELEMENT_ATTRIBUTES.DISABLED]: null
-})
+export const SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT = deepFreeze({})
 
 /** Sirius element properties */
 export const SIRIUS_ELEMENT_PROPERTIES = deepFreeze({
@@ -224,10 +220,10 @@ export class SiriusElement extends HTMLElement {
     }
 
     /** Hide the element
-     * @param {string} event - Event to wait for before hiding the element
+     * @param {string|undefined} event - Event to wait for before hiding the element
      * @param {HTMLElement} element - Element to hide
      * */
-    _hide(event, element) {
+    _hide({event, element}) {
         // Hide the element when built
         this._onBuiltElement = {
             element: element || this.containerElement,
@@ -811,7 +807,7 @@ export class SiriusElement extends HTMLElement {
      * @param {string} eventName - Event name
      */
     dispatchEventName(eventName) {
-        this.dispatchEvent(new Event(eventName));
+        this.dispatchEvent(new CustomEvent(eventName, {bubbles: false}));
     }
 
     /** Dispatch the built event */

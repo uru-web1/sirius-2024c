@@ -37,13 +37,6 @@ export const SIRIUS_ICON_ATTRIBUTES = deepFreeze({
  * */
 export const SIRIUS_ICON_ATTRIBUTES_DEFAULT = deepFreeze({
     [SIRIUS_ICON_ATTRIBUTES.ICON]: SIRIUS_ICONS.WARNING,
-    [SIRIUS_ICON_ATTRIBUTES.ICON_ROTATION]: null,
-    [SIRIUS_ICON_ATTRIBUTES.ICON_WIDTH]: null,
-    [SIRIUS_ICON_ATTRIBUTES.ICON_HEIGHT]: null,
-    [SIRIUS_ICON_ATTRIBUTES.ICON_FILL]: null,
-    [SIRIUS_ICON_ATTRIBUTES.ANIMATION_DURATION]: null,
-    [SIRIUS_ICON_ATTRIBUTES.SHOW_ANIMATION]: null,
-    [SIRIUS_ICON_ATTRIBUTES.HIDING_ANIMATION]: null,
 })
 
 /** Sirius rotation constants */
@@ -56,10 +49,10 @@ export const SIRIUS_ICON_ROTATION = deepFreeze({
 
 /** Sirius rotation degrees */
 export const SIRIUS_ICON_ROTATION_DEGREES = deepFreeze({
-    [SIRIUS_ICON_ROTATION.RIGHT]: 0,
-    [SIRIUS_ICON_ROTATION.DOWN]: 90,
-    [SIRIUS_ICON_ROTATION.LEFT]: 180,
-    [SIRIUS_ICON_ROTATION.UP]: 270,
+    [SIRIUS_ICON_ROTATION.RIGHT]: 90,
+    [SIRIUS_ICON_ROTATION.DOWN]: 180,
+    [SIRIUS_ICON_ROTATION.LEFT]: 270,
+    [SIRIUS_ICON_ROTATION.UP]: 0,
 })
 
 /** Sirius class that represents an icon component */
@@ -256,6 +249,8 @@ export class SiriusIcon extends SiriusElement {
      * @param {string} name - Icon name
      */
     #setIconName(name) {
+        if (!name) return
+
         this._onBuiltSvgElement = (element) => {
             // Get the icon and rotate key
             const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON
@@ -274,7 +269,7 @@ export class SiriusIcon extends SiriusElement {
             changeSvgElementInnerHTML(element, this.#iconName);
 
             // Set the icon rotation
-            if (this.#iconRotation !== null)
+            if (this.#iconRotation !== null && this.#iconRotation !== undefined)
                 this.iconRotation = this.#iconRotation;
         }
     }
@@ -300,6 +295,8 @@ export class SiriusIcon extends SiriusElement {
      * @param {string} rotate - Rotation direction
      */
     #setIconRotation(rotate) {
+        if (!rotate) return
+
         // Get the icon rotation degrees
         const degrees = this.#getRotationDegrees(rotate)
         if (degrees === null) return
@@ -359,16 +356,13 @@ export class SiriusIcon extends SiriusElement {
             this._setKeyframeRules(SIRIUS_ICON_ATTRIBUTES.HIDING_ANIMATION, rules);
     }
 
-    /** Private method to set style attribute
+    /** Private method to set the SVG container element style attribute
      * @param {string} style - Style attribute value
      */
     #setStyle(style) {
-        if (!style)
-            return
-
-        // Add the style attribute to the element when built
-        this._setStyle(() => {
-            this._onBuiltSvgContainerElement = (element) => this._setStyleAttributes(style, element);
+        if (style)
+            this._setStyle(() => {
+                this._onBuiltSvgContainerElement = (element) => this._setStyleAttributes(style, element);
         })
     }
 
@@ -378,7 +372,7 @@ export class SiriusIcon extends SiriusElement {
     #setHidden(hide) {
         this._onBuiltSvgContainerElement = (element) => {
             if (hide === 'true' || hide === '')
-                this._hide('animationend', element)
+                this._hide({event:'animationend', element})
             else
                 this._show(element)
         }
@@ -396,14 +390,12 @@ export class SiriusIcon extends SiriusElement {
         }
     }
 
-    /** Set the events property
+    /** Set the events property to this
      * @param {object} events - Events property
      */
     set events(events) {
-        if (!events)
-            return
-
-        this._setEvents(events, this);
+        if (events)
+            this._setEvents(events, this);
     }
 
     /** Get the icon SVG element
@@ -543,9 +535,9 @@ export class SiriusIcon extends SiriusElement {
 
         // Add icon to the shadow DOM
         this.#iconContainerElement = this._containerElement = this._templateContent.firstChild;
-        this.#svgContainerElement = this.#iconContainerElement.firstElementChild;
-        this.#svgElement = this.#svgContainerElement.firstElementChild;
-        this.shadowRoot.appendChild(this._containerElement);
+        this.#svgContainerElement = this.iconContainerElement.firstElementChild;
+        this.#svgElement = this.svgContainerElement.firstElementChild;
+        this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event
         this.dispatchBuiltEvent();

@@ -3,11 +3,11 @@ export const SIRIUS_LOGGER = {
     NAME: 'SiriusLogger',
     INNER_PADDING: {
         CLASS: {
-            WIDTH: 15,
+            WIDTH: 20,
             FILL_CHAR: ' ',
         },
         ELEMENT_ID: {
-            WIDTH: 15,
+            WIDTH: 20,
             FILL_CHAR: ' ',
         },
     },

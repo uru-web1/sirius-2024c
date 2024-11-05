@@ -5,7 +5,7 @@ import deepFreeze from "./utils/deep-freeze.js";
 export const SIRIUS_LABEL = deepFreeze({
     NAME: "SiriusLabel",
     TAG: "sirius-label",
-    CSS_VARS:{
+    CSS_VARS: {
         CAPTION_TEXT_ALIGN: "--text-align",
         CAPTION_BACKGROUND_COLOR: "--background-color",
         CAPTION_COLOR: "--color",
@@ -55,6 +55,20 @@ export class SiriusLabel extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_LABEL_ATTRIBUTES)];
     }
 
+    /** Get the label container element
+     * @returns {HTMLElement} - Label container element
+     */
+    get labelContainerElement() {
+        return this.#labelContainerElement
+    }
+
+    /** Get the caption container element
+     * @returns {HTMLElement} - Caption container element
+     */
+    get captionContainerElement() {
+        return this.#captionContainerElement
+    }
+
     /** Get the caption
      * @returns {string} - Caption
      */
@@ -80,7 +94,7 @@ export class SiriusLabel extends SiriusElement {
      * @param {string} textAlignment - Text alignment
      */
     set captionTextAlign(textAlignment) {
-        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_TEXT_ALIGN,textAlignment);
+        this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_TEXT_ALIGN, textAlignment);
     }
 
     /** Get the caption background color
@@ -139,7 +153,6 @@ export class SiriusLabel extends SiriusElement {
         this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_SIZE, fontSize);
     }
 
-
     /** Get the caption padding
      * @returns {string} - Padding
      */
@@ -154,28 +167,11 @@ export class SiriusLabel extends SiriusElement {
         this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_PADDING, padding);
     }
 
-    /** Get the label container element
-     * @returns {HTMLElement} - Label container element
-     */
-    get labelContainerElement() {
-        return this.#labelContainerElement
-    }
-
-    /** Get the caption container element
-     * @returns {HTMLElement} - Caption container element
-     */
-    get captionContainerElement() {
-        return this.#captionContainerElement
-    }
-
     /** Set on built label container element callback
      * @param {function(HTMLElement): void} callback - Callback
      */
     set _onBuiltLabelContainerElement(callback) {
-        this.onBuilt = () => {
-            if (this._checkElement(this.labelContainerElement))
-                callback(this.labelContainerElement);
-        }
+        this._onBuiltContainerElement = callback
     }
 
     /** Set on built caption container element callback
@@ -245,28 +241,22 @@ export class SiriusLabel extends SiriusElement {
             this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_PADDING, padding)
     }
 
-    /** Private method to set style attribute
+    /** Private method to set the caption container style
      * @param {string} style - Style attribute value
      */
     #setStyle(style) {
-        if (!style)
-            return
-
-        // Add the style attribute to the element when built
-        this._setStyle(() => {
-            this._onBuiltCaptionContainerElement = (element) => this._setStyleAttributes(style, element);
-        })
+        if (style)
+            this._setStyle(() => {
+                this._onBuiltCaptionContainerElement = (element) => this._setStyleAttributes(style, element);
+            })
     }
 
-    /** Set the events property
+    /** Set the events property to the caption container element
      * @param {object} events - Events property
      */
     set events(events) {
-        if (!events)
-            return
-
-        // Add the events property to the element when built
-        this._onBuiltCaptionContainerElement = (element) => this._setEvents(events, element);
+        if (events)
+            this._onBuiltCaptionContainerElement = (element) => this._setEvents(events, element);
     }
 
     /** Get the template for the Sirius label
@@ -290,7 +280,6 @@ export class SiriusLabel extends SiriusElement {
         const {formattedValue, shouldContinue} = this._preAttributeChangedCallback(name, oldValue, newValue);
         if (!shouldContinue) return;
 
-
         switch (name) {
             case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
                 this._setId(formattedValue);
@@ -308,7 +297,7 @@ export class SiriusLabel extends SiriusElement {
                 this.#setCaptionTextAlign(formattedValue);
                 break;
 
-                case SIRIUS_LABEL_ATTRIBUTES.CAPTION_BACKGROUND_COLOR:
+            case SIRIUS_LABEL_ATTRIBUTES.CAPTION_BACKGROUND_COLOR:
                 this.#setCaptionBackgroundColor(formattedValue);
                 break;
 
@@ -320,11 +309,11 @@ export class SiriusLabel extends SiriusElement {
                 this.#setCaptionFontFamily(formattedValue);
                 break;
 
-                case SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_SIZE:
+            case SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_SIZE:
                 this.#setCaptionFontSize(formattedValue);
                 break;
 
-                case SIRIUS_LABEL_ATTRIBUTES.CAPTION_PADDING:
+            case SIRIUS_LABEL_ATTRIBUTES.CAPTION_PADDING:
                 this.#setCaptionPadding(formattedValue);
                 break;
 
@@ -357,9 +346,8 @@ export class SiriusLabel extends SiriusElement {
         await this._createTemplate(innerHTML);
 
         // Add label to the shadow DOM
-        this._containerElement = this._templateContent.firstChild;
-        this.#labelContainerElement = this._containerElement
-        this.#captionContainerElement = this._containerElement.firstElementChild;
+        this.#labelContainerElement = this._containerElement = this._templateContent.firstChild;
+        this.#captionContainerElement = this.labelContainerElement.firstElementChild;
         this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event

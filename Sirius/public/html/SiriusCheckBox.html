@@ -3,49 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Sirius Checkbox Example</title>
+    <title>SiriusCheckbox Example</title>
     <link href="../css/Sirius.css" rel="stylesheet">
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusCheckbox.js" type="module"></script>
 </head>
 <body>
+<sirius-checkbox label-caption="The last of us" id="checkbox-3"></sirius-checkbox>
+
 <script type="module">
     import sirius from '../js/Sirius.js';
-    import {SIRIUS_CHECKBOX, SiriusCheckbox} from '../js/SiriusCheckbox.js';
-    import {SIRIUS_ELEMENT} from "../js/SiriusElement.js";
+    import { SIRIUS_CHECKBOX_ATTRIBUTES, SiriusCheckbox} from '../js/SiriusCheckbox.js';
+    import { SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
 
     // Get the attributes keys
-    const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
-    const labelKey = SIRIUS_CHECKBOX.ATTRIBUTES.LABEL.NAME;
-    const captionKey = SIRIUS_CHECKBOX.ATTRIBUTES.CAPTION.NAME;
-    const widthKey = SIRIUS_CHECKBOX.CHECKBOX_ATTRIBUTES.WIDTH.NAME;
-    const heightKey = SIRIUS_CHECKBOX.CHECKBOX_ATTRIBUTES.HEIGHT.NAME;
-    const checkmarkKey = SIRIUS_CHECKBOX.CHECKBOX_ATTRIBUTES.FILL.NAME;
-    const styleKey = SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME;
+    const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+    const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+    const labelHiddenKey = SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_HIDDEN;
+    const labelCaptionKey = SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION;
+    const iconWidthKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_WIDTH;
+    const iconHeightKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_HEIGHT;
+    const iconFillKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_FILL;
 
     sirius.onLoaded = async () => {
         const siriusCheckbox1 = new SiriusCheckbox({
             [idKey]: 'checkbox-1',
-            [labelKey]: true,
-            [captionKey]: 'La hamburguesa es buena',
-            [checkmarkKey]: 'blue',
+            [labelCaptionKey]: 'Uncharted',
+            [iconFillKey]: 'blue',
             [styleKey]: 'position: absolute; top: 50px; left: 50px;',
-            [widthKey]: '50px',
-            [heightKey]: '50px',
+            [iconWidthKey]: '50px',
+            [iconHeightKey]: '50px',
         });
+
+        // Add the checkbox to the body
         siriusCheckbox1.addToBody()
 
         const siriusCheckbox2 = new SiriusCheckbox({
             [idKey]: 'checkbox-2',
-            [labelKey]: true,
-            [captionKey]: 'La pizza es buena',
+            [labelCaptionKey]: 'Fallout',
+            [labelHiddenKey]: "true",
         });
+
+        // Add the checkbox to the body
         siriusCheckbox2.addToBody()
     };
 
 </script>
 
-<sirius-checkbox caption="La proteína es god" id="checkbox-3" label=true></sirius-checkbox>
 
 </body>
 </html>
