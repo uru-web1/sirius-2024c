@@ -69,6 +69,8 @@ export const SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT = deepFreeze({
 
 /** Sirius class that represents a checkbox component */
 export class SiriusCheckbox extends SiriusElement {
+    #parentElement = null;
+    #children=[]
     #checkboxContainerElement = null;
     #labelContainerElement = null;
     #labelElement = null;
@@ -114,6 +116,32 @@ export class SiriusCheckbox extends SiriusElement {
      */
     get iconElement() {
         return this.#iconElement;
+    }
+
+    /** Get parent element
+     * @returns {SiriusCheckbox} - Parent element
+     */
+    get parentElement() {
+        return this.#parentElement;
+    }
+
+    /** Set parent element
+     * @param {SiriusCheckbox} element - Parent element
+     */
+    set parentElement(element) {
+        if (this.#parentElement!==null){
+            this.logger.error("Parent element already set. Remove the current parent element before setting a new one.");
+            return;
+        }
+
+        this.#parentElement = element;
+    }
+
+    /** Get children elements
+     * @returns {Array<SiriusCheckbox>} - Children elements
+     */
+    get children() {
+        return this.#children;
     }
 
     /** Get checked attribute
@@ -706,6 +734,35 @@ export class SiriusCheckbox extends SiriusElement {
 
         // Add the events property to the element when built
         this._onBuiltIconElement = (element) => this._setEvents(events, element);
+    }
+
+    /** Add checkbox children elements
+     * @param {SiriusCheckbox} elements - Children elements
+     */
+    addChildrenElements(...elements) {
+        if (!elements)
+            return
+
+        elements.forEach(element => {
+            if (!element) return;
+
+            element.parentElement = this;
+            this.#children.push(element);
+        })
+    }
+
+    /** Remove checkbox children elements
+     * @param {SiriusCheckbox} elements - Children elements
+     */
+    removeChildrenElements(...elements) {
+        if (!elements) return;
+
+         elements.forEach(element => {
+            if (!element) return;
+
+            element.#parentElement = null;
+            this.#children = this.#children.filter(child => child !== element);
+        })
     }
 
     /** Get the template for the Sirius checkbox

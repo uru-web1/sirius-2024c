@@ -46,6 +46,26 @@
 
         // Add the checkbox to the body
         siriusCheckbox2.addToBody()
+
+        const siriusCheckbox3 = new SiriusCheckbox({
+            [idKey]: 'checkbox-3',
+            [labelCaptionKey]: 'Slave',
+        });
+
+        // Add the checkbox to the body
+        siriusCheckbox3.addToBody()
+
+        // Add children to the checkbox
+        siriusCheckbox2.addChildrenElements(siriusCheckbox3);
+        console.log(siriusCheckbox2.children)
+        console.log(siriusCheckbox3.parentElement)
+
+        /*
+        // Remove children from the checkbox
+        siriusCheckbox2.removeChildrenElements(siriusCheckbox3);
+        console.log(siriusCheckbox2.children)
+        console.log(siriusCheckbox3.parentElement)
+         */
     };
 
 </script>
