@@ -513,13 +513,13 @@ export class SiriusCheckbox extends SiriusElement {
         else if (status === "checked")
             this.onBuilt = () => {
                 this.iconElement.hide = "false";
-                this.iconElement.iconName = "check-mark";
+                this.iconElement.icon = "check-mark";
             }
 
         else if (status === "indeterminate")
             this.onBuilt = () => {
                 this.iconElement.hide = "false";
-                this.iconElement.iconName = "indeterminate";
+                this.iconElement.icon = "indeterminate";
             }
 
         else {
