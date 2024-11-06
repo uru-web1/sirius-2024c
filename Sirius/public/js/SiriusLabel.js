@@ -290,7 +290,6 @@ export class SiriusLabel extends SiriusElement {
         const {formattedValue, shouldContinue} = this._preAttributeChangedCallback(name, oldValue, newValue);
         if (!shouldContinue) return;
 
-
         switch (name) {
             case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
                 this._setId(formattedValue);
@@ -346,7 +345,7 @@ export class SiriusLabel extends SiriusElement {
             attributes: SIRIUS_LABEL_ATTRIBUTES,
             defaultValues: SIRIUS_LABEL_ATTRIBUTES_DEFAULT
         });
-
+        
         // Create the CSS stylesheet and add it to the shadow DOM
         await this._loadAndAdoptStyles()
 

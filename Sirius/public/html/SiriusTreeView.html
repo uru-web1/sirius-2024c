@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree View UI</title>
+    <link rel="stylesheet" href="../css/Sirius.css">
+    <script defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusLabel.js" type="module"></script>
+    <script defer src="../js/SiriusTreeView.js" type="module"></script>
+</head>
+<body>
+    
+  <ul class="tree">
+    <li class="parent">
+        <details>
+            <summary><sirius-label caption="Hello world HTML" caption-color="red" caption-font-family="monospace"
+                caption-text-align="center" caption-padding="2px" id="label-2" style="border: 1px solid green; width: 100px;"></sirius-label></summary>
+            <ul>
+                <li>
+                    <div>
+                        <input type="checkbox">
+                    </div>
+                    
+                </li>
+                
+                <li>
+                    <div>
+                        <input type="checkbox">
+                    <sirius-label caption="Hello world HTML" caption-color="red" caption-font-family="monospace"
+                    caption-text-align="center" caption-padding="2px" id="label-2" style="border: 1px solid green; width: 100px;"></sirius-label>
+                    </div>
+                </li>
+                <li>Gossip</li>
+                <li>Lol</li>
+                <li>Sports</li>
+            </ul>
+        </details>
+    </li> 
+    <li class="parent">
+        <details>
+            <summary>News</summary>
+            <ul>
+                <li>World</li>
+                <li>
+                    <details>
+                        <summary>China</summary>
+                        <ul>
+                            <li>L</li>
+                            <li>O</li>
+                            <li>
+                                <details>
+                                    <summary>P</summary>
+                                        <ul>
+                                            <li>Aña</li>
+                                        </ul>
+                                </details>
+                            </li>
+                            
+                        </ul>
+                    </details>
+                </li>
+                <li>aloja</li>
+            </ul>
+        </details>
+    </li>
+    <li class="parent"></li>
+    <li></li>
+    <li></li>
+  </ul>
+
+    <sirius-treeview id="1">
+        
+        <tree-item>
+
+                    <p>holiwi</p>
+                    <tree-item>
+                        <p>lol</p>
+                        <tree-item>
+                            <sirius-label caption="Hello world HTML" caption-color="red" caption-font-family="monospace"
+                caption-text-align="center" caption-padding="2px" id="label-2" style="border: 1px solid green; width: 100px;"></sirius-label>
+                        </tree-item>
+                    </tree-item>
+                    <p>lol</p>
+            
+        </tree-item>
+        
+        <tree-item>
+                    <ul>
+                        <li>
+                            <p>tontis</p>
+                        </li>
+                    </ul>
+        </tree-item>
+        <tree-item>
+
+                    <p>chachis</p>
+
+        </tree-item>
+
+    </sirius-treeview>
+
+    
+</body>
+</html>
