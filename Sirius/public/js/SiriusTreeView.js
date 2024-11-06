@@ -1,4 +1,4 @@
-import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
+import {SiriusElement} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 export const SIRIUS_TREEVIEW = deepFreeze({
@@ -16,51 +16,51 @@ export class SiriusTreeView extends SiriusElement {
     }
 
     #wrapNonListElements(treeItem) {
-        // Obtener todos los elementos hijos del `tree-item`
+        // Get all child elements of the `tree-item`
         const childNodes = Array.from(treeItem.childNodes);
     
-        // Crear un array para los elementos procesados
+        // Create an array for processed elements
         const processedNodes = childNodes.map(node => {
             if (node.nodeType === Node.ELEMENT_NODE) {
                 if (node.tagName.toLowerCase() === 'tree-item') {
-                    // Si el nodo es un `tree-item`, creamos un `<details>` y `<summary>`
-                    const label = node.getAttribute('label') || 'Item';
+                    // Get custom summary content or fallback to label
+                    const summaryContent = node.getAttribute('summary-content') || node.getAttribute('label') || 'Item';
+                    
+                    // Wrap tree-item in <details> and <summary> using summaryContent
                     return `<li>    
                                 <details>
-                                    <summary>${label}</summary>
-                                    ${this.#wrapNonListElements(node)} <!-- Llamada recursiva para procesar elementos internos -->
+                                    <summary>${summaryContent}</summary>
+                                    ${this.#wrapNonListElements(node)} <!-- Recursive call to process inner elements -->
                                 </details>
                             </li>`;
                 } else if (node.tagName.toLowerCase() !== 'ul' && node.tagName.toLowerCase() !== 'li') {
-                    // Envolver otros elementos que no sean `ul` o `li` en `<li>`
+                    // Wrap other elements that are not `ul` or `li` in `<li>`
                     return `<li>${node.outerHTML}</li>`;
                 } else {
-                    // Dejar `ul` y `li` tal como están
                     return node.outerHTML;
                 }
             } else {
-                // Dejar nodos de texto o comentarios tal como están
+                // Leave text or comment nodes as they are
                 return node.textContent;
             }
         });
     
-        // Envolver todos los elementos no listados en un solo `<ul>` si hay elementos que procesar
+        // Wrap all non-listed elements inside a single `<ul>` if there are elements to process
         return `<ul>${processedNodes.join('')}</ul>`;
     }
     
-    
-
     #createTreeItems() {
-        // Obtiene los elementos hijos y busca etiquetas `tree-item`
+        // Get child elements and look for `tree-item` tags
         const childElements = this.getElementsInside();
         const treeItems = childElements.filter(child => child.tagName.toLowerCase() === 'tree-item');
         
-        // Generar el HTML de cada `tree-item` dentro de un `<li>` con clase `parent`
+        // Generate HTML for each `tree-item` inside an `<li>` with the class `parent`
         const childrenHTML = treeItems.map(treeItem => {
             const wrappedContent = this.#wrapNonListElements(treeItem);
+            const summaryContent = treeItem.getAttribute('summary-content') || treeItem.getAttribute('label') || 'Item';
             return `<li class="${SIRIUS_TREEVIEW.CLASSES.PARENT_CONTAINER}">
                         <details>
-                            <summary>${treeItem.getAttribute('label') || 'Item'}</summary>
+                            <summary>${summaryContent}</summary>
                             ${wrappedContent}
                         </details>
                     </li>`;
@@ -70,37 +70,37 @@ export class SiriusTreeView extends SiriusElement {
     }
 
     #getTemplate() {
-        // Llama a #createTreeItems para obtener los elementos `li` con sus contenidos
+        // Call #createTreeItems to get the `li` elements with their content
         const childrenHTML = this.#createTreeItems();
 
-        // Envolver los elementos `li` generados dentro de un `<ul>` con clase `TREE_CONTAINER`
+        // Wrap the generated `li` elements inside a `<ul>` with the class `TREE_CONTAINER`
         return `<ul class="${SIRIUS_TREEVIEW.CLASSES.TREE_CONTAINER}">
                     ${childrenHTML}
                 </ul>`;
     }
 
     getElementsInside() {
-        // Obtener los elementos del componente (p. ej., los hijos que fueron insertados)
-        return Array.from(this.children); // Usamos children para obtener los elementos directos del nodo
+        // Get the elements of the component (e.g., the children that were inserted)
+        return Array.from(this.children); // Use children to get direct child elements
     }
 
     async connectedCallback() {
         await super.connectedCallback();
 
-        // Crear el shadow DOM solo si no existe
         if (!this.shadowRoot) {
             this.attachShadow({ mode: 'open' });
         }
 
-        // Cargar los estilos y agregar contenido al shadow DOM
+        // Load styles and add content to the shadow DOM
         await this._loadAndAdoptStyles();
         const innerHTML = this.#getTemplate();
-        this.shadowRoot.innerHTML = innerHTML; // Insertamos el template generado con los hijos
+        this.shadowRoot.innerHTML = innerHTML; // Insert the generated template with children
 
-        // Disparar el evento de construcción
+        // Trigger the build event
         this.dispatchBuiltEvent();
     }
 }
 
-// Registrar el componente
+// Register the component
 customElements.define(SIRIUS_TREEVIEW.TAG, SiriusTreeView);
+
