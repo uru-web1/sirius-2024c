@@ -56,14 +56,14 @@ export class SiriusLabel extends SiriusElement {
     }
 
     /** Get the label container element
-     * @returns {HTMLElement} - Label container element
+     * @returns {HTMLElement|null} - Label container element
      */
     get labelContainerElement() {
         return this.#labelContainerElement
     }
 
     /** Get the caption container element
-     * @returns {HTMLElement} - Caption container element
+     * @returns {HTMLElement|null} - Caption container element
      */
     get captionContainerElement() {
         return this.#captionContainerElement
@@ -167,30 +167,12 @@ export class SiriusLabel extends SiriusElement {
         this.setAttribute(SIRIUS_LABEL_ATTRIBUTES.CAPTION_PADDING, padding);
     }
 
-    /** Set on built label container element callback
-     * @param {function(HTMLElement): void} callback - Callback
-     */
-    set _onBuiltLabelContainerElement(callback) {
-        this._onBuiltContainerElement = callback
-    }
-
-    /** Set on built caption container element callback
-     * @param {function(HTMLElement): void} callback - Callback
-     */
-    set _onBuiltCaptionContainerElement(callback) {
-        this.onBuilt = () => {
-            if (this._checkElement(this.captionContainerElement))
-                callback(this.captionContainerElement);
-        }
-    }
-
     /** Private method to set the caption
      * @param {string} caption - Caption
      */
     #setCaption(caption) {
         if (caption)
-            this._onBuiltCaptionContainerElement = element =>
-                element.innerHTML = caption;
+            this.onBuilt = () => this.captionContainerElement.innerHTML = caption;
     }
 
     /** Private method to set the caption text align
@@ -246,9 +228,7 @@ export class SiriusLabel extends SiriusElement {
      */
     #setStyle(style) {
         if (style)
-            this._setStyle(() => {
-                this._onBuiltCaptionContainerElement = (element) => this._setStyleAttributes(style, element);
-            })
+            this._setStyle = () => this._setStyleAttributes(style, this.captionContainerElement);
     }
 
     /** Set the events property to the caption container element
@@ -256,7 +236,7 @@ export class SiriusLabel extends SiriusElement {
      */
     set events(events) {
         if (events)
-            this._onBuiltCaptionContainerElement = (element) => this._setEvents(events, element);
+            this.onBuilt = () => this._setEvents(events, this.captionContainerElement);
     }
 
     /** Get the template for the Sirius label
@@ -318,7 +298,7 @@ export class SiriusLabel extends SiriusElement {
                 break;
 
             default:
-                this.logger.error(`Unregistered attribute: ${name}`);
+                this._onInjectedLogger = () => this.logger.error(`Unregistered attribute: ${name}`);
                 break;
         }
     }

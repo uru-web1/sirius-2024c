@@ -2,51 +2,16 @@
     display: inline-block;
     box-sizing: border-box;
 
+    --padding: 2px;
     --svg-width: 24px;
     --svg-height: 24px;
     --svg-fill: grey;
-    --animation-duration: 500ms;
-    --icon-rotation: 0deg;
 }
 
 .icon-container {
     display: grid;
     place-items: center;
+    padding: var(--padding);
+    width: var(--svg-width);
+    height: var(--svg-height);
 }
-
-.svg-container {
-    display: grid;
-    place-items: center;
-    transform: rotate(var(--icon-rotation));
-}
-
-.svg-container:not(.hidden,.hiding) > svg {
-    animation: show-animation var(--animation-duration) forwards;
-}
-
-.svg-container.hiding > svg {
-    animation: hiding-animation var(--animation-duration) forwards;
-}
-
-@keyframes show-animation {
-    0% {
-        scale: 0;
-        opacity: 0;
-    }
-    100% {
-        scale: 1;
-        opacity: 1;
-    }
-}
-
-@keyframes hiding-animation {
-    0% {
-        scale: 1;
-        opacity: 1;
-    }
-    100% {
-        scale: 0;
-        opacity: 0;
-    }
-}
-

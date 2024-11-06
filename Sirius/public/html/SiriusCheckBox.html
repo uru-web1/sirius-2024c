@@ -7,14 +7,33 @@
     <link href="../css/Sirius.css" rel="stylesheet">
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusCheckbox.js" type="module"></script>
+
+    <style>
+        .checkboxes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .parent-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-left: 1rem;
+        }
+    </style>
 </head>
 <body>
 <sirius-checkbox label-caption="The last of us" id="checkbox-3"></sirius-checkbox>
+<div class="checkboxes-container"></div>
 
 <script type="module">
     import sirius from '../js/Sirius.js';
-    import { SIRIUS_CHECKBOX_ATTRIBUTES, SiriusCheckbox} from '../js/SiriusCheckbox.js';
-    import { SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
+    import {SIRIUS_CHECKBOX_ATTRIBUTES, SiriusCheckbox} from '../js/SiriusCheckbox.js';
+    import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
+
+    // Get the checkboxes container
+    const checkboxesContainer = document.querySelector('.checkboxes-container');
 
     // Get the attributes keys
     const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
@@ -30,35 +49,62 @@
             [idKey]: 'checkbox-1',
             [labelCaptionKey]: 'Uncharted',
             [iconFillKey]: 'blue',
-            [styleKey]: 'position: absolute; top: 50px; left: 50px;',
+            [styleKey]: 'background-color: yellow',
             [iconWidthKey]: '50px',
             [iconHeightKey]: '50px',
         });
-
-        // Add the checkbox to the body
-        siriusCheckbox1.addToBody()
+        checkboxesContainer.appendChild(siriusCheckbox1);
 
         const siriusCheckbox2 = new SiriusCheckbox({
             [idKey]: 'checkbox-2',
-            [labelCaptionKey]: 'Fallout',
+            [labelCaptionKey]: 'Hidden label',
             [labelHiddenKey]: "true",
         });
-
-        // Add the checkbox to the body
-        siriusCheckbox2.addToBody()
+        checkboxesContainer.appendChild(siriusCheckbox2);
 
         const siriusCheckbox3 = new SiriusCheckbox({
             [idKey]: 'checkbox-3',
-            [labelCaptionKey]: 'Slave',
+            [labelCaptionKey]: 'Parent 1',
         });
+        checkboxesContainer.appendChild(siriusCheckbox3);
 
-        // Add the checkbox to the body
-        siriusCheckbox3.addToBody()
+        // Create the first parent container
+        const parentContainer1 = document.createElement('div');
+        parentContainer1.classList.add('parent-container');
+        checkboxesContainer.appendChild(parentContainer1);
+
+        const siriusCheckbox4 = new SiriusCheckbox({
+            [idKey]: 'checkbox-4',
+            [labelCaptionKey]: 'Child 1 (Parent 1)',
+        });
+        parentContainer1.appendChild(siriusCheckbox4);
+
+        const siriusCheckbox5 = new SiriusCheckbox({
+            [idKey]: 'checkbox-5',
+            [labelCaptionKey]: 'Child 2 (Parent 1)',
+        });
+        parentContainer1.appendChild(siriusCheckbox5);
+
+        const siriusCheckbox6 = new SiriusCheckbox({
+            [idKey]: 'checkbox-6',
+            [labelCaptionKey]: 'Child 3. Parent 2',
+        });
+        parentContainer1.appendChild(siriusCheckbox6);
+
+        // Create the second parent container
+        const parentContainer2 = document.createElement('div');
+        parentContainer2.classList.add('parent-container');
+        parentContainer1.appendChild(parentContainer2);
+
+        const siriusCheckbox7 = new SiriusCheckbox({
+            [idKey]: 'checkbox-7',
+            [labelCaptionKey]: 'Child 4 (Parent 2)',
+        });
+        parentContainer2.appendChild(siriusCheckbox7);
 
         // Add children to the checkbox
-        siriusCheckbox2.addChildrenElements(siriusCheckbox3);
-        console.log(siriusCheckbox2.children)
-        console.log(siriusCheckbox3.parentElement)
+        siriusCheckbox3.addChildrenElements(siriusCheckbox4, siriusCheckbox5, siriusCheckbox6);
+        siriusCheckbox6.addChildrenElements(siriusCheckbox7);
 
         /*
         // Remove children from the checkbox
