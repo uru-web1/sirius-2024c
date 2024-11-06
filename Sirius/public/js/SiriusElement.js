@@ -46,11 +46,7 @@ export const SIRIUS_ELEMENT_ATTRIBUTES = deepFreeze({
 })
 
 /** Sirius element attributes default values */
-export const SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT = deepFreeze({
-    [SIRIUS_ELEMENT_ATTRIBUTES.STYLE]: null,
-    [SIRIUS_ELEMENT_ATTRIBUTES.HIDE]: null,
-    [SIRIUS_ELEMENT_ATTRIBUTES.DISABLED]: null
-})
+export const SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT = deepFreeze({})
 
 /** Sirius element properties */
 export const SIRIUS_ELEMENT_PROPERTIES = deepFreeze({
@@ -110,14 +106,14 @@ export class SiriusElement extends HTMLElement {
     /** Get hidden icon state
      * @returns {string} - Icon hidden state
      */
-    get hidden() {
+    get hide() {
         return this.getAttribute(SIRIUS_ELEMENT_ATTRIBUTES.HIDE);
     }
 
     /** Set hidden icon state
      * @param {string} hide - Icon hidden state
      */
-    set hidden(hide) {
+    set hide(hide) {
         this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.HIDE, hide);
     }
 
@@ -191,31 +187,13 @@ export class SiriusElement extends HTMLElement {
         this.#onBuilt.push(callback);
     }
 
-    /** Added on built element callback
-     * @param {HTMLElement} element - Element to check
-     * @param {function(HTMLElement): void} callback - On built callback
-     * */
-    set _onBuiltElement({element, callback}) {
-        this.onBuilt = () => {
-            if (this._checkElement(element))
-                callback(element)
-        }
-    }
-
-    /** Added on built container element callback
-     * @param {function(HTMLElement): void} callback - On built callback
-     */
-    set _onBuiltContainerElement(callback) {
-        this.onBuilt = () => this._onBuiltElement = {element: this.containerElement, callback}
-    }
-
     /** On injected logger
-     * @param {function(SiriusLogger): void} callback - On injected logger callback
+     * @param {function(): void} callback - On injected logger callback
      */
     set _onInjectedLogger(callback) {
         // Check if the logger has been injected
         if (this.#isLoggerInjected) {
-            callback(this.logger);
+            callback();
             return;
         }
 
@@ -223,84 +201,74 @@ export class SiriusElement extends HTMLElement {
         this.#onInjectedLogger.push(callback);
     }
 
-    /** Hide the element
-     * @param {string} event - Event to wait for before hiding the element
-     * @param {HTMLElement} element - Element to hide
+    /** Hide the container element on built
+     * @param {string|undefined} event - Event to wait for before hiding the element
      * */
-    _hide(event, element) {
-        // Hide the element when built
-        this._onBuiltElement = {
-            element: element || this.containerElement,
-            callback: (element) => {
-                // Check if the element is already hidden
-                if (this._hidden || this._hiding) {
-                    this.logger.log('Element already hidden or hiding');
-                    return;
-                }
-
-                // Check if there is an event to wait for
-                if (!event) {
-                    element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-                    this._hidden = true;
-                    this.logger.log('Element hidden');
-                    return;
-                }
-
-                // Get event handler
-                const eventHandler = () => {
-                    // Check if the event hasn't been stopped
-                    if (this._hiding) {
-                        // Hide the element
-                        element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
-                        element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-                        this._hiding = false
-                        this._hidden = true;
-
-                        this.logger.log('Element hidden');
-                    }
-
-                    // Remove event listener
-                    element.removeEventListener(event, eventHandler);
-                }
-
-                // Add event listener to hide the element
-                element.addEventListener(event, eventHandler);
-
-                // Remove the hidden class and add the hiding class
-                element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-                element.classList.add(SIRIUS_ELEMENT.CLASSES.HIDING);
-                this._hiding = true;
-
-                this.logger.log('Element hiding');
+    _hide(event) {
+        this.onBuilt = () => {
+            // Check if the element is already hidden
+            if (this._hidden || this._hiding) {
+                this.logger.log('Element already hidden or hiding');
+                return;
             }
+
+            // Check if there is an event to wait for
+            if (!event) {
+                this.containerElement.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                this._hidden = true;
+                this.logger.log('Element hidden');
+                return;
+            }
+
+            // Get event handler
+            const eventHandler = () => {
+                // Check if the event hasn't been stopped
+                if (this._hiding) {
+                    // Hide the element
+                    this.containerElement.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
+                    this.containerElement.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+                    this._hiding = false
+                    this._hidden = true;
+
+                    this.logger.log('Element hidden');
+                }
+
+                // Remove event listener
+                this.containerElement.removeEventListener(event, eventHandler);
+            }
+
+            // Add event listener to hide the element
+            this.containerElement.addEventListener(event, eventHandler);
+
+            // Remove the hidden class and add the hiding class
+            this.containerElement.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+            this.containerElement.classList.add(SIRIUS_ELEMENT.CLASSES.HIDING);
+            this._hiding = true;
+
+            this.logger.log('Element hiding');
         }
     }
 
-    /** Show the element
-     * @param {HTMLElement} element - Element to hide
-     * */
-    _show(element) {
+    /** Show the container element on built */
+    _show() {
         // Show the element when built
-        this._onBuiltElement = {
-            element: element || this.containerElement,
-            callback: (element) => {
-                // Check if the element is already shown
-                if (!this._hidden && !this._hiding) {
-                    this.logger.log('Element already shown');
-                    return;
-                }
-
-                // Check if the element is hiding
-                if (this._hiding) {
-                    this._hiding = false;
-                    element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
-                }
-
-                // Show the element
-                element.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-                this._hidden = false;
-                this.logger.log('Element shown');
+        this.onBuilt = () => {
+            // Check if the element is already shown
+            if (!this._hidden && !this._hiding) {
+                this.logger.log('Element already shown');
+                return;
             }
+
+            // Check if the element is hiding
+            if (this._hiding) {
+                this._hiding = false;
+                this.containerElement.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDING);
+            }
+
+            // Show the element
+            this.containerElement.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
+            this._hidden = false;
+            this.logger.log('Element shown');
         }
     }
 
@@ -331,16 +299,18 @@ export class SiriusElement extends HTMLElement {
         this.setAttribute(SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID, id)
     }
 
-    /** Protected method to set style attribute
+    /** Protected method to set style attribute on built
      * @param {function(): void} callback - Callback to apply the style
      */
-    _setStyle(callback) {
-        // Set the applying attribute flag and set the style attribute
-        this._applyingAttribute.set(SIRIUS_ELEMENT_ATTRIBUTES.STYLE, true);
-        this.removeAttribute(SIRIUS_ELEMENT_ATTRIBUTES.STYLE);
+    set _setStyle(callback) {
+        this.onBuilt = () => {
+            // Set the applying attribute flag and set the style attribute
+            this._applyingAttribute.set(SIRIUS_ELEMENT_ATTRIBUTES.STYLE, true);
+            this.removeAttribute(SIRIUS_ELEMENT_ATTRIBUTES.STYLE);
 
-        // Call the callback
-        callback();
+            // Call the callback
+            callback();
+        }
     }
 
     /** Protected method to set style attributes without overriding the existing ones
@@ -389,41 +359,6 @@ export class SiriusElement extends HTMLElement {
         // Add event listeners
         for (let event in events)
             element.addEventListener(event, events[event])
-    }
-
-    /** Check the container element
-     * @param {HTMLElement} element - Element to check
-     * @returns {boolean} - True if the container element is set
-     */
-    _checkElement(element) {
-        if (!element) {
-            this.logger.error(`Element is not set: ${element}`);
-            return false
-        }
-
-        // Check if the element is an instance of HTMLElement
-        if (element instanceof HTMLElement)
-            return true
-
-        this.logger.error(`Invalid element: ${element}`);
-        return false
-    }
-
-    /** Check SVG element
-     * @param {HTMLElement} element - Element to check
-     */
-    _checkSVGElement(element) {
-        if (!element) {
-            this.logger.error(`Element is not set: ${element}`);
-            return false
-        }
-
-        // Check if the element is an instance of SVGElement
-        if (element instanceof SVGElement)
-            return true;
-
-        this.logger.error(`Invalid SVG element: ${element}`);
-        return false;
     }
 
     /** Get element style sheet CSS rule
@@ -615,7 +550,11 @@ export class SiriusElement extends HTMLElement {
                 value = attributesDefault?.[name]
 
             // Check if the value is null
-            if (value === null||value ===undefined) return;
+            if (value === null || value === undefined) return;
+
+            // Check the value type
+            if (typeof value !== 'string')
+                throw new Error(`Invalid value type for '${name}' attribute: ${typeof value}. Valid type: string`);
 
             // Set the attribute default value
             this.setAttribute(name, value.trim())
@@ -784,6 +723,13 @@ export class SiriusElement extends HTMLElement {
         this._templateContent = this._template.content.cloneNode(true);
     }
 
+    /** Get derived element ID attribute
+     * @returns {string} alias - Derived element alias
+     * */
+    _getDerivedId(alias) {
+        return `${this.id}__${alias}`;
+    }
+
     /** Add the element to the body */
     addToBody() {
         document.body.appendChild(this);
@@ -792,26 +738,21 @@ export class SiriusElement extends HTMLElement {
     /** Center the element on the screen */
     centerScreen() {
         // Center the element when built
-        this._onBuiltContainerElement = (element) => {
-            element.classList.add(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
-            this.logger.log('Element centered on the screen');
-        }
+        this.classList.add(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
+        this.logger.log('Element centered on the screen');
     }
 
     /** Remove centering of the element */
     removeCenterScreen() {
-        // Remove centering of the element when built
-        this._onBuiltContainerElement = (element) => {
-            element.classList.remove(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
-            this.logger.log('Element removed from center screen');
-        }
+        this.classList.remove(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
+        this.logger.log('Element removed from center screen');
     }
 
     /** Dispatch event
      * @param {string} eventName - Event name
      */
     dispatchEventName(eventName) {
-        this.dispatchEvent(new Event(eventName));
+        this.dispatchEvent(new CustomEvent(eventName, {bubbles: false}));
     }
 
     /** Dispatch the built event */
@@ -830,8 +771,8 @@ export class SiriusElement extends HTMLElement {
      * @param {string} newValue - New attribute value
      */
     _logAttributeChange(name, oldValue, newValue) {
-        this._onInjectedLogger = (logger) =>
-            logger.log(`'${name}' attribute changed: ${oldValue} -> ${newValue}`);
+        this._onInjectedLogger = () =>
+            this.logger.log(`'${name}' attribute changed: ${oldValue} -> ${newValue}`);
     }
 
     /** Pre attribute changed callback
