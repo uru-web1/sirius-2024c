@@ -20,36 +20,60 @@
         const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
         const labelKey = SIRIUS_RADIO.ATTRIBUTES.LABEL.NAME;
         const checkedKey = SIRIUS_RADIO.ATTRIBUTES.CHECKED.NAME;
-        
+        const nameKey = 'grupo1'; 
+
         sirius.onLoaded = async () => {
 
-        const siriusRadio1 = new SiriusRadio({
-            [idKey]: 'radio-1',
-            [labelKey]: 'Fresa',
-            [checkedKey]: false
-        });
+            const siriusRadio1 = new SiriusRadio({
+                [idKey]: 'radio-1',
+                [labelKey]: 'Fresa',
+                [checkedKey]: false,
+                name: nameKey
+            });
 
-        const siriusRadio2 = new SiriusRadio({
-            [idKey]: 'radio-2',
-            [labelKey]: 'Mora',
-            [checkedKey]: true
-        });
+            const siriusRadio2 = new SiriusRadio({
+                [idKey]: 'radio-2',
+                [labelKey]: 'Mora',
+                [checkedKey]: false,
+                name: nameKey
+            });
 
-        
-        siriusRadio1.addToBody();
-        siriusRadio2.addToBody();
-    };
+            const siriusRadio3 = new SiriusRadio({
+                [idKey]: 'radio-3',
+                [labelKey]: 'Opción 1',
+                [checkedKey]: false,
+                name: nameKey
+            });
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        if (sirius.onLoaded) {
-            await sirius.onLoaded();
-        }
-    });
-</script>
+            const siriusRadio4 = new SiriusRadio({
+                [idKey]: 'radio-4',
+                [labelKey]: 'Opción 2',
+                [checkedKey]: false,
+                name: nameKey
+            });
 
-<siriusradio id="radio-3" label="Opción 1"></siriusradio>
-<siriusradio id="radio-4" label="Opción 2"></siriusradio>
-<siriusradio id="radio-5" label="Opción 3"></siriusradio>
+            const siriusRadio5 = new SiriusRadio({
+                [idKey]: 'radio-5',
+                [labelKey]: 'Opción 3',
+                [checkedKey]: false,
+                name: nameKey
+            });
+
+            // Agregar los radios al body
+            siriusRadio1.addToBody();
+            siriusRadio2.addToBody();
+            siriusRadio3.addToBody();
+            siriusRadio4.addToBody();
+            siriusRadio5.addToBody();
+            };
+
+            document.addEventListener('DOMContentLoaded', async () => {
+            if (sirius.onLoaded) {
+                await sirius.onLoaded();
+            }
+            });
+            
+            </script>
 
 </body>
 </html>

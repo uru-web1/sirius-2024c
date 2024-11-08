@@ -1,7 +1,6 @@
 import { SIRIUS_TYPES, SiriusElement } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
-
-// Definición de constantes para el radio
+// Definición de constantes para el radio 
 export const SIRIUS_RADIO = deepFreeze({
     NAME: "SiriusRadio",
     TAG: "sirius-radio",
@@ -9,6 +8,7 @@ export const SIRIUS_RADIO = deepFreeze({
         LABEL: { NAME: "label", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING },
         CHECKED: { NAME: "checked", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN },
         DISABLED: { NAME: "disabled", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN },
+        GROUP: { NAME: "group", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING },
     },
     CLASSES: {
         CONTAINER: 'radio-container',
@@ -27,11 +27,32 @@ export class SiriusRadio extends SiriusElement {
             label: props.label || SIRIUS_RADIO.ATTRIBUTES.LABEL.DEFAULT,
             checked: props.checked !== undefined ? props.checked : SIRIUS_RADIO.ATTRIBUTES.CHECKED.DEFAULT,
             disabled: props.disabled !== undefined ? props.disabled : SIRIUS_RADIO.ATTRIBUTES.DISABLED.DEFAULT,
+            group: props.group || SIRIUS_RADIO.ATTRIBUTES.GROUP.DEFAULT,
         };
+
         this._loadAttributes({
             htmlAttributes: SIRIUS_RADIO.ATTRIBUTES,
             properties: props
         });
+    }
+
+    // Método para deseleccionar los demas radios
+    static deselectOtherRadios(groupName, selectedRadio) {
+        const radiosInGroup = SiriusRadio.radioGroups[groupName];
+        radiosInGroup.forEach((radio) => {
+            if (radio !== selectedRadio && radio.isSelected) {
+                radio.deselectRadio();
+            }
+        });
+    }
+
+    //Deselecciona el radio
+    deselectRadio() {
+        this._attributes.checked = false;
+        const input = this.shadowRoot.querySelector('input[type="radio"]');
+        if (input) {
+            input.checked = false;
+        }
     }
 
     async connectedCallback() {
