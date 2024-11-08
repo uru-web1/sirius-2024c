@@ -9,40 +9,19 @@
     <script defer src="../js/SiriusLabel.js" type="module"></script>
     <script defer src="../js/SiriusTreeView.js" type="module"></script>
     <script defer src="../js/SiriusCheckbox.js" type="module"></script>
+    <script defer src="../js/SiriusIcon.js" type="module"></script>
 </head>
 <body>
 
-    <sirius-treeview id="1">
+    <sirius-treeview id="1"> 
         
-        <tree-item summary-content="aloja">
-
-            <p>holiwi</p>
-            <tree-item>
-                <p>lol</p>
-                <tree-item>
-                    <sirius-label caption="Hello world HTML" caption-color="red" caption-font-family="monospace"
-                    caption-text-align="center" caption-padding="2px" id="label-2" style="border: 1px solid green; width: 100px;"></sirius-label>
-                </tree-item>
-            </tree-item>
-            <p>lol</p>
-            <sirius-checkbox label-caption="The last of us" id="checkbox-3" height="20"></sirius-checkbox>
-        </tree-item>
-        
-        <tree-item summary-content="aña">
-                    <ul>
-                        <li>
-                            <p>tontis</p>
-                        </li>
-                    </ul>
-        </tree-item>
-        <tree-item summary-content="The World">
-
-                    <p>chachis</p>
-
+        <tree-item summary-content="l">
+            <p>hola</p>
+            <sirius-checkbox label-caption='The last of us' id='checkbox-1' icon-height=10px icon-width=10px></sirius-checkbox>
+            <sirius-checkbox data-children=checkbox-1 label-caption='The last of us' id=checkbox-2 icon-height=10px icon-width=10px></sirius-checkbox>
         </tree-item>
 
     </sirius-treeview>
-
     
 </body>
 </html>

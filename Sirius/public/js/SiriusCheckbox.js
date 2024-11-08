@@ -57,6 +57,7 @@ export const SIRIUS_CHECKBOX_ATTRIBUTES = deepFreeze({
     LABEL_CAPTION_FONT_FAMILY: "label-caption-font-family",
     LABEL_CAPTION_FONT_SIZE: "label-caption-font-size",
     LABEL_CAPTION_PADDING: "label-caption-padding",
+    DATA_CHILDREN:'data-children'
 })
 
 /** Sirius label checkbox default values */
@@ -751,26 +752,33 @@ export class SiriusCheckbox extends SiriusElement {
     addChildrenElements(...elements) {
         if (!elements)
             return
-
+    
         elements.forEach(element => {
             if (!element) return;
-
+            
             // Check if it's a checkbox element
             if (!(element instanceof SiriusCheckbox)) {
                 this.logger.error("Element is not a SiriusCheckbox element");
                 return;
             }
-
+    
             // Check if the parent element is already set
             if (element.#parentElement !== null) {
-                element.logger.error("Parent element already set. Remove the current parent element before setting a new one.");
+                element.logger.error(`Parent element already set for element with id ${element.id}. Remove the current parent element before setting a new one.`);
                 return;
             }
-
+    
+            // Check if the element is already a child
+            if (this.#children.includes(element)) {
+                this.logger.error(`Element with id ${element.id} is already a child of parent with id ${this.id}.`);
+                return;
+            }
+            
             // Set the parent element and add the child element
             element.#parentElement = this;
             this.#children.push(element);
-        })
+
+        });
     }
 
     /** Remove checkbox children elements
@@ -930,6 +938,12 @@ export class SiriusCheckbox extends SiriusElement {
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_PADDING:
                 this.#setLabelCaptionPadding(formattedValue);
+                break;
+            
+            case SIRIUS_CHECKBOX_ATTRIBUTES.DATA_CHILDREN:
+                const children=document.getElementById(formattedValue)
+                                
+                this.addChildrenElements(children)
                 break;
 
             default:
