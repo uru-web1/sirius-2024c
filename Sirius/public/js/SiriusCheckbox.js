@@ -752,10 +752,9 @@ export class SiriusCheckbox extends SiriusElement {
     addChildrenElements(...elements) {
         if (!elements)
             return
-    
+        
         elements.forEach(element => {
             if (!element) return;
-            
             // Check if it's a checkbox element
             if (!(element instanceof SiriusCheckbox)) {
                 this.logger.error("Element is not a SiriusCheckbox element");
@@ -779,7 +778,16 @@ export class SiriusCheckbox extends SiriusElement {
             this.#children.push(element);
 
         });
+        // Initialize parent-child relationships based on data-children attribute
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('sirius-checkbox[data-children]').forEach(parent => {
+                const childrenIds = parent.getAttribute('data-children').split(',');
+                const childrenElements = childrenIds.map(id => document.getElementById(id.trim()));
+                parent.addChildrenElements(...childrenElements);
+            });
+        });
     }
+    
 
     /** Remove checkbox children elements
      * @param {SiriusCheckbox} elements - Children elements
@@ -941,9 +949,18 @@ export class SiriusCheckbox extends SiriusElement {
                 break;
             
             case SIRIUS_CHECKBOX_ATTRIBUTES.DATA_CHILDREN:
-                const children=document.getElementById(formattedValue)
-                                
-                this.addChildrenElements(children)
+                // Divide el valor del atributo en un array de IDs
+                const childIds = formattedValue.split(',').map(id => id.trim());
+
+                // Mapea los IDs a elementos SiriusCheckbox
+                const children = childIds
+                    .map(id => document.getElementById(id))
+                    .filter(element => element instanceof SiriusCheckbox); // Filtrar para asegurarse de que sean instancias de SiriusCheckbox
+
+                // Llama a addChildrenElements con los elementos encontrados
+                console.log(children);
+                
+                this.addChildrenElements(...children);
                 break;
 
             default:
