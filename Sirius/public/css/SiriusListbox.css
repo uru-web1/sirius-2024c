@@ -1,0 +1,30 @@
+:host{
+    display: inline-block;
+
+    --gap: 10px;
+    --padding: 10px;
+    --background-color: rgb(184, 184, 184);
+}
+
+.listbox-container {
+    display: grid;
+    gap: var(--gap);
+    padding: var(--padding);
+    background-color: var(--background-color);
+    border-radius: 1em;
+}
+
+.head-container {
+    border-bottom: 1px solid black;
+    padding: 5px;
+
+}
+
+.item-container {
+    display: flex;
+    gap: 10px
+}
+
+.items-container{
+    padding: 10px;
+}
