@@ -278,7 +278,7 @@ export class SiriusElement extends HTMLElement {
      */
     _setId(id) {
         if (!id) {
-            this.logger.error('Element ID is required');
+            this._onInjectedLogger=()=>this.logger.error('Element ID is required');
             return;
         }
 
@@ -291,7 +291,7 @@ export class SiriusElement extends HTMLElement {
             sirius.setInstance(id, this);
             this.#elementId = id
         } catch (error) {
-            this.logger.error(error);
+            this._onInjectedLogger=()=>this.logger.error(error);
         }
     }
 

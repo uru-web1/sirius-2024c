@@ -313,7 +313,7 @@ export class SiriusLabel extends SiriusElement {
         this._loadAttributes({
             instanceProperties: this._properties,
             attributes: SIRIUS_LABEL_ATTRIBUTES,
-            defaultValues: SIRIUS_LABEL_ATTRIBUTES_DEFAULT
+            attributesDefault: SIRIUS_LABEL_ATTRIBUTES_DEFAULT
         });
         
         // Create the CSS stylesheet and add it to the shadow DOM

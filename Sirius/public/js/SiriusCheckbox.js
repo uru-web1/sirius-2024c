@@ -24,6 +24,9 @@ export const SIRIUS_CHECKBOX = deepFreeze({
         CHECKBOX_BORDER_RADIUS: "--checkbox-border-radius",
         CHECKBOX_BORDER_WIDTH: "--checkbox-border-width",
     },
+    SLOTS:{
+        LABEL: "label"
+    },
     CLASSES: {
         CHECKBOX_CONTAINER: 'checkbox-container',
         ICON_CONTAINER: 'icon-container',
@@ -51,19 +54,11 @@ export const SIRIUS_CHECKBOX_ATTRIBUTES = deepFreeze({
     CHECKBOX_BORDER_LINE_STYLE: "checkbox-border-line-style",
     CHECKBOX_BORDER_RADIUS: "checkbox-border-radius",
     CHECKBOX_BORDER_WIDTH: "checkbox-border-width",
-    LABEL_HIDDEN: "label-hidden",
-    LABEL_CAPTION: "label-caption",
-    LABEL_CAPTION_BACKGROUND_COLOR: "label-caption-background-color",
-    LABEL_CAPTION_COLOR: "label-caption-color",
-    LABEL_CAPTION_FONT_FAMILY: "label-caption-font-family",
-    LABEL_CAPTION_FONT_SIZE: "label-caption-font-size",
-    LABEL_CAPTION_PADDING: "label-caption-padding",
     PARENT_ID:'parent-id'
 })
 
 /** Sirius label checkbox default values */
 export const SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT = deepFreeze({
-    [SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION]: "",
     [SIRIUS_CHECKBOX_ATTRIBUTES.STATUS]: "unchecked",
 })
 
@@ -73,7 +68,6 @@ export class SiriusCheckbox extends SiriusElement {
     #children = []
     #checkboxContainerElement = null;
     #labelContainerElement = null;
-    #labelElement = null;
     #iconContainerElement = null;
     #iconElement = null;
 
@@ -102,13 +96,6 @@ export class SiriusCheckbox extends SiriusElement {
      */
     get labelContainerElement() {
         return this.#labelContainerElement;
-    }
-
-    /** Get the label element
-     * @returns {SiriusLabel|null} - Label element
-     */
-    get labelElement() {
-        return this.#labelElement;
     }
 
     /** Get the icon container element
@@ -411,97 +398,6 @@ export class SiriusCheckbox extends SiriusElement {
         this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.CHECKBOX_BORDER_WIDTH, value);
     }
 
-    /** Get label hidden attribute
-     * @returns {string} - Label hidden attribute
-     */
-    get labelHidden() {
-        return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_HIDDEN);
-    }
-
-    /** Set label hidden attribute
-     * @param {string} value - Label hidden attribute
-     */
-    set labelHidden(value) {
-        this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_HIDDEN, value);
-    }
-
-    /** Get label caption attribute
-     * @returns {string} - Label caption attribute
-     */
-    get labelCaption() {
-        return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION);
-    }
-
-    /** Set label caption attribute
-     * @param {string} value - Label caption attribute
-     */
-    set labelCaption(value) {
-        this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION, value);
-    }
-
-    /** Get label caption background color attribute
-     * @returns {string} - Label caption background color attribute
-     */
-    get labelCaptionBackgroundColor() {
-        return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_BACKGROUND_COLOR);
-    }
-
-    /** Set label caption background color attribute
-     * @param {string} value - Label caption background color attribute
-     */
-    set labelCaptionBackgroundColor(value) {
-        this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_BACKGROUND_COLOR, value);
-    }
-
-    /** Get label caption color attribute
-     * @returns {string} - Label caption color attribute
-     */
-    get labelCaptionColor() {
-        return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_COLOR);
-    }
-
-    /** Set label caption color attribute
-     * @param {string} value - Label caption color attribute
-     */
-    set labelCaptionColor(value) {
-        this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_COLOR, value);
-    }
-
-    /** Get label caption font family attribute
-     * @returns {string} - Label caption font family attribute
-     */
-    get labelCaptionFontFamily() {
-        return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_FONT_FAMILY);
-    }
-
-    /** Set label caption font family attribute
-     * @param {string} value - Label caption font family attribute
-     */
-    set labelCaptionFontFamily(value) {
-        this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_FONT_FAMILY, value);
-    }
-
-    /** Get label caption font size attribute
-     * @returns {string} - Label caption font size attribute
-     */
-    get labelCaptionFontSize() {
-        return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_FONT_SIZE);
-    }
-
-    /** Set label caption font size attribute
-     * @param {string} value - Label caption font size attribute
-     */
-    set labelCaptionFontSize(value) {
-        this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_FONT_SIZE, value);
-    }
-
-    /** Get label caption padding attribute
-     * @returns {string} - Label caption padding attribute
-     */
-    get labelCaptionPadding() {
-        return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_PADDING);
-    }
-
     /** Set parent ID attribute
      * @param {string} value - Parent ID attribute
      */
@@ -680,66 +576,6 @@ export class SiriusCheckbox extends SiriusElement {
             this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARS.CHECKBOX_BORDER_WIDTH, width);
     }
 
-    /** Private method to set the label hidden attribute
-     * @param {string} hide - Label hidden attribute value
-     */
-    #setLabelHidden(hide) {
-        this.onBuilt = () => {
-            if (hide === 'true' || hide === '')
-                this.labelContainerElement.classList.add(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-            else
-                this.labelContainerElement.classList.remove(SIRIUS_ELEMENT.CLASSES.HIDDEN);
-        }
-    }
-
-    /** Private method to set the label caption
-     * @param {string} caption - Label caption attribute value
-     */
-    #setLabelCaption(caption) {
-        if (caption)
-            this.onBuilt = () => this.labelElement.caption = caption;
-    }
-
-    /** Private method to set the label caption background color
-     * @param {string} color - Label caption background color attribute value
-     */
-    #setLabelCaptionBackgroundColor(color) {
-        if (color)
-            this.onBuilt = () => this.labelElement.captionBackgroundColor = color;
-    }
-
-    /** Private method to set the label caption color
-     * @param {string} color - Label caption color attribute value
-     */
-    #setLabelCaptionColor(color) {
-        if (color)
-            this.onBuilt = () => this.labelElement.captionColor = color;
-    }
-
-    /** Private method to set the label caption font family
-     * @param {string} fontFamily - Label caption font family attribute value
-     */
-    #setLabelCaptionFontFamily(fontFamily) {
-        if (fontFamily)
-            this.onBuilt = () => this.labelElement.captionFontFamily = fontFamily;
-    }
-
-    /** Private method to set the label caption font size
-     * @param {string} fontSize - Label caption font size attribute value
-     */
-    #setLabelCaptionFontSize(fontSize) {
-        if (fontSize)
-            this.onBuilt = () => this.labelElement.captionFontSize = fontSize;
-    }
-
-    /** Private method to set the label caption padding
-     * @param {string} padding - Label caption padding attribute value
-     */
-    #setLabelCaptionPadding(padding) {
-        if (padding)
-            this.onBuilt = () => this.labelElement.captionPadding = padding;
-    }
-
     /** Private method to the parent ID
      * @param {string} parentId - Parent ID attribute value
      */
@@ -813,6 +649,22 @@ export class SiriusCheckbox extends SiriusElement {
         this.onBuilt = () => this.iconElement.events = events;
     }
 
+    /** Set the label element
+     * @param {HTMLElement} label - Label element
+     */
+    set label(label) {
+        if (label)
+        this.onBuilt = () => {
+            label.slot = SIRIUS_CHECKBOX.SLOTS.LABEL
+            this.labelContainerElement.appendChild(label)
+        }
+    }
+
+    /** Clear the label slot */
+    clearLabel() {
+        this.onBuilt= () => this.#labelContainerElement.innerHTML = "";
+    }
+
     /** Get the template for the Sirius checkbox
      * @returns {string} - Template
      */
@@ -821,11 +673,13 @@ export class SiriusCheckbox extends SiriusElement {
         const checkboxContainerClasses = [SIRIUS_CHECKBOX.CLASSES.CHECKBOX_CONTAINER];
         const iconContainerClasses = [SIRIUS_CHECKBOX.CLASSES.ICON_CONTAINER];
         const labelContainerClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL_CONTAINER]
+        const labelClasses = [SIRIUS_ELEMENT.CLASSES.LABEL]
 
         return `<div class="${checkboxContainerClasses.join(' ')}">
                     <div class="${iconContainerClasses.join(' ')}">
                     </div>
                     <div class="${labelContainerClasses.join(' ')}">
+                        <slot name="${SIRIUS_CHECKBOX.SLOTS.LABEL}" class="${labelClasses.join(' ')}"></slot>
                     </div>
                 </div>`;
     }
@@ -916,34 +770,6 @@ export class SiriusCheckbox extends SiriusElement {
             case SIRIUS_CHECKBOX_ATTRIBUTES.CHECKBOX_BORDER_WIDTH:
                 this.#setCheckboxBorderWidth(formattedValue);
                 break;
-
-            case SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_HIDDEN:
-                this.#setLabelHidden(formattedValue);
-                break;
-
-            case SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION:
-                this.#setLabelCaption(formattedValue);
-                break;
-
-            case SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_BACKGROUND_COLOR:
-                this.#setLabelCaptionBackgroundColor(formattedValue);
-                break;
-
-            case SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_COLOR:
-                this.#setLabelCaptionColor(formattedValue);
-                break;
-
-            case SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_FONT_FAMILY:
-                this.#setLabelCaptionFontFamily(formattedValue);
-                break;
-
-            case SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_FONT_SIZE:
-                this.#setLabelCaptionFontSize(formattedValue);
-                break;
-
-            case SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_PADDING:
-                this.#setLabelCaptionPadding(formattedValue);
-                break;
             
             case SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID:
                 this.#setParentId(formattedValue);
@@ -965,7 +791,7 @@ export class SiriusCheckbox extends SiriusElement {
         this._loadAttributes({
             instanceProperties: this._properties,
             attributes: SIRIUS_CHECKBOX_ATTRIBUTES,
-            defaultAttributes: SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT
+            attributesDefault: SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT
         });
 
         // Create the CSS style sheets and add them to the shadow DOM
@@ -973,7 +799,6 @@ export class SiriusCheckbox extends SiriusElement {
 
         // Create derived IDs
         const iconId = this._getDerivedId("icon")
-        const labelId = this._getDerivedId("label")
 
         // Get the required keys
         const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
@@ -986,11 +811,6 @@ export class SiriusCheckbox extends SiriusElement {
             [idKey]: iconId,
             [iconKey]: "check-mark",
             [hideKey]: SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT[statusKey] === "unchecked" ? "true" : "false"
-        })
-
-        // Create SiriusLabel element
-        this.#labelElement = new SiriusLabel({
-            [idKey]: labelId,
         })
 
         // Get HTML inner content
@@ -1007,7 +827,6 @@ export class SiriusCheckbox extends SiriusElement {
 
         // Add icon and label to the checkbox container
         this.#iconContainerElement.appendChild(this.iconElement);
-        this.#labelContainerElement.appendChild(this.labelElement);
 
         // Add event listeners
         this.iconElement.events = {

@@ -535,7 +535,7 @@ export class SiriusSvg extends SiriusElement {
         this._loadAttributes({
             instanceProperties: this._properties,
             attributes: SIRIUS_SVG_ATTRIBUTES,
-            defaultValues: SIRIUS_SVG_ATTRIBUTES_DEFAULT
+            attributesDefault: SIRIUS_SVG_ATTRIBUTES_DEFAULT
         });
 
         // Create the CSS stylesheet and add it to the shadow DOM
