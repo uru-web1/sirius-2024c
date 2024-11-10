@@ -29,6 +29,7 @@ export const SIRIUS_ICON_ATTRIBUTES = deepFreeze({
     SHOW_ANIMATION: 'show-animation',
     HIDING_ANIMATION: 'hiding-animation',
     ROTATION: "rotation",
+    TRANSITION_DURATION: "transition-duration",
     ANIMATION_DURATION: 'animation-duration',
     PADDING: 'padding',
 })
@@ -142,6 +143,20 @@ export class SiriusIcon extends SiriusElement {
         this.setAttribute(SIRIUS_ICON_ATTRIBUTES.FILL, fill);
     }
 
+    /** Get the transition duration
+     * @returns {string} - Transition duration
+     */
+    get transitionDuration() {
+        return this.getAttribute(SIRIUS_ICON_ATTRIBUTES.TRANSITION_DURATION);
+    }
+
+    /** Set the transition duration
+     * @param {string} duration - Transition duration
+     */
+    set transitionDuration(duration) {
+        this.setAttribute(SIRIUS_ICON_ATTRIBUTES.TRANSITION_DURATION, duration);
+    }
+
     /** Get the icon animation duration
      * @returns {string} - Icon animation duration
      */
@@ -242,6 +257,14 @@ export class SiriusIcon extends SiriusElement {
             this._setCSSVariable(SIRIUS_ICON.CSS_VARS.SVG_FILL, fill);
             this.onBuilt = () => this.svgElement.fill = fill;
         }
+    }
+
+    /** Private method to set the icon transition duration
+     * @param {string} duration - Transition duration
+     */
+    #setTransitionDuration(duration) {
+        if (duration)
+            this.onBuilt = () => this.svgElement.transitionDuration = duration;
     }
 
     /** Private method to set the icon animation duration
@@ -385,6 +408,10 @@ export class SiriusIcon extends SiriusElement {
 
             case SIRIUS_ICON_ATTRIBUTES.HIDING_ANIMATION:
                 this.#setHidingAnimation(formattedValue);
+                break;
+
+            case SIRIUS_ICON_ATTRIBUTES.TRANSITION_DURATION:
+                this.#setTransitionDuration(formattedValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.ANIMATION_DURATION:

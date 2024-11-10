@@ -1,5 +1,6 @@
 import deepFreeze from "./utils/deep-freeze.js";
 import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
+import {SIRIUS} from "./Sirius.js";
 
 /** Sirius SVG constants */
 export const SIRIUS_SVG = deepFreeze({
@@ -10,6 +11,7 @@ export const SIRIUS_SVG = deepFreeze({
         HEIGHT: '--height',
         FILL: '--fill',
         ROTATION: '--rotation',
+        TRANSITION_DURATION: '--transition-duration',
         ANIMATION_DURATION: '--animation-duration',
     },
     CLASSES: {
@@ -121,6 +123,7 @@ export const SIRIUS_SVG_ATTRIBUTES = deepFreeze({
     HEIGHT: 'height',
     FILL: 'fill',
     ROTATION: 'rotation',
+    TRANSITION_DURATION: 'transition-duration',
     ANIMATION_DURATION: 'animation-duration',
     SHOW_ANIMATION: 'show-animation',
     HIDING_ANIMATION: 'hiding-animation',
@@ -254,6 +257,20 @@ export class SiriusSvg extends SiriusElement {
         this.setAttribute(SIRIUS_SVG_ATTRIBUTES.ROTATION, value);
     }
 
+    /** Get the transition duration
+     * @returns {string} - Transition duration
+     */
+    get transitionDuration() {
+        return this.getAttribute(SIRIUS_SVG_ATTRIBUTES.ANIMATION_DURATION);
+    }
+
+    /** Set the transition duration
+     * @param {string} value - Transition duration
+     */
+    set transitionDuration(value) {
+        this.setAttribute(SIRIUS_SVG_ATTRIBUTES.ANIMATION_DURATION, value);
+    }
+
     /** Get the animation duration
      * @returns {string} - Animation duration
      */
@@ -382,6 +399,14 @@ export class SiriusSvg extends SiriusElement {
         this._setCSSVariable(SIRIUS_SVG.CSS_VARS.ROTATION, `${degrees}deg`)
     }
 
+    /** Private method to set the transition duration
+     * @param {string} duration - Transition duration
+     */
+    #setTransitionDuration(duration) {
+        if (duration)
+            this._setCSSVariable(SIRIUS_SVG.CSS_VARS.TRANSITION_DURATION, duration);
+    }
+
     /** Private method to set the animation duration
      * @param {string} duration - Animation duration
      */
@@ -477,6 +502,10 @@ export class SiriusSvg extends SiriusElement {
 
             case SIRIUS_SVG_ATTRIBUTES.ROTATION:
                 this.#setRotation(formattedValue);
+                break;
+
+                case SIRIUS_SVG_ATTRIBUTES.TRANSITION_DURATION:
+                this.#setTransitionDuration(formattedValue);
                 break;
 
             case SIRIUS_SVG_ATTRIBUTES.ANIMATION_DURATION:

@@ -1,9 +1,9 @@
 import { SiriusElement } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
-// Define constants for the SiriusTreeView component
+// Define constants for the SiriusTreeViewV1 component
 export const SIRIUS_TREEVIEW = deepFreeze({
-    NAME: "SiriusTreeView",
+    NAME: "SiriusTreeViewV1",
     TAG: "sirius-treeview",
     CLASSES: {
         TREE_CONTAINER: 'tree', // Class for the tree container

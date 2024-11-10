@@ -6,27 +6,26 @@
     <title>SiriusListBox Example</title>
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusCheckbox.js" type="module"></script>
-    <script defer src="../js/SiriusListbox.js" type="module"></script>
+    <script defer src="../js/SiriusListBox.js" type="module"></script>
 
 </head>
 <body>
-    
-        <!-- <sirius-listbox id="listbox-1"></sirius-listbox> -->
+    <!-- <sirius-listbox id="listbox-1"></sirius-listbox> -->
 
     <script type="module">
         import sirius from '../js/Sirius.js';
-        import {SiriusListbox, SIRIUS_LISTBOX_ATTRIBUTES} from '../js/SiriusListbox.js';
+        import {SiriusListBox, SIRIUS_LIST_BOX_ATTRIBUTES} from '../js/SiriusListBox.js';
         import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "../js/SiriusElement.js";
 
         sirius.onLoaded = async () => {
             const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
-            const itemsKey = SIRIUS_LISTBOX_ATTRIBUTES.LISTBOX_ITEMS;
-            const headKey = SIRIUS_LISTBOX_ATTRIBUTES.HEAD;
-            const backgroundKey = SIRIUS_LISTBOX_ATTRIBUTES.BACKGROUND_COLOR;
-            const checkboxColorKey = SIRIUS_LISTBOX_ATTRIBUTES.CHECKBOX_COLOR;
+            const itemsKey = SIRIUS_LIST_BOX_ATTRIBUTES.LIST_BOX_ITEMS;
+            const headKey = SIRIUS_LIST_BOX_ATTRIBUTES.HEAD;
+            const backgroundKey = SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR;
+            const checkboxColorKey = SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR;
 
-            // Crear una instancia del componente ListBox
-            const listBox1 = new SiriusListbox({
+            // Create a new ListBox
+            const listBox1 = new SiriusListBox({
                 [idKey]: 'listbox-1',
                 [headKey]: 'true',
                 [itemsKey]: JSON.stringify([
@@ -39,7 +38,7 @@
                 
             });
 
-            // Añadir el ListBox al DOM
+            // Add the ListBox to the body
             listBox1.addToBody();
         };
     </script>

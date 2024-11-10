@@ -6,6 +6,7 @@
     --height: 24px;
     --fill: grey;
     --rotation: 0deg;
+    --transition-duration: 0ms;
     --animation-duration: 500ms;
 }
 
@@ -16,6 +17,7 @@
     height: var(--height);
     fill: var(--fill);
     transform: rotate(var(--rotation));
+    transition: transform var(--transition-duration) ease-in-out;
 }
 
 .svg-container:not(.hidden,.hiding) > svg {

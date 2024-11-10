@@ -6,7 +6,7 @@
     --background-color: rgb(184, 184, 184);
 }
 
-.listbox-container {
+.list-box-container {
     display: grid;
     gap: var(--gap);
     padding: var(--padding);
@@ -17,7 +17,6 @@
 .head-container {
     border-bottom: 1px solid black;
     padding: 5px;
-
 }
 
 .item-container {

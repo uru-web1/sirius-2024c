@@ -4,41 +4,42 @@ import {SIRIUS_LABEL_ATTRIBUTES, SiriusLabel} from "./SiriusLabel.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 /** SiriusListBox class */
-export const SIRIUS_LISTBOX = deepFreeze({
-    NAME: "SiriusListbox",
-    TAG: "sirius-listbox",
+export const SIRIUS_LIST_BOX = deepFreeze({
+    NAME: "SiriusListBox",
+    TAG: "sirius-list-box",
     CSS_VARS: {
         GAP: "--gap",
         BACKGROUND_COLOR: "--background-color",
         PADDING: "--padding"
     },
     CLASSES: {
-        LISTBOX_CONTAINER: 'listbox-container',
-        ITEM_CONTAINER: 'item-container',
+        LIST_BOX_CONTAINER: 'list-box-container',
         ITEMS_CONTAINER: 'items-container',
+        ITEM_CONTAINER: 'item-container',
         HEAD_CONTAINER: 'head-container',
     }
 })
 
 /** SiriusListBox attributes */
-export const SIRIUS_LISTBOX_ATTRIBUTES = deepFreeze({
+export const SIRIUS_LIST_BOX_ATTRIBUTES = deepFreeze({
     BACKGROUND_COLOR: "background-color",
-    CHECKBOX_COLOR: "checkbox-border-color",
     PADDING: "padding",
     GAP: "gap",
     HEAD: "head",
-    LISTBOX_ITEMS: "listbox-items",
+    CHECKBOX_COLOR: "checkbox-border-color",
     CHECKBOX_STATUS: "checkbox-status",
+    LIST_BOX_ITEMS: "list-box-items",
+    ITEMS: "items"
 })
 
-/** Sirius listbox attributes default values */
-export const SIRIUS_LISTBOX_ATTRIBUTES_DEFAULT = deepFreeze({
-    [SIRIUS_LISTBOX_ATTRIBUTES.ITEMS]: [],
+/** SiriusListBox attributes default values */
+export const SIRIUS_LIST_BOX_ATTRIBUTES_DEFAULT = deepFreeze({
+    [SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS]: [],
 });
 
-/** Sirius class that represents a listbox component */
-export class SiriusListbox extends SiriusElement{
-    #listboxContainerElement = null;
+/** Sirius class that represents a ListBox component */
+export class SiriusListBox extends SiriusElement{
+    #listBoxContainerElement = null;
     #items = [];
     #checkboxList = [];
     #labelList = [];
@@ -49,237 +50,248 @@ export class SiriusListbox extends SiriusElement{
     #checkboxElement = null;
     #labelElement = null;
 
-
     /**
-     * Create a Sirius listbox element
+     * Create a Sirius ListBox element
      * @param {object} properties - Element properties
      */
     constructor(properties) {
-        super(properties, SIRIUS_LISTBOX.NAME);
+        super(properties, SIRIUS_LIST_BOX.NAME);
     }
 
     /** Define observed attributes
      * @returns {string[]} - Observed attributes
      * */
     static get observedAttributes() {
-        return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_LISTBOX_ATTRIBUTES)];
+        return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_LIST_BOX_ATTRIBUTES)];
     }
 
-    /**Get the head attribute
+    /** Get the head attribute
      * @returns {boolean} - head attribute
      * */
     get head(){
         return this.#head;
     }
 
-    /**Get the items container element
-     * @returns {HTMLElement|null} - Listbox container element
+    /** Get the items container element
+     * @returns {HTMLElement|null} - ListBox container element
      */
 
     get itemContainerElement(){
         return this.#itemContainerElement
     }
 
-    /**Get the checkbox element
-     * @returns {HTMLElement|null} - Listbox container element
+    /** Get the checkbox element
+     * @returns {HTMLElement|null} - ListBox container element
     */
     get checkboxElement(){
         return this.#checkboxElement
     }
 
-    /**Get the label element
-     * @returns {HTMLElement|null} - Listbox container element
+    /** Get the label element
+     * @returns {HTMLElement|null} - ListBox container element
      */
     get labelElement(){
         return this.#labelElement
     }
 
-    /**Get the head container element
-     * @returns {HTMLElement|null} - Listbox container element
+    /** Get the head container element
+     * @returns {HTMLElement|null} - ListBox container element
      */
     get headContainerElement(){
         return this.#headContainerElement
     }
 
-    /**Get the listbox container element
-    * @returns {HTMLElement|null} - Listbox container element
+    /** Get the ListBox container element
+    * @returns {HTMLElement|null} - ListBox container element
     */
-    get listboxContainerElement() {
-        return this.#listboxContainerElement;
+    get listBoxContainerElement() {
+        return this.#listBoxContainerElement;
     }
 
-    /**Get items attribute
+    /** Get the items container element
+     * @returns {HTMLElement|null} - ListBox container element
+     */
+    get itemsContainerElement() {
+        return this.#itemsContainerElement;
+    }
+
+    /** Get items attribute
     * @returns {Array} - Items attribute
     */
     get items() {
-        return JSON.parse(this.getAttribute(SIRIUS_LISTBOX_ATTRIBUTES.LISTBOX_ITEMS) || "[]");
+        return JSON.parse(this.getAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.LIST_BOX_ITEMS) || "[]");
     }
 
-    /**Set items attribute
+    /** Set items attribute
     * @param {Array} value - Items attribute
     */
     set items(value) {
-        this.setAttribute(SIRIUS_LISTBOX_ATTRIBUTES.ITEMS, JSON.stringify(value));
+        this.setAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS, JSON.stringify(value));
     }
 
-    /**Get gap attribute
+    /** Get gap attribute
     * @returns {string} - Gap attribute
     */
     get gap() {
-        return this.getAttribute(SIRIUS_LISTBOX_ATTRIBUTES.GAP);
+        return this.getAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.GAP);
     }
 
-    /**Set gap attribute
+    /** Set gap attribute
     * @param {string} value - Gap attribute
     */
     set gap(value) {
-        this.setAttribute(SIRIUS_LISTBOX_ATTRIBUTES.GAP, value);
+        this.setAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.GAP, value);
     }
 
-    /**Get padding attribute
+    /** Get padding attribute
     * @returns {string} - Padding attribute
     */
     get padding() {
-        return this.getAttribute(SIRIUS_LISTBOX_ATTRIBUTES.PADDING);
+        return this.getAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.PADDING);
     }
 
-    /**Set padding attribute
+    /** Set padding attribute
     * @param {string} value - Padding attribute
     */
     set padding(value) {
-        this.setAttribute(SIRIUS_LISTBOX_ATTRIBUTES.PADDING, value);
+        this.setAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.PADDING, value);
     }
 
-    /**Get background color attribute
+    /** Get background color attribute
     * @returns {string} - Background color attribute
     */
     get backgroundColor() {
-        return this.getAttribute(SIRIUS_LISTBOX_ATTRIBUTES.BACKGROUND_COLOR);
+        return this.getAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR);
     }
 
-    /**Set background color attribute
+    /** Set background color attribute
     * @param {string} value - Background color attribute
     */
     set backgroundColor(value) {
-        this.setAttribute(SIRIUS_LISTBOX_ATTRIBUTES.BACKGROUND_COLOR, value);
+        this.setAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR, value);
     }
 
-    /**Get checkbox color attribute
+    /** Get checkbox color attribute
      *  
      * @returns {string} - Checkbox color attribute
      * */
     get checkboxBorderColor() {
-        return this.getAttribute(SIRIUS_LISTBOX_ATTRIBUTES.CHECKBOX_COLOR);
+        return this.getAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR);
     }
 
-    /**Set checkbox color attribute
+    /** Set checkbox color attribute
      *  
      * @param {string} value - Checkbox color attribute
      * */
     set checkboxBorderColor(value) {
-        this.setAttribute(SIRIUS_LISTBOX_ATTRIBUTES.CHECKBOX_COLOR, value);
+        this.setAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR, value);
     }
 
     /**Private method to set the items attribute
     * @param {Array} items - Items attribute value
     */
     #setItems(items) {
-        if (items) {
-            this.#items = items;
-            this.#renderItems();
-        }
+        if (!items) return
+
+        this.#items = items;
+        this.#renderItems();
     }
 
     /**Private method to set the head attribute
-     * @param {boolean} head - Head attribute value
+     * @param {string} head - Head attribute value
     */
     #setHead(head){
         this.#head = head;  
     }
 
-    /** Render the listbox items
+    /** Render the ListBox items
      * @returns {void}
      */
     #renderItems() {
+        this.onBuilt = () => {
+            if (this.#head) {
 
-        if (!this.#listboxContainerElement) return;
-        
-        if (this.#head){
-            
-            this.#headContainerElement.appendChild(this.#createHead());
+                this.#headContainerElement.appendChild(this.#createHead());
 
-            // Render new items
-            this.#items.forEach(item => {
-                const itemElement = this.#createItem(item);
-                this.#checkboxList[0].addChildrenElements(itemElement.querySelector("sirius-checkbox"));
-                this.#itemsContainerElement.appendChild(itemElement);
-            });
+                // Render new items
+                this.#items.forEach(item => {
+                    const itemElement = this.#createItem(item);
+                    this.#checkboxList[0].addChildrenElements(itemElement.querySelector("sirius-checkbox"));
+                    this.#itemsContainerElement.appendChild(itemElement);
+                });
 
-        }else{
+            } else {
 
-             // Render new items
-            this.#items.forEach(item => {
-                this.#itemsContainerElement.appendChild(this.#createItem(item));
-            });
+                // Render new items
+                this.#items.forEach(item => {
+                    this.#itemsContainerElement.appendChild(this.#createItem(item));
+                });
+            }
         }
-
     }
 
-    /** Create the head of the listbox
-     * @returns {HTMLElement} - Listbox head element
+    /** Create the head of the ListBox
+     * @returns {HTMLElement} - ListBox head element
      */
     #createHead(){
-        const headElement = this.#createItem({ id: 'item-0', label: 'Seleccionar todo', checked: "unchecked" });
-        return headElement;
+        return this.#createItem({id: 'item-0', label: 'Select all', checked: "unchecked"});
     }
 
-    /** Create a listbox item
+    /** Create a ListBox item
      * 
      * @param {object} item - Item object
      * @param {string} item.id - Item id
      * @param {string} item.label - Item label
      * @param {string} item.checked - Item checked status
-     * @returns {HTMLElement} - Listbox item element
+     * @returns {HTMLElement} - ListBox item element
      */
     #createItem({id,label,checked}) {
-
-
+        // Get the required attributes
         const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
+
+        // Get the derived attributes
         const labelId = this._getDerivedId("label")
         const checkboxId = this._getDerivedId("checkbox")
-        const labelHiddenkey = SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_HIDDEN;
+
+        // Get the checkbox attributes
+        const labelHiddenKey = SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_HIDDEN;
         const statusKey = SIRIUS_CHECKBOX_ATTRIBUTES.STATUS;
+
+        // Get the label attributes
         const captionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION;
 
+        // Create the item container element
         const itemContainer = document.createElement('div');
-        itemContainer.classList.add(SIRIUS_LISTBOX.CLASSES.ITEM_CONTAINER);
-        itemContainer.setAttribute(idKey, id)
+        itemContainer.classList.add(SIRIUS_LIST_BOX.CLASSES.ITEM_CONTAINER);
+        itemContainer.setAttribute('id', id)
 
-        
-        this.#checkboxElement = new SiriusCheckbox({ 
-            [idKey]: checkboxId, 
+        // Create the checkbox and label elements
+        this.#checkboxElement = new SiriusCheckbox({
+            [idKey]: checkboxId,
             [statusKey]: checked,
-            [labelHiddenkey]: "true" });
-
-        this.#labelElement = new SiriusLabel({ 
-            [idKey]: labelId, 
-            [captionKey]: label });
-
+            [labelHiddenKey]: "true" });
         itemContainer.appendChild(this.checkboxElement);
+
+        // Create the label element
+        this.#labelElement = new SiriusLabel({
+            [idKey]: labelId,
+            [captionKey]: label });
         itemContainer.appendChild(this.labelElement);
 
+        /// Add the checkbox and label elements to the list
         this.#checkboxList.push(this.checkboxElement);
         this.#labelList.push(this.labelElement);
 
         return itemContainer;
     }
 
-    /** Private method to set the listbox container element style attribute
+    /** Private method to set the ListBox container element style attribute
      * @param {string} style - Style attribute value
      */
     #setStyle(style) {
         if (!style)
             return
+
         // Add the style attribute to the element when built
         this._setStyle = () => this._setStyleAttributes(style,this.listBoxContainerElement);
     }
@@ -290,6 +302,7 @@ export class SiriusListbox extends SiriusElement{
     set events(events){
         if (!events)
             return
+
         // Add the events property to the element when built
         this.onBuilt = () => this._setEvents(events, this);
     }
@@ -299,7 +312,7 @@ export class SiriusListbox extends SiriusElement{
      */
     #setGap(gap) {
         if (gap)
-            this._setCSSVariable(SIRIUS_LISTBOX.CSS_VARS.GAP, gap);
+            this._setCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.GAP, gap);
     }
 
     /** Private method to set the padding attribute
@@ -307,7 +320,7 @@ export class SiriusListbox extends SiriusElement{
      */
     #setPadding(padding) {
         if (padding)
-            this._setCSSVariable(SIRIUS_LISTBOX.CSS_VARS.PADDING, padding);
+            this._setCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.PADDING, padding);
     }
 
     /** Private method to set the background color attribute
@@ -315,33 +328,28 @@ export class SiriusListbox extends SiriusElement{
      */
     #setBackgroundColor(backgroundColor) {
         if (backgroundColor)
-            this._setCSSVariable(SIRIUS_LISTBOX.CSS_VARS.BACKGROUND_COLOR, backgroundColor);
+            this._setCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.BACKGROUND_COLOR, backgroundColor);
     }
 
     /** Private method to set the checkbox color attribute
      * @param {string} checkboxColor - Checkbox color attribute value
      */
-    #setCheckboxColor(Color) {
-        if (Color)
-            this.onBuilt = () => {
-                this.#checkboxList.forEach(checkbox => {
-
-                    checkbox.checkboxBorderColor = Color;
-                }
-                );
-            }
+    #setCheckboxColor(checkboxColor) {
+        if (checkboxColor)
+            this.onBuilt = () =>
+                this.#checkboxList.forEach(checkbox => checkbox.checkboxBorderColor = checkboxColor);
     }
 
-    /** Get the template for the Sirius listbox
+    /** Get the template for the Sirius ListBox
      * @returns {string} - Template
      */
     #getTemplate() {
-        // Get the listbox classes
-        const listboxContainerClasses = [SIRIUS_LISTBOX.CLASSES.LISTBOX_CONTAINER];
-        const headContainerClasses = [SIRIUS_LISTBOX.CLASSES.HEAD_CONTAINER];
-        const itemsListContainerClasses = [SIRIUS_LISTBOX.CLASSES.ITEMS_CONTAINER];
+        // Get the ListBox classes
+        const listBoxContainerClasses = [SIRIUS_LIST_BOX.CLASSES.LIST_BOX_CONTAINER];
+        const headContainerClasses = [SIRIUS_LIST_BOX.CLASSES.HEAD_CONTAINER];
+        const itemsListContainerClasses = [SIRIUS_LIST_BOX.CLASSES.ITEMS_CONTAINER];
 
-        return `<div class="${listboxContainerClasses.join(' ')}">
+        return `<div class="${listBoxContainerClasses.join(' ')}">
                     <div class="${headContainerClasses.join(' ')}"></div>
                     <div class="${itemsListContainerClasses.join(' ')}"></div>
                 </div>`;
@@ -367,27 +375,27 @@ export class SiriusListbox extends SiriusElement{
                 this.#setStyle(formattedValue);
                 break;
 
-            case SIRIUS_LISTBOX_ATTRIBUTES.LISTBOX_ITEMS:
+            case SIRIUS_LIST_BOX_ATTRIBUTES.LIST_BOX_ITEMS:
                 this.#setItems(JSON.parse(formattedValue));
                 break;
             
-            case SIRIUS_LISTBOX_ATTRIBUTES.HEAD:
+            case SIRIUS_LIST_BOX_ATTRIBUTES.HEAD:
                 this.#setHead(formattedValue);
                 break;
 
-            case SIRIUS_LISTBOX_ATTRIBUTES.GAP:
+            case SIRIUS_LIST_BOX_ATTRIBUTES.GAP:
                 this.#setGap(formattedValue);
                 break;
 
-            case SIRIUS_LISTBOX_ATTRIBUTES.PADDING:
+            case SIRIUS_LIST_BOX_ATTRIBUTES.PADDING:
                 this.#setPadding(formattedValue);
                 break;
 
-            case SIRIUS_LISTBOX_ATTRIBUTES.BACKGROUND_COLOR:
+            case SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR:
                 this.#setBackgroundColor(formattedValue);
                 break;
             
-            case SIRIUS_LISTBOX_ATTRIBUTES.CHECKBOX_COLOR:
+            case SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR:
                 this.#setCheckboxColor(formattedValue);
                 break;
 
@@ -397,18 +405,17 @@ export class SiriusListbox extends SiriusElement{
         }
     }
 
-
     /** Lifecycle method called when the component is connected to the DOM
      */
     async connectedCallback() {
         // Call the parent connectedCallback
         await super.connectedCallback();
 
-        // Load Sirius listbox HTML attributes
+        // Load Sirius ListBox HTML attributes
         this._loadAttributes({
             instanceProperties: this._properties,
-            attributes: SIRIUS_LISTBOX_ATTRIBUTES,
-            defaultAttributes: SIRIUS_LISTBOX_ATTRIBUTES_DEFAULT
+            attributes: SIRIUS_LIST_BOX_ATTRIBUTES,
+            defaultAttributes: SIRIUS_LIST_BOX_ATTRIBUTES_DEFAULT
         });
 
         // Create the CSS stylesheet and add it to the shadow DOM
@@ -421,22 +428,17 @@ export class SiriusListbox extends SiriusElement{
         this._createTemplate(innerHTML);
         
         // Get the container element
-        this.#listboxContainerElement = this._containerElement = this._templateContent.firstChild;
-        this.#headContainerElement = this.#listboxContainerElement.firstElementChild;
-        this.#itemsContainerElement = this.#listboxContainerElement.lastElementChild;
+        this.#listBoxContainerElement = this._containerElement = this._templateContent.firstChild;
+        this.#headContainerElement = this.#listBoxContainerElement.firstElementChild;
+        this.#itemsContainerElement = this.#listBoxContainerElement.lastElementChild;
         
-        // Add listbox to the shadow DOM
+        // Add ListBox to the shadow DOM
         this.shadowRoot.appendChild(this.containerElement);
-
-        // // Render the items
-        this.#renderItems();
 
         // Dispatch the built event
         this.dispatchBuiltEvent();
-
     }
-
 }
 
 // Register custom element
-customElements.define(SIRIUS_LISTBOX.TAG, SiriusListbox);
+customElements.define(SIRIUS_LIST_BOX.TAG, SiriusListBox);
