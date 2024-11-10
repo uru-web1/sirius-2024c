@@ -7,6 +7,7 @@ import {
 import deepFreeze from "./utils/deep-freeze.js";
 import {SIRIUS_ICON_ATTRIBUTES, SiriusIcon} from "./SiriusIcon.js";
 import {SiriusLabel} from "./SiriusLabel.js";
+import sirius from "./Sirius.js";
 
 /** Sirius checkbox constants */
 export const SIRIUS_CHECKBOX = deepFreeze({
@@ -57,7 +58,7 @@ export const SIRIUS_CHECKBOX_ATTRIBUTES = deepFreeze({
     LABEL_CAPTION_FONT_FAMILY: "label-caption-font-family",
     LABEL_CAPTION_FONT_SIZE: "label-caption-font-size",
     LABEL_CAPTION_PADDING: "label-caption-padding",
-    DATA_CHILDREN:'data-children'
+    PARENT_ID:'parent-id'
 })
 
 /** Sirius label checkbox default values */
@@ -135,7 +136,7 @@ export class SiriusCheckbox extends SiriusElement {
      * @returns {SiriusCheckbox[]} - Children elements
      */
     get children() {
-        return this.#children;
+        return Object.freeze([...this.#children]);
     }
 
     /** Get status attribute
@@ -501,6 +502,21 @@ export class SiriusCheckbox extends SiriusElement {
         return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.LABEL_CAPTION_PADDING);
     }
 
+    /** Set parent ID attribute
+     * @param {string} value - Parent ID attribute
+     */
+    set parentId(value) {
+        this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID, value);
+    }
+
+    /** Get parent ID attribute
+     * @returns {string} - Parent ID attribute
+     */
+    get parentId() {
+        return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID);
+    }
+
+
     /** Private method to set the status attribute
      * @param {string} status - Status attribute value
      */
@@ -724,6 +740,57 @@ export class SiriusCheckbox extends SiriusElement {
             this.onBuilt = () => this.labelElement.captionPadding = padding;
     }
 
+    /** Private method to the parent ID
+     * @param {string} parentId - Parent ID attribute value
+     */
+    #setParentId(parentId) {
+        if (!parentId) {
+            this.#removeParentElement()
+            return
+        }
+
+        this.onBuilt = () => {
+            const parent = sirius.getInstance(parentId);
+
+            // Check if the parent element exists
+            if (!parent) {
+                this.logger.error(`Parent with ID '${parentId}' not found`);
+                return;
+            }
+
+            // Check if it's a checkbox element
+            if (!(parent instanceof SiriusCheckbox)) {
+                this.logger.error("Element is not a SiriusCheckbox element");
+                return;
+            }
+
+            // Check if the parent element to set is the current parent element
+            if (this.#parentElement === parent)
+                return
+
+            // Remove the current parent element
+            if (this.#parentElement)
+                this.#removeParentElement()
+
+            // Add the parent element
+            this.#addParentElement(parent);
+        }
+    }
+
+    /** Private method to add the parent element
+     * @param {SiriusCheckbox} parent - Parent element
+     * */
+    #addParentElement(parent) {
+        this.#parentElement = parent;
+        parent.#children.push(this);
+    }
+
+    /** Private method to remove the parent element */
+    #removeParentElement() {
+        this.#parentElement.#children = this.#children.filter(child => child !== this);
+        this.#parentElement = null;
+    }
+
     /** Private method to set the checkbox container style
      * @param {string} style - Style attribute value
      */
@@ -744,76 +811,6 @@ export class SiriusCheckbox extends SiriusElement {
 
         // Add the events property to the element when built
         this.onBuilt = () => this.iconElement.events = events;
-    }
-
-    /** Add checkbox children elements
-     * @param {SiriusCheckbox} elements - Children elements
-     */
-    addChildrenElements(...elements) {
-        if (!elements)
-            return
-        
-        elements.forEach(element => {
-            if (!element) return;
-            // Check if it's a checkbox element
-            if (!(element instanceof SiriusCheckbox)) {
-                this.logger.error("Element is not a SiriusCheckbox element");
-                return;
-            }
-    
-            // Check if the parent element is already set
-            if (element.#parentElement !== null) {
-                element.logger.error(`Parent element already set for element with id ${element.id}. Remove the current parent element before setting a new one.`);
-                return;
-            }
-    
-            // Check if the element is already a child
-            if (this.#children.includes(element)) {
-                this.logger.error(`Element with id ${element.id} is already a child of parent with id ${this.id}.`);
-                return;
-            }
-            
-            // Set the parent element and add the child element
-            element.#parentElement = this;
-            this.#children.push(element);
-
-        });
-        // Initialize parent-child relationships based on data-children attribute
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('sirius-checkbox[data-children]').forEach(parent => {
-                const childrenIds = parent.getAttribute('data-children').split(',');
-                const childrenElements = childrenIds.map(id => document.getElementById(id.trim()));
-                parent.addChildrenElements(...childrenElements);
-            });
-        });
-    }
-    
-
-    /** Remove checkbox children elements
-     * @param {SiriusCheckbox} elements - Children elements
-     */
-    removeChildrenElements(...elements) {
-        if (!elements) return;
-
-        elements.forEach(element => {
-            if (!element) return;
-
-            // Check if it's a checkbox element
-            if (!(element instanceof SiriusCheckbox)) {
-                this.logger.error("Element is not a SiriusCheckbox element");
-                return;
-            }
-
-            // Check if the parent element is the current element
-            if (element.#parentElement !== this) {
-                this.logger.error(`Parent element is not the current element. Cannot remove the child element '${element.id}'`);
-                return;
-            }
-
-            // Remove the parent element and remove the child element
-            element.#parentElement = null;
-            this.#children = this.#children.filter(child => child !== element);
-        })
     }
 
     /** Get the template for the Sirius checkbox
@@ -948,19 +945,8 @@ export class SiriusCheckbox extends SiriusElement {
                 this.#setLabelCaptionPadding(formattedValue);
                 break;
             
-            case SIRIUS_CHECKBOX_ATTRIBUTES.DATA_CHILDREN:
-                // Divide el valor del atributo en un array de IDs
-                const childIds = formattedValue.split(',').map(id => id.trim());
-
-                // Mapea los IDs a elementos SiriusCheckbox
-                const children = childIds
-                    .map(id => document.getElementById(id))
-                    .filter(element => element instanceof SiriusCheckbox); // Filtrar para asegurarse de que sean instancias de SiriusCheckbox
-
-                // Llama a addChildrenElements con los elementos encontrados
-                console.log(children);
-                
-                this.addChildrenElements(...children);
+            case SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID:
+                this.#setParentId(formattedValue);
                 break;
 
             default:

@@ -67,6 +67,7 @@ export class SiriusElement extends HTMLElement {
     _hidden = false;
     _hiding = false;
     _containerElement = null
+    #elementId = ''
     #elementName = ''
     #logger = null
     #isBuilt = false
@@ -281,22 +282,17 @@ export class SiriusElement extends HTMLElement {
             return;
         }
 
-        // Get the current element ID
-        const currentId = this.getAttribute(SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID);
+        // Remove the old element ID
+        if (this.#elementId)
+        sirius.removeInstance(this.#elementId)
 
         // Set the element ID attribute
         try {
             sirius.setInstance(id, this);
+            this.#elementId = id
         } catch (error) {
             this.logger.error(error);
-            return;
         }
-
-        // Remove the old element ID
-        sirius.removeInstance(currentId)
-
-        // Set the element ID attribute
-        this.setAttribute(SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID, id)
     }
 
     /** Protected method to set style attribute on built
