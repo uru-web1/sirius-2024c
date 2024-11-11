@@ -5,13 +5,13 @@ import deepFreeze from "./utils/deep-freeze.js";
 export const SIRIUS_LABEL = deepFreeze({
     NAME: "SiriusLabel",
     TAG: "sirius-label",
-    CSS_VARS: {
-        CAPTION_TEXT_ALIGN: "--text-align",
-        CAPTION_BACKGROUND_COLOR: "--background-color",
-        CAPTION_COLOR: "--color",
-        CAPTION_FONT_FAMILY: "--font-family",
-        CAPTION_FONT_SIZE: "--font-size",
-        CAPTION_PADDING: "--padding"
+    CSS_VARIABLES: {
+        CAPTION_TEXT_ALIGN: "--sirius-label--text-align",
+        CAPTION_BACKGROUND_COLOR: "--sirius-label--background-color",
+        CAPTION_COLOR: "--sirius-label--color",
+        CAPTION_FONT_FAMILY: "--sirius-label--font-family",
+        CAPTION_FONT_SIZE: "--sirius-label--font-size",
+        CAPTION_PADDING: "--sirius-label--padding"
     },
     CLASSES: {
         LABEL_CONTAINER: 'label-container',
@@ -180,7 +180,7 @@ export class SiriusLabel extends SiriusElement {
      */
     #setCaptionTextAlign(textAlignment) {
         if (textAlignment)
-            this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_TEXT_ALIGN, textAlignment)
+            this._setCSSVariable(SIRIUS_LABEL.CSS_VARIABLES.CAPTION_TEXT_ALIGN, textAlignment)
     }
 
     /** Private method to set the caption background color
@@ -188,7 +188,7 @@ export class SiriusLabel extends SiriusElement {
      */
     #setCaptionBackgroundColor(bgColor) {
         if (bgColor)
-            this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_BACKGROUND_COLOR, bgColor)
+            this._setCSSVariable(SIRIUS_LABEL.CSS_VARIABLES.CAPTION_BACKGROUND_COLOR, bgColor)
     }
 
     /** Private method to set the caption color
@@ -196,7 +196,7 @@ export class SiriusLabel extends SiriusElement {
      */
     #setCaptionColor(color) {
         if (color)
-            this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_COLOR, color)
+            this._setCSSVariable(SIRIUS_LABEL.CSS_VARIABLES.CAPTION_COLOR, color)
     }
 
     /** Private method to set the caption font family
@@ -204,7 +204,7 @@ export class SiriusLabel extends SiriusElement {
      */
     #setCaptionFontFamily(fontFamily) {
         if (fontFamily)
-            this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_FONT_FAMILY, fontFamily)
+            this._setCSSVariable(SIRIUS_LABEL.CSS_VARIABLES.CAPTION_FONT_FAMILY, fontFamily)
     }
 
     /** Private method to set the caption font size
@@ -212,7 +212,7 @@ export class SiriusLabel extends SiriusElement {
      */
     #setCaptionFontSize(fontSize) {
         if (fontSize)
-            this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_FONT_SIZE, fontSize)
+            this._setCSSVariable(SIRIUS_LABEL.CSS_VARIABLES.CAPTION_FONT_SIZE, fontSize)
     }
 
     /** Private method to set the caption padding
@@ -220,7 +220,7 @@ export class SiriusLabel extends SiriusElement {
      */
     #setCaptionPadding(padding) {
         if (padding)
-            this._setCSSVariable(SIRIUS_LABEL.CSS_VARS.CAPTION_PADDING, padding)
+            this._setCSSVariable(SIRIUS_LABEL.CSS_VARIABLES.CAPTION_PADDING, padding)
     }
 
     /** Private method to set the caption container style
@@ -315,7 +315,7 @@ export class SiriusLabel extends SiriusElement {
             attributes: SIRIUS_LABEL_ATTRIBUTES,
             attributesDefault: SIRIUS_LABEL_ATTRIBUTES_DEFAULT
         });
-        
+
         // Create the CSS stylesheet and add it to the shadow DOM
         await this._loadAndAdoptStyles()
 

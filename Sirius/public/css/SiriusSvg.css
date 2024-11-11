@@ -2,30 +2,30 @@
     display: inline-block;
     box-sizing: border-box;
 
-    --width: 24px;
-    --height: 24px;
-    --fill: grey;
-    --rotation: 0deg;
-    --transition-duration: 0ms;
-    --animation-duration: 500ms;
+    --sirius-svg--width: 24px;
+    --sirius-svg--height: 24px;
+    --sirius-svg--fill: grey;
+    --sirius-svg--rotation: 0deg;
+    --sirius-svg--transition-duration: 0ms;
+    --sirius-svg--animation-duration: 500ms;
 }
 
 .svg-container {
     display: grid;
     place-items: center;
-    width: var(--width);
-    height: var(--height);
-    fill: var(--fill);
-    transform: rotate(var(--rotation));
-    transition: transform var(--transition-duration) ease-in-out;
+    width: var(--sirius-svg--width);
+    height: var(--sirius-svg--height);
+    fill: var(--sirius-svg--fill);
+    transform: rotate(var(--sirius-svg--rotation));
+    transition: transform var(--sirius-svg--transition-duration) ease-in-out;
 }
 
 .svg-container:not(.hidden,.hiding) > svg {
-    animation: show-animation var(--animation-duration) forwards;
+    animation: show-animation var(--sirius-svg--animation-duration) forwards;
 }
 
 .svg-container.hiding > svg {
-    animation: hiding-animation var(--animation-duration) forwards;
+    animation: hiding-animation var(--sirius-svg--animation-duration) forwards;
 }
 
 @keyframes show-animation {

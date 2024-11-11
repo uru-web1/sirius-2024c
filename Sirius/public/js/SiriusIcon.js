@@ -6,12 +6,11 @@ import deepFreeze from "./utils/deep-freeze.js";
 export const SIRIUS_ICON = deepFreeze({
     NAME: "SiriusIcon",
     TAG: "sirius-icon",
-    CSS_VARS: {
-        PADDING: "--padding",
-        SVG_WIDTH: '--svg-width',
-        SVG_HEIGHT: '--svg-height',
-        SVG_FILL: '--svg-fill',
-        ANIMATION_DURATION: '--animation-duration',
+    CSS_VARIABLES: {
+        PADDING: "--sirius-icon--padding",
+        WIDTH: '--sirius-icon--width',
+        HEIGHT: '--sirius-icon--height',
+        ANIMATION_DURATION: '--sirius-icon--animation-duration',
     },
     CLASSES: {
         ICON_CONTAINER: 'icon-container',
@@ -37,7 +36,10 @@ export const SIRIUS_ICON_ATTRIBUTES = deepFreeze({
 /** Sirius icon attributes default values
  * If an attribute is not present in the object, the default value is null
  * */
-export const SIRIUS_ICON_ATTRIBUTES_DEFAULT = deepFreeze({})
+export const SIRIUS_ICON_ATTRIBUTES_DEFAULT = deepFreeze({
+    [SIRIUS_ICON_ATTRIBUTES.WIDTH]: "24px",
+    [SIRIUS_ICON_ATTRIBUTES.HEIGHT]: "24px",
+})
 
 /** Sirius class that represents an icon component */
 export class SiriusIcon extends SiriusElement {
@@ -234,7 +236,7 @@ export class SiriusIcon extends SiriusElement {
      */
     #setWidth(width) {
         if (width) {
-            this._setCSSVariable(SIRIUS_ICON.CSS_VARS.SVG_WIDTH, width);
+            this._setCSSVariable(SIRIUS_ICON.CSS_VARIABLES.WIDTH, width);
             this.onBuilt = () => this.svgElement.width = width;
         }
     }
@@ -244,7 +246,7 @@ export class SiriusIcon extends SiriusElement {
      */
     #setHeight(height) {
         if (height) {
-            this._setCSSVariable(SIRIUS_ICON.CSS_VARS.SVG_HEIGHT, height);
+            this._setCSSVariable(SIRIUS_ICON.CSS_VARIABLES.HEIGHT, height);
             this.onBuilt = () => this.svgElement.height = height;
         }
     }
@@ -253,10 +255,7 @@ export class SiriusIcon extends SiriusElement {
      * @param {string} fill - Icon fill color
      */
     #setFill(fill) {
-        if (fill) {
-            this._setCSSVariable(SIRIUS_ICON.CSS_VARS.SVG_FILL, fill);
-            this.onBuilt = () => this.svgElement.fill = fill;
-        }
+        if (fill) this.onBuilt = () => this.svgElement.fill = fill;
     }
 
     /** Private method to set the icon transition duration
@@ -296,7 +295,7 @@ export class SiriusIcon extends SiriusElement {
      */
     #setPadding(padding) {
         if (padding)
-            this._setCSSVariable(SIRIUS_ICON.CSS_VARS.PADDING, padding);
+            this._setCSSVariable(SIRIUS_ICON.CSS_VARIABLES.PADDING, padding);
     }
 
     /** Private method to set the SVG container element style attribute
@@ -347,7 +346,7 @@ export class SiriusIcon extends SiriusElement {
         // Get the icon classes
         const iconContainerClasses = [SIRIUS_ICON.CLASSES.ICON_CONTAINER];
 
-        return `<div class='${iconContainerClasses.join(' ')}'">
+        return `<div class="${iconContainerClasses.join(' ')}">
                 </div>`;
     }
 

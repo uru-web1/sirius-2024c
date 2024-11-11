@@ -2,15 +2,15 @@
     display: inline-block;
     box-sizing: border-box;
 
-    --padding: 5px;
-    --gap: 5px;
-    --background-color: transparent;
-    --checkbox-order: -1;
-    --checkbox-background-color: transparent;
-    --checkbox-border-color: black;
-    --checkbox-border-line-style: solid;
-    --checkbox-border-radius: 4px;
-    --checkbox-border-width: 2px;
+    --sirius-checkbox--container-padding: 5px 0px;
+    --sirius-checkbox--container-gap: 5px;
+    --sirius-checkbox--container-background-color: transparent;
+    --sirius-checkbox--order: -1;
+    --sirius-checkbox--background-color: transparent;
+    --sirius-checkbox--border-color: black;
+    --sirius-checkbox--border-line-style: solid;
+    --sirius-checkbox--border-radius: 4px;
+    --sirius-checkbox--border-width: 2px;
 }
 
 .checkbox-container {
@@ -18,24 +18,29 @@
     align-items: center;
     justify-content: space-around;
     width: fit-content;
-    background-color: var(--background-color);
-    padding: var(--padding);
-    gap: var(--gap);
+    background-color: var(--sirius-checkbox--container-background-color);
+    padding: var(--sirius-checkbox--container-padding);
+    gap: var(--sirius-checkbox--container-gap);
 }
 
 .icon-container {
     display: grid;
     place-items: center;
-    order: var(--checkbox-order);
-    background-color: var(--checkbox-background-color);
-    border: var(--checkbox-border-width) var(--checkbox-border-line-style) var(--checkbox-border-color);
-    border-radius: var(--checkbox-border-radius);
+    order: var(--sirius-checkbox--order);
+    background-color: var(--sirius-checkbox--background-color);
+    border: var(--sirius-checkbox--border-width) var(--sirius-checkbox--border-line-style) var(--sirius-checkbox--border-color);
+    border-radius: var(--sirius-checkbox--border-radius);
     cursor: pointer;
 }
 
 .label-container {
+    order: 0
+}
+
+.label {
     display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
     align-items: center;
     justify-items: start;
-    order: 0
 }

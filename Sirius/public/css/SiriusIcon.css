@@ -2,16 +2,15 @@
     display: inline-block;
     box-sizing: border-box;
 
-    --padding: 2px;
-    --svg-width: 24px;
-    --svg-height: 24px;
-    --svg-fill: grey;
+    --sirius-icon--padding: 0;
+    --sirius-icon--width: 24px;
+    --sirius-icon--height: 24px;
 }
 
 .icon-container {
     display: grid;
     place-items: center;
-    padding: var(--padding);
-    width: var(--svg-width);
-    height: var(--svg-height);
+    padding: var(--sirius-icon--padding);
+    width: var(--sirius-icon--width);
+    height: var(--sirius-icon--height);
 }

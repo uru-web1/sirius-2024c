@@ -6,31 +6,31 @@ import {
 } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 import {SIRIUS_ICON_ATTRIBUTES, SiriusIcon} from "./SiriusIcon.js";
-import {SiriusLabel} from "./SiriusLabel.js";
 import sirius from "./Sirius.js";
 
 /** Sirius checkbox constants */
 export const SIRIUS_CHECKBOX = deepFreeze({
     NAME: "SiriusCheckbox",
     TAG: "sirius-checkbox",
-    CSS_VARS: {
-        GAP: '--gap',
-        PADDING: "--padding",
-        BACKGROUND_COLOR: "--background-color",
-        CHECKBOX_ORDER: "--checkbox-order",
-        CHECKBOX_BACKGROUND_COLOR: "--checkbox-background-color",
-        CHECKBOX_BORDER_COLOR: "--checkbox-border-color",
-        CHECKBOX_BORDER_LINE_STYLE: "--checkbox-border-line-style",
-        CHECKBOX_BORDER_RADIUS: "--checkbox-border-radius",
-        CHECKBOX_BORDER_WIDTH: "--checkbox-border-width",
+    CSS_VARIABLES: {
+        GAP: '--sirius-checkbox--container-gap',
+        PADDING: "--sirius-checkbox--container-padding",
+        BACKGROUND_COLOR: "--sirius-checkbox--container-background-color",
+        CHECKBOX_ORDER: "--sirius-checkbox--order",
+        CHECKBOX_BACKGROUND_COLOR: "--sirius-checkbox--background-color",
+        CHECKBOX_BORDER_COLOR: "--sirius-checkbox--border-color",
+        CHECKBOX_BORDER_LINE_STYLE: "--sirius-checkbox--border-line-style",
+        CHECKBOX_BORDER_RADIUS: "--sirius-checkbox--border-radius",
+        CHECKBOX_BORDER_WIDTH: "--sirius-checkbox--border-width",
     },
-    SLOTS:{
+    SLOTS: {
         LABEL: "label"
     },
     CLASSES: {
         CHECKBOX_CONTAINER: 'checkbox-container',
         ICON_CONTAINER: 'icon-container',
         LABEL_CONTAINER: 'label-container',
+        LABEL: 'label',
         DISABLED: 'disabled',
     }
 })
@@ -54,12 +54,13 @@ export const SIRIUS_CHECKBOX_ATTRIBUTES = deepFreeze({
     CHECKBOX_BORDER_LINE_STYLE: "checkbox-border-line-style",
     CHECKBOX_BORDER_RADIUS: "checkbox-border-radius",
     CHECKBOX_BORDER_WIDTH: "checkbox-border-width",
-    PARENT_ID:'parent-id'
+    PARENT_ID: 'parent-id'
 })
 
-/** Sirius label checkbox default values */
+/** Sirius checkbox default values */
 export const SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT = deepFreeze({
     [SIRIUS_CHECKBOX_ATTRIBUTES.STATUS]: "unchecked",
+    [SIRIUS_CHECKBOX_ATTRIBUTES.ICON_PADDING]: "2px",
 })
 
 /** Sirius class that represents a checkbox component */
@@ -453,7 +454,7 @@ export class SiriusCheckbox extends SiriusElement {
      */
     #setGap(gap) {
         if (gap)
-            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARS.GAP, gap);
+            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARIABLES.GAP, gap);
     }
 
     /** Private method to set the padding attribute
@@ -461,7 +462,7 @@ export class SiriusCheckbox extends SiriusElement {
      */
     #setPadding(padding) {
         if (padding)
-            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARS.PADDING, padding);
+            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARIABLES.PADDING, padding);
     }
 
     /** Private method to set the background color attribute
@@ -469,7 +470,7 @@ export class SiriusCheckbox extends SiriusElement {
      */
     #setBackgroundColor(backgroundColor) {
         if (backgroundColor)
-            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARS.BACKGROUND_COLOR, backgroundColor);
+            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARIABLES.BACKGROUND_COLOR, backgroundColor);
     }
 
     /** Private method to set the icon width
@@ -533,7 +534,7 @@ export class SiriusCheckbox extends SiriusElement {
      */
     #setCheckboxOrder(order) {
         if (order)
-            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARS.CHECKBOX_ORDER, order);
+            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARIABLES.CHECKBOX_ORDER, order);
     }
 
     /** Private method to set the checkbox background color
@@ -541,7 +542,7 @@ export class SiriusCheckbox extends SiriusElement {
      */
     #setCheckboxBackgroundColor(color) {
         if (color)
-            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARS.CHECKBOX_BACKGROUND_COLOR, color);
+            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARIABLES.CHECKBOX_BACKGROUND_COLOR, color);
     }
 
     /** Private method to set the checkbox border color
@@ -549,7 +550,7 @@ export class SiriusCheckbox extends SiriusElement {
      */
     #setCheckboxBorderColor(color) {
         if (color)
-            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARS.CHECKBOX_BORDER_COLOR, color);
+            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARIABLES.CHECKBOX_BORDER_COLOR, color);
     }
 
     /** Private method to set the checkbox border line style
@@ -557,7 +558,7 @@ export class SiriusCheckbox extends SiriusElement {
      */
     #setCheckboxBorderLineStyle(style) {
         if (style)
-            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARS.CHECKBOX_BORDER_LINE_STYLE, style);
+            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARIABLES.CHECKBOX_BORDER_LINE_STYLE, style);
     }
 
     /** Private method to set the checkbox border radius
@@ -565,7 +566,7 @@ export class SiriusCheckbox extends SiriusElement {
      */
     #setCheckboxBorderRadius(radius) {
         if (radius)
-            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARS.CHECKBOX_BORDER_RADIUS, radius);
+            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARIABLES.CHECKBOX_BORDER_RADIUS, radius);
     }
 
     /** Private method to set the checkbox border width
@@ -573,7 +574,7 @@ export class SiriusCheckbox extends SiriusElement {
      */
     #setCheckboxBorderWidth(width) {
         if (width)
-            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARS.CHECKBOX_BORDER_WIDTH, width);
+            this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARIABLES.CHECKBOX_BORDER_WIDTH, width);
     }
 
     /** Private method to the parent ID
@@ -654,16 +655,17 @@ export class SiriusCheckbox extends SiriusElement {
      */
     set label(label) {
         if (label)
-        this.onBuilt = () => {
-            label.slot = SIRIUS_CHECKBOX.SLOTS.LABEL
-            this.labelContainerElement.appendChild(label)
-        }
+            this.onBuilt = () => {
+                label.slot = SIRIUS_CHECKBOX.SLOTS.LABEL
+                this.labelContainerElement.appendChild(label)
+            }
     }
 
     /** Clear the label slot */
     clearLabel() {
-        this.onBuilt= () => this.#labelContainerElement.innerHTML = "";
+        this.onBuilt = () => this.#labelContainerElement.innerHTML = "";
     }
+
 
     /** Get the template for the Sirius checkbox
      * @returns {string} - Template
@@ -673,7 +675,7 @@ export class SiriusCheckbox extends SiriusElement {
         const checkboxContainerClasses = [SIRIUS_CHECKBOX.CLASSES.CHECKBOX_CONTAINER];
         const iconContainerClasses = [SIRIUS_CHECKBOX.CLASSES.ICON_CONTAINER];
         const labelContainerClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL_CONTAINER]
-        const labelClasses = [SIRIUS_ELEMENT.CLASSES.LABEL]
+        const labelClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL]
 
         return `<div class="${checkboxContainerClasses.join(' ')}">
                     <div class="${iconContainerClasses.join(' ')}">
@@ -770,7 +772,7 @@ export class SiriusCheckbox extends SiriusElement {
             case SIRIUS_CHECKBOX_ATTRIBUTES.CHECKBOX_BORDER_WIDTH:
                 this.#setCheckboxBorderWidth(formattedValue);
                 break;
-            
+
             case SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID:
                 this.#setParentId(formattedValue);
                 break;

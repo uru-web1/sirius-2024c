@@ -278,20 +278,20 @@ export class SiriusElement extends HTMLElement {
      */
     _setId(id) {
         if (!id) {
-            this._onInjectedLogger=()=>this.logger.error('Element ID is required');
+            this._onInjectedLogger = () => this.logger.error('Element ID is required');
             return;
         }
 
         // Remove the old element ID
         if (this.#elementId)
-        sirius.removeInstance(this.#elementId)
+            sirius.removeInstance(this.#elementId)
 
         // Set the element ID attribute
         try {
             sirius.setInstance(id, this);
             this.#elementId = id
         } catch (error) {
-            this._onInjectedLogger=()=>this.logger.error(error);
+            this._onInjectedLogger = () => this.logger.error(error);
         }
     }
 
@@ -539,7 +539,7 @@ export class SiriusElement extends HTMLElement {
 
             // Check if the attribute is set on the instance properties
             if (instanceProperties)
-                value = instanceProperties?.[name];
+                value = instanceProperties?.[name] || attributesDefault?.[name];
 
             // Get the attribute default value
             else
