@@ -1,6 +1,5 @@
 :host{
     display: inline-block;
-
     --gap: 10px;
     --padding: 10px;
     --background-color: rgb(184, 184, 184);
@@ -12,6 +11,7 @@
     padding: var(--padding);
     background-color: var(--background-color);
     border-radius: 1em;
+    margin: 40px;
 }
 
 .head-container {
@@ -21,9 +21,10 @@
 
 .item-container {
     display: flex;
+    align-items: center;
     gap: 10px
 }
 
 .items-container{
-    padding: 10px;
+    padding: 5px;
 }
