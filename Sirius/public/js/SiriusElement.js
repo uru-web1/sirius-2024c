@@ -88,6 +88,9 @@ export class SiriusElement extends HTMLElement {
 
         // Add properties
         this._properties = properties;
+
+        // Build the SiriusElement
+        this.#build().then();
     }
 
     /** Define observed attributes
@@ -95,6 +98,58 @@ export class SiriusElement extends HTMLElement {
      * */
     static get observedAttributes() {
         return [...Object.values(SIRIUS_ELEMENT_ATTRIBUTES), ...Object.values(SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES)];
+    }
+
+    /** Build the SiriusElement */
+    async #build() {
+        // Inject logger event listener
+        this.addEventListener(SIRIUS_ELEMENT.EVENTS.INJECTED_LOGGER, async () => {
+            // Set the logger as injected
+            this.#isLoggerInjected = true;
+
+            // Call the injected logger callbacks
+            for (const callback of this.#onInjectedLogger) await callback(this.logger);
+
+            // Clear the injected logger callbacks
+            this.#onInjectedLogger = [];
+        });
+
+        // Load Sirius element required HTML attributes
+        this._loadRequiredAttributes({
+            instanceProperties: this._properties,
+            attributes: SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
+        });
+
+        // Inject logger
+        this.#logger = new SiriusLogger({
+            name: this.#elementName,
+            elementId: this.id
+        });
+
+        // Dispatch injected logger event
+        this.dispatchInjectedLoggerEvent();
+
+        // Load Sirius element HTML attributes
+        this._loadAttributes({
+            instanceProperties: this._properties,
+            attributes: SIRIUS_ELEMENT_ATTRIBUTES,
+            attributesDefault: SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT,
+        });
+
+        // Attach shadow DOM
+        this.attachShadow({mode: "open"});
+
+        // Built event listener
+        this.addEventListener(SIRIUS_ELEMENT.EVENTS.BUILT, async () => {
+            // Set the element as built
+            this.#isBuilt = true;
+
+            // Call the initialization callbacks
+            for (const callback of this.#onBuilt) await callback();
+
+            // Clear the initialization callbacks
+            this.#onBuilt = [];
+        });
     }
 
     /** Get the element container
@@ -776,13 +831,13 @@ export class SiriusElement extends HTMLElement {
             this.logger.log(`'${name}' attribute changed: ${oldValue} -> ${newValue}`);
     }
 
-    /** Pre attribute changed callback
+    /** Attribute change pre-handler
      * @param {string} name - Attribute name
-     * @param {string} oldValue - Old attribute value
-     * @param {string} newValue - New attribute value
+     * @param {string} oldValue - Old value
+     * @param {string} newValue - New value
      * @returns {{formattedValue: string, shouldContinue: boolean}} - Formatted attribute value and if the attribute change should continue
      */
-    _preAttributeChangedCallback(name, oldValue, newValue) {
+    _attributeChangePreHandler(name, oldValue, newValue) {
         // Format the attribute value
         const formattedValue = this._formatAttributeValue(newValue);
 
@@ -810,57 +865,5 @@ export class SiriusElement extends HTMLElement {
         }
 
         return {formattedValue, shouldContinue: oldValue !== formattedValue}
-    }
-
-    /** Connected callback */
-    async connectedCallback() {
-        // Inject logger event listener
-        this.addEventListener(SIRIUS_ELEMENT.EVENTS.INJECTED_LOGGER, async () => {
-            // Set the logger as injected
-            this.#isLoggerInjected = true;
-
-            // Call the injected logger callbacks
-            for (const callback of this.#onInjectedLogger) await callback(this.logger);
-
-            // Clear the injected logger callbacks
-            this.#onInjectedLogger = [];
-        });
-
-        // Load Sirius element required HTML attributes
-        this._loadRequiredAttributes({
-            instanceProperties: this._properties,
-            attributes: SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
-        });
-
-        // Inject logger
-        this.#logger = new SiriusLogger({
-            name: this.#elementName,
-            elementId: this.id
-        });
-
-        // Dispatch injected logger event
-        this.dispatchInjectedLoggerEvent();
-
-        // Load Sirius element HTML attributes
-        this._loadAttributes({
-            instanceProperties: this._properties,
-            attributes: SIRIUS_ELEMENT_ATTRIBUTES,
-            attributesDefault: SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT,
-        });
-
-        // Attach shadow DOM
-        this.attachShadow({mode: "open"});
-
-        // Built event listener
-        this.addEventListener(SIRIUS_ELEMENT.EVENTS.BUILT, async () => {
-            // Set the element as built
-            this.#isBuilt = true;
-
-            // Call the initialization callbacks
-            for (const callback of this.#onBuilt) await callback();
-
-            // Clear the initialization callbacks
-            this.#onBuilt = [];
-        });
     }
 }

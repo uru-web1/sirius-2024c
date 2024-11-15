@@ -56,7 +56,7 @@ export class SiriusListBox extends SiriusElement {
     #labelList = [];
     #itemContainerList = [];
     _checkedItems = [];
-    
+
 
     /**
      * Create a Sirius ListBox element
@@ -64,6 +64,9 @@ export class SiriusListBox extends SiriusElement {
      */
     constructor(properties) {
         super(properties, SIRIUS_LIST_BOX.NAME);
+
+        // Build the SiriusListBox
+        this.#build().then();
     }
 
     /** Define observed attributes
@@ -71,6 +74,39 @@ export class SiriusListBox extends SiriusElement {
      * */
     static get observedAttributes() {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_LIST_BOX_ATTRIBUTES)];
+    }
+
+    /** Build the SiriusListBox */
+    async #build() {
+        // Call the parent connectedCallback
+        await super.connectedCallback();
+
+        // Load Sirius ListBox HTML attributes
+        this._loadAttributes({
+            instanceProperties: this._properties,
+            attributes: SIRIUS_LIST_BOX_ATTRIBUTES,
+            defaultAttributes: SIRIUS_LIST_BOX_ATTRIBUTES_DEFAULT
+        });
+
+        // Create the CSS stylesheet and add it to the shadow DOM
+        await this._loadAndAdoptStyles();
+
+        // Get HTML inner content
+        const innerHTML = this.#getTemplate();
+
+        // Create the HTML template
+        this._createTemplate(innerHTML);
+
+        // Get the container element
+        this.#listBoxContainerElement = this._containerElement = this._templateContent.firstChild;
+        this.#headContainerElement = this.#listBoxContainerElement.firstElementChild;
+        this.#itemsListContainerElement = this.#listBoxContainerElement.lastElementChild;
+
+        // Add ListBox to the shadow DOM
+        this.shadowRoot.appendChild(this.containerElement);
+
+        // Dispatch the built event
+        this.dispatchBuiltEvent();
     }
 
     /** Get the head attribute
@@ -195,7 +231,7 @@ export class SiriusListBox extends SiriusElement {
         this.setAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR, value);
     }
 
-    /**Public method to get the checked items
+    /** Public method to get the checked items
      * @returns {Array} - Checked items
      */
     getCheckedItems(){
@@ -208,17 +244,17 @@ export class SiriusListBox extends SiriusElement {
         return this._checkedItems;
     }
 
-    /**Private method to set the items attribute
+    /** Private method to set the items attribute
      * @param {Array} items - Items attribute value
      */
     #setItems(items) {
         if (!items) return
-        
+
         this.#itemsList = items;
         this.#renderItems();
     }
 
-    /**Private method to set the head attribute
+    /** Private method to set the head attribute
      * @param {string} head - Head attribute value
      */
     #setHead(head) {
@@ -375,6 +411,7 @@ export class SiriusListBox extends SiriusElement {
             }
     }
 
+
     /** Get the template for the Sirius ListBox
      * @returns {string} - Template
      */
@@ -390,48 +427,43 @@ export class SiriusListBox extends SiriusElement {
                 </div>`;
     }
 
-
-    /**Attribute change callback
+    /** Private method to handle attribute changes
      * @param {string} name - Attribute name
      * @param {string} oldValue - Old value
      * @param {string} newValue - New value
      */
-    attributeChangedCallback(name, oldValue, newValue) {
-        // Call the pre-attribute changed callback
-        const {formattedValue, shouldContinue} = this._preAttributeChangedCallback(name, oldValue, newValue);
-        if (!shouldContinue) return;
-
+    #attributeChangeHandler(name, oldValue, newValue) {
         switch (name) {
             case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
-                this._setId(formattedValue);
+                this._setId(newValue);
                 break;
 
             case SIRIUS_ELEMENT_ATTRIBUTES.STYLE:
-                this.#setStyle(formattedValue);
+                this.#setStyle(newValue);
                 break;
 
             case SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS:
-                this.#setItems(JSON.parse(formattedValue));
+                this.#setItems(JSON.parse(newValue));
                 break;
 
             case SIRIUS_LIST_BOX_ATTRIBUTES.HEAD:
-                this.#setHead(formattedValue);
+                this.#setHead(newValue);
                 break;
 
             case SIRIUS_LIST_BOX_ATTRIBUTES.GAP:
-                this.#setGap(formattedValue);
+                this.#setGap(newValue);
                 break;
 
             case SIRIUS_LIST_BOX_ATTRIBUTES.PADDING:
-                this.#setPadding(formattedValue);
+                this.#setPadding(newValue);
                 break;
 
             case SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR:
-                this.#setBackgroundColor(formattedValue);
+                this.#setBackgroundColor(newValue);
                 break;
 
             case SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR:
-                this.#setCheckboxColor(formattedValue);
+                this.#setCheckboxColor(newValue);
                 break;
 
             default:
@@ -440,38 +472,18 @@ export class SiriusListBox extends SiriusElement {
         }
     }
 
-    /** Lifecycle method called when the component is connected to the DOM
+    /** Attribute change callback
+     * @param {string} name - Attribute name
+     * @param {string} oldValue - Old value
+     * @param {string} newValue - New value
      */
-    async connectedCallback() {
-        // Call the parent connectedCallback
-        await super.connectedCallback();
+    attributeChangedCallback(name, oldValue, newValue) {
+        // Call the attribute change pre-handler
+        const {formattedValue, shouldContinue} = this._attributeChangePreHandler(name, oldValue, newValue);
+        if (!shouldContinue) return;
 
-        // Load Sirius ListBox HTML attributes
-        this._loadAttributes({
-            instanceProperties: this._properties,
-            attributes: SIRIUS_LIST_BOX_ATTRIBUTES,
-            defaultAttributes: SIRIUS_LIST_BOX_ATTRIBUTES_DEFAULT
-        });
-
-        // Create the CSS stylesheet and add it to the shadow DOM
-        await this._loadAndAdoptStyles();
-
-        // Get HTML inner content
-        const innerHTML = this.#getTemplate();
-
-        // Create the HTML template
-        this._createTemplate(innerHTML);
-
-        // Get the container element
-        this.#listBoxContainerElement = this._containerElement = this._templateContent.firstChild;
-        this.#headContainerElement = this.#listBoxContainerElement.firstElementChild;
-        this.#itemsListContainerElement = this.#listBoxContainerElement.lastElementChild;
-
-        // Add ListBox to the shadow DOM
-        this.shadowRoot.appendChild(this.containerElement);
-
-        // Dispatch the built event
-        this.dispatchBuiltEvent();
+        // Call the attribute change handler
+        this.onBuilt=()=>this.#attributeChangeHandler(name, oldValue, formattedValue);
     }
 }
 

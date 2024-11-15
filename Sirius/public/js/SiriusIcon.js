@@ -1,6 +1,7 @@
 import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
 import {SiriusSvg} from "./SiriusSvg.js";
 import deepFreeze from "./utils/deep-freeze.js";
+import {SIRIUS_CHECKBOX_ATTRIBUTES} from "./SiriusCheckbox.js";
 
 /** Sirius icon constants */
 export const SIRIUS_ICON = deepFreeze({
@@ -52,6 +53,9 @@ export class SiriusIcon extends SiriusElement {
      */
     constructor(properties) {
         super(properties, SIRIUS_ICON.NAME);
+
+        // Build the SiriusIcon
+        this.#build().then();
     }
 
     /** Define observed attributes
@@ -59,6 +63,49 @@ export class SiriusIcon extends SiriusElement {
      * */
     static get observedAttributes() {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_ICON_ATTRIBUTES)]
+    }
+
+    /** Build the SiriusIcon */
+    async #build() {
+        // Load SiriusIcon attributes
+        this._loadAttributes({
+            instanceProperties: this._properties,
+            attributes: SIRIUS_ICON_ATTRIBUTES,
+            attributesDefault: SIRIUS_ICON_ATTRIBUTES_DEFAULT
+        });
+
+        // Load the CSS style sheets and add them to the shadow DOM
+        await this._loadAndAdoptStyles();
+
+        // Create derived ID
+        const svgId = this._getDerivedId("svg")
+
+        // Get the required keys
+        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
+
+        // Create SiriusSvg element
+        this.#svgElement = new SiriusSvg({
+            [idKey]: svgId
+        })
+
+        // Add the SVG element classes
+        this.svgElement.classList.add(SIRIUS_ICON.CLASSES.SVG_ELEMENT);
+
+        // Get HTML inner content
+        const innerHTML = this.#getTemplate();
+
+        // Create the HTML template
+        await this._createTemplate(innerHTML);
+
+        // Add icon to the shadow DOM
+        this.#iconContainerElement = this._containerElement = this._templateContent.firstChild;
+        this.shadowRoot.appendChild(this.containerElement);
+
+        // Add the SVG element to the icon container
+        this.iconContainerElement.appendChild(this.svgElement);
+
+        // Dispatch the built event
+        this.dispatchBuiltEvent();
     }
 
     /** Get icon container element
@@ -350,75 +397,71 @@ export class SiriusIcon extends SiriusElement {
                 </div>`;
     }
 
-    /** Attribute change callback
+    /** Private method to handle attribute changes
      * @param {string} name - Attribute name
-     * @param {string} oldValue - Old attribute value
-     * @param {string} newValue - New attribute
-     * */
-    attributeChangedCallback(name, oldValue, newValue) {
-        // Call the pre-attribute changed callback
-        const {formattedValue, shouldContinue} = this._preAttributeChangedCallback(name, oldValue, newValue);
-        if (!shouldContinue) return;
-
+     * @param {string} oldValue - Old value
+     * @param {string} newValue - New value
+     */
+    #attributeChangeHandler(name, oldValue, newValue) {
         switch (name) {
             case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
-                this._setId(formattedValue);
+                this._setId(newValue);
                 break;
 
             case SIRIUS_ELEMENT_ATTRIBUTES.STYLE:
-                this.#setStyle(formattedValue);
+                this.#setStyle(newValue);
                 break;
 
             case SIRIUS_ELEMENT_ATTRIBUTES.HIDE:
-                this.#setHide(formattedValue);
+                this.#setHide(newValue);
                 break;
 
             case SIRIUS_ELEMENT_ATTRIBUTES.DISABLED:
-                this.#setDisabled(formattedValue);
+                this.#setDisabled(newValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.ICON:
-                this.#setIcon(formattedValue);
+                this.#setIcon(newValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.ROTATION:
-                this.#setRotation(formattedValue);
+                this.#setRotation(newValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.WIDTH:
-                this.#setWidth(formattedValue);
+                this.#setWidth(newValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.HEIGHT:
-                this.#setHeight(formattedValue);
+                this.#setHeight(newValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.FILL:
-                this.#setFill(formattedValue);
+                this.#setFill(newValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.DISABLED:
-                this.#setDisabled(formattedValue);
+                this.#setDisabled(newValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.SHOW_ANIMATION:
-                this.#setShowAnimation(formattedValue);
+                this.#setShowAnimation(newValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.HIDING_ANIMATION:
-                this.#setHidingAnimation(formattedValue);
+                this.#setHidingAnimation(newValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.TRANSITION_DURATION:
-                this.#setTransitionDuration(formattedValue);
+                this.#setTransitionDuration(newValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.ANIMATION_DURATION:
-                this.#setAnimationDuration(formattedValue);
+                this.#setAnimationDuration(newValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.PADDING:
-                this.#setPadding(formattedValue);
+                this.#setPadding(newValue);
                 break;
 
             default:
@@ -427,51 +470,18 @@ export class SiriusIcon extends SiriusElement {
         }
     }
 
-    /** Lifecycle method called when the component is connected to the DOM
-     */
-    async connectedCallback() {
-        // Call the parent connected callback
-        await super.connectedCallback();
+    /** Attribute change callback
+     * @param {string} name - Attribute name
+     * @param {string} oldValue - Old attribute value
+     * @param {string} newValue - New attribute
+     * */
+    attributeChangedCallback(name, oldValue, newValue) {
+        // Call the attribute change pre-handler
+        const {formattedValue, shouldContinue} = this._attributeChangePreHandler(name, oldValue, newValue);
+        if (!shouldContinue) return;
 
-        // Load SiriusIcon attributes
-        this._loadAttributes({
-            instanceProperties: this._properties,
-            attributes: SIRIUS_ICON_ATTRIBUTES,
-            attributesDefault: SIRIUS_ICON_ATTRIBUTES_DEFAULT
-        });
-
-        // Load the CSS style sheets and add them to the shadow DOM
-        await this._loadAndAdoptStyles();
-
-        // Create derived ID
-        const svgId = this._getDerivedId("svg")
-
-        // Get the required keys
-        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
-
-        // Create SiriusSvg element
-        this.#svgElement = new SiriusSvg({
-            [idKey]: svgId
-        })
-
-        // Add the SVG element classes
-        this.svgElement.classList.add(SIRIUS_ICON.CLASSES.SVG_ELEMENT);
-
-        // Get HTML inner content
-        const innerHTML = this.#getTemplate();
-
-        // Create the HTML template
-        await this._createTemplate(innerHTML);
-
-        // Add icon to the shadow DOM
-        this.#iconContainerElement = this._containerElement = this._templateContent.firstChild;
-        this.shadowRoot.appendChild(this.containerElement);
-
-        // Add the SVG element to the icon container
-        this.iconContainerElement.appendChild(this.svgElement);
-
-        // Dispatch the built event
-        this.dispatchBuiltEvent();
+        // Call the attribute changed handler
+        this.onBuilt=()=>this.#attributeChangeHandler(name, oldValue, formattedValue);
     }
 }
 
