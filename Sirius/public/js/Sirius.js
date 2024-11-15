@@ -117,7 +117,7 @@ class Sirius {
 
     /** Get Sirius element by ID
      * @param id - Element ID
-     * @returns {SiriusCheckbox|SiriusIcon | SiriusLabel | SiriusListbox | SiriusSvg | SiriusTreeView | null} - Element
+     * @returns {SiriusCheckbox|SiriusIcon | SiriusLabel | SiriusListBox | SiriusSvg | SiriusTreeView | null} - Element
      * */
     getInstance(id) {
         return this.#instancesId.has(id) ? this.#instancesId.get(id) : null;

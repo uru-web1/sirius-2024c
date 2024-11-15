@@ -295,6 +295,11 @@ export class SiriusElement extends HTMLElement {
         }
     }
 
+    /** Remove instance from Sirius */
+    removeInstance() {
+        sirius.onLoaded = async () => sirius.removeInstance(this.id);
+    }
+
     /** Protected method to set style attribute on built
      * @param {function(): void} callback - Callback to apply the style
      */
@@ -720,10 +725,10 @@ export class SiriusElement extends HTMLElement {
     }
 
     /** Get derived element ID attribute
-     * @returns {string} alias - Derived element alias
+     * @returns {string} aliases - Derived element alias
      * */
-    _getDerivedId(alias) {
-        return `${this.id}__${alias}`;
+    _getDerivedId(...aliases) {
+        return [this.id, ...aliases].join("__");
     }
 
     /** Add the element to the body */

@@ -69,6 +69,7 @@ export class SiriusCheckbox extends SiriusElement {
     #children = []
     #checkboxContainerElement = null;
     #labelContainerElement = null;
+    #labelSlotElement=null
     #iconContainerElement = null;
     #iconElement = null;
 
@@ -97,6 +98,13 @@ export class SiriusCheckbox extends SiriusElement {
      */
     get labelContainerElement() {
         return this.#labelContainerElement;
+    }
+
+    /** Get the label slot element
+     * @returns {HTMLSlotElement|null} - Label container element
+     */
+    get labelSlotElement() {
+        return this.#labelSlotElement;
     }
 
     /** Get the icon container element
@@ -657,15 +665,14 @@ export class SiriusCheckbox extends SiriusElement {
         if (label)
             this.onBuilt = () => {
                 label.slot = SIRIUS_CHECKBOX.SLOTS.LABEL
-                this.labelContainerElement.appendChild(label)
+                this.labelSlotElement.appendChild(label)
             }
     }
 
     /** Clear the label slot */
     clearLabel() {
-        this.onBuilt = () => this.#labelContainerElement.innerHTML = "";
+        this.onBuilt = () => this.labelSlotElement.innerHTML = "";
     }
-
 
     /** Get the template for the Sirius checkbox
      * @returns {string} - Template
@@ -825,6 +832,7 @@ export class SiriusCheckbox extends SiriusElement {
         this.#checkboxContainerElement = this._containerElement = this._templateContent.firstChild;
         this.#iconContainerElement = this.#checkboxContainerElement.firstElementChild;
         this.#labelContainerElement = this.#checkboxContainerElement.lastElementChild;
+        this.#labelSlotElement = this.#labelContainerElement.firstElementChild
         this.shadowRoot.appendChild(this.containerElement);
 
         // Add icon and label to the checkbox container
