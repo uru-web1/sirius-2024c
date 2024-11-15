@@ -630,6 +630,7 @@ export class SiriusElement extends HTMLElement {
      * @param {string} cssFilename - CSS filename
      */
     async #loadCSSStyleSheet(cssFilename) {
+
         // Create the CSS stylesheet
         const sheet = new CSSStyleSheet();
 

@@ -666,7 +666,6 @@ export class SiriusCheckbox extends SiriusElement {
         this.onBuilt = () => this.#labelContainerElement.innerHTML = "";
     }
 
-
     /** Get the template for the Sirius checkbox
      * @returns {string} - Template
      */

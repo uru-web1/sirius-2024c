@@ -234,6 +234,7 @@ class Sirius {
             // Load the class and create an instance
             const importedClass = await this.getClass(jsFilename, jsClass);
             const instance = new importedClass(props);
+
             this.#instancesId.set(props.id, instance);
 
             return instance;
