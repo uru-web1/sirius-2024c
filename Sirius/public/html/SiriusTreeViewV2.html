@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>SiriusTreeViewV2 Example</title>
+    <link href="../css/Sirius.css" rel="stylesheet">
+    <script defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusTreeViewV2.js" type="module"></script>
+    <script defer src="../js/SiriusCheckbox.js" type="module"></script>
+    <script defer src="../js/SiriusLabel.js" type="module"></script>
+</head>
+<body>
+<sirius-tree-view id="tree-view-1" icon-fill="red">
+    <sirius-checkbox slot="parent" id="checkbox-1">
+        <sirius-label slot="label" id="checkbox-1__label" caption="Grandfather 1 (Parent 1)"></sirius-label>
+    </sirius-checkbox>
+    <sirius-tree-view slot="children" id="tree-view-2" icon-fill="blue">
+        <sirius-checkbox slot="parent" id="checkbox-2">
+            <sirius-label slot="label" id="checkbox-2__label" caption="Parent 2 (Child 1)"></sirius-label>
+        </sirius-checkbox>
+        <sirius-checkbox slot="children" id="checkbox-3">
+            <sirius-label slot="label" id="checkbox-3__label" caption="Grandchild 1"></sirius-label>
+        </sirius-checkbox>
+        <sirius-checkbox slot="children" id="checkbox-4">
+            <sirius-label slot="label" id="checkbox-4__label" caption="Grandchild 2"></sirius-label>
+        </sirius-checkbox>
+    </sirius-tree-view>
+    <sirius-checkbox slot="children" id="checkbox-5">
+        <sirius-label slot="label" id="checkbox-5__label" caption="Child 2"></sirius-label>
+    </sirius-checkbox>
+</sirius-tree-view>
+</body>
+</html>

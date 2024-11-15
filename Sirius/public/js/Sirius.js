@@ -20,22 +20,26 @@ export const SIRIUS = deepFreeze({
 
 /** Sirius framework singleton class */
 class Sirius {
-    #logger
-    #jsModules
-    #instancesId
-    #cssFiles
-    #CSSFilesPromises
-    #lockedCSSFiles
+    // Logger
+    #logger = null;
+
+    // JavaScript modules
+    #jsModules = new Map();
+
+    // Module instances ID
+    #instancesId = new Map();
+
+    // CSS files
+    #CSSFiles = new Map();
+    #CSSFilesPromises = new Map();
+    #lockedCSSFiles = new Set();
+
+    // Loaded flag
+    #loaded = false;
     #onLoaded = []
 
     /** Create Sirius object */
     constructor() {
-        // JavaScript modules
-        this.#jsModules = new Map();
-
-        // Module instances ID
-        this.#instancesId = new Map();
-
         // Inject logger
         this.#logger = new SiriusLogger({
             name: SIRIUS.NAME,
@@ -45,9 +49,20 @@ class Sirius {
             errorColor: SIRIUS.ERROR.COLOR
         })
 
-        this.#cssFiles = new Map();
-        this.#lockedCSSFiles = new Set();
-        this.#CSSFilesPromises = new Map();
+        // On DOM content loaded
+        addEventListener("DOMContentLoaded", async () => {
+            // Set the loaded flag
+            this.#loaded = true;
+
+            // Get the initialization callbacks
+            const callbacks = this.#onLoaded
+
+            // Clear the initialization callbacks
+            this.#onLoaded = [];
+
+            // Call the initialization callbacks
+            for (const callback of callbacks) await callback();
+        });
     }
 
     /** Get Sirius logger
@@ -58,22 +73,23 @@ class Sirius {
     }
 
     /** Set Sirius on loaded callback
-     * @param callback - On loaded callback
+     * @param {function(): Promise<void>} callback - Callback
      * */
     set onLoaded(callback) {
+        // Check if the framework is loaded
+        if (this.#loaded) {
+            callback().then();
+            return;
+        }
+
+        // Add the callback to the list
         this.#onLoaded.push(callback);
-
-        // On DOM content loaded
-        addEventListener("DOMContentLoaded", async () => {
-            // Call the initialization callbacks
-            for (const callback of this.#onLoaded) await callback();
-
-            // Clear the initialization callbacks
-            this.#onLoaded = [];
-        });
     }
 
-    /** Set instance ID */
+    /** Set instance ID
+     * @param id - Instance ID
+     * @param instance - Instance
+     * */
     setInstance(id, instance) {
         if (!id || !instance) return;
 
@@ -81,18 +97,42 @@ class Sirius {
         if (this.#instancesId.has(id))
             throw new Error(`Instance with ID '${id}' already exists`);
 
+        // Set the instance
         this.#instancesId.set(id, instance);
     }
 
-    /** Get CSS styles file
-     * @param cssFilename - CSS filename
+    /** Remove instance by ID
+     * @param id - Instance ID
+     */
+    removeInstance(id) {
+        if (!id) return;
+
+        // Check if the instance exists
+        if (!this.#instancesId.has(id))
+            throw new Error(`Instance with ID '${id}' does not exist`);
+
+        // Remove the instance
+        this.#instancesId.delete(id);
+    }
+
+    /** Get Sirius element by ID
+     * @param id - Element ID
+     * @returns {SiriusCheckbox|SiriusIcon | SiriusLabel | SiriusListbox | SiriusSvg | SiriusTreeView | null} - Element
+     * */
+    getInstance(id) {
+        return this.#instancesId.has(id) ? this.#instancesId.get(id) : null;
+    }
+
+    /** Load CSS style sheet file
+     * @param {string} cssFilename - CSS filename
+     * @param {string} cssRoute - CSS route
      * @returns {Promise<any|string>} - CSS file
      */
-    async getStylesFile(cssFilename) {
+    async loadCSSStyleSheetFile(cssFilename, cssRoute = SIRIUS.ROUTES.CSS(cssFilename)) {
         // Check if the CSS file is already loaded
-        if (this.#cssFiles.has(cssFilename)) {
+        if (this.#CSSFiles.has(cssFilename)) {
             this.logger.log(`CSS file '${cssFilename}' already loaded`);
-            return this.#cssFiles.get(cssFilename);
+            return this.#CSSFiles.get(cssFilename);
         }
 
         // Wait for the CSS file to be loaded
@@ -111,7 +151,6 @@ class Sirius {
         this.#lockedCSSFiles.add(cssFilename);
 
         // Create CSS promise and store it
-        const cssRoute = SIRIUS.ROUTES.CSS(cssFilename);
         const cssPromise = (async () => {
             // Load the CSS file
             const response = await fetch(cssRoute)
@@ -119,7 +158,7 @@ class Sirius {
             this.logger.log(`CSS file '${cssFilename}' loaded`);
 
             // Store the CSS file
-            this.#cssFiles.set(cssFilename, css);
+            this.#CSSFiles.set(cssFilename, css);
             return css
         })()
 
@@ -130,31 +169,22 @@ class Sirius {
         return cssPromise;
     }
 
-    /** Get Sirius element by ID
-     * @param id - Element ID
-     * @returns {HTMLElement | null} - Element
-     * */
-    getInstance(id) {
-        let e = document.getElementById(id);
-
-        if (e) return e;
-        return this.#instancesId.has(id) ? this.#instancesId.get(id) : null;
-    }
-
     /** Get Sirius Script file
      * @param {string} jsFilename - JavaScript filename
      * @param {string} jsClass - JavaScript class
+     * @param {string} jsRoute - CSS route
      * @returns {Promise<Class | null>} - JavaScript class
      * */
-    async getClass(jsFilename, jsClass) {
+    async getClass(jsFilename, jsClass, jsRoute = SIRIUS.ROUTES.JS(jsFilename)) {
         // Check if script has been loaded
         if (this.#jsModules.has(jsFilename)) {
             const jsModule = this.#jsModules.get(jsFilename);
 
-            // Loaded class
+            // The class is already loaded
             if (jsModule.has(jsClass))
                 return jsModule.get(jsClass)
 
+            // Load the class
             const importedClass = this.#jsModules[jsClass]
             if (!importedClass) {
                 this.logger.error(`Class '${jsClass}' not found on loaded script '${jsFilename}'`);
@@ -167,11 +197,11 @@ class Sirius {
         }
 
         // Store the class in a new Map if jsFilename is not already in the map
-        this.#jsModules.set(jsFilename, new Map());
-        const jsModule = this.#jsModules.get(jsFilename);
+        const jsModule = new Map()
+        this.#jsModules.set(jsFilename, jsModule);
 
         // Load the script
-        const importedScript = await import(SIRIUS.ROUTES.JS(jsFilename));
+        const importedScript = await import(jsRoute);
         if (!importedScript) {
             this.logger.error(`Error loading script '${jsFilename}'`);
             return null;
@@ -202,8 +232,9 @@ class Sirius {
             }
 
             // Load the class and create an instance
-            let importedClass = await this.getClass(jsFilename, jsClass);
-            let instance = new importedClass(props);
+            const importedClass = await this.getClass(jsFilename, jsClass);
+            const instance = new importedClass(props);
+
             this.#instancesId.set(props.id, instance);
 
             return instance;

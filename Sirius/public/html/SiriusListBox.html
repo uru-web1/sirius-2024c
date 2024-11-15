@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>SiriusListBox Example</title>
+    <script defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusCheckbox.js" type="module"></script>
+    <script defer src="../js/SiriusListBox.js" type="module"></script>
+
+</head>
+<body>
+
+    <!-- Con HTML
+    <sirius-list-box id="listbox-1"></sirius-list-box>
+
+    <script type="module">
+        import sirius from '../js/Sirius.js';
+        
+        sirius.onLoaded = async () => {
+            const listbox1 = document.querySelector('#listbox-1');
+            
+            listbox1.items = `[
+                { "id": "item-1", "label": "Item 1" },
+                { "id": "item-2", "label": "Item 2" },
+                { "id": "item-3", "label": "Item 3" }
+            ]`;
+            listbox1.background-color = 'lightblue';
+            listbox1.checkboxColor = 'blue';
+        };
+    </script> -->
+
+
+    <!-- Con JS -->
+    <script type="module">
+        import sirius from '../js/Sirius.js';
+        import {SiriusListBox, SIRIUS_LIST_BOX_ATTRIBUTES} from '../js/SiriusListBox.js';
+        import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
+                SIRIUS_ELEMENT_ATTRIBUTES
+        } from "../js/SiriusElement.js";
+
+        sirius.onLoaded = async () => {
+            const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+            const itemsKey = SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS;
+            const headKey = SIRIUS_LIST_BOX_ATTRIBUTES.HEAD;
+            const backgroundKey = SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR;
+            const checkboxColorKey = SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR;
+            const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+
+            // Create a new ListBox
+            const listBox1 = new SiriusListBox({
+                [idKey]: 'listbox-1',
+                [itemsKey]:`[
+                    { "id": "item-1", "label": "Item 1"},
+                    { "id": "item-2", "label": "Item 2"},
+                    { "id": "item-3", "label": "Item 3"}
+                ]
+                `,
+                [backgroundKey]: 'lightblue',
+                [checkboxColorKey]: 'blue',
+                [styleKey]: "{'position': 'absolute', 'top': '20', 'left': '20'}"
+                
+            });
+
+            const listBox2 = new SiriusListBox({
+                [idKey]: 'listbox-2',
+                [itemsKey]:`[
+                    { "id": "item-1", "label": "Item 1"},
+                    { "id": "item-2", "label": "Item 2"},
+                    { "id": "item-3", "label": "Item 3"}]
+                `,
+                [backgroundKey]: 'lightblue',
+                [checkboxColorKey]: 'blue'
+                
+            });
+
+            // Add the ListBox to the body
+            listBox1.addToBody();
+            listBox2.addToBody();
+        };
+    </script>
+</body>
+</html>
