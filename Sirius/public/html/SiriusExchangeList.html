@@ -3,41 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>SiriusListBox Example</title>
+    <title>SiriusExchangeList Example</title>
     <script defer src="../js/Sirius.js" type="module"></script>
-    <script defer src="../js/SiriusCheckbox.js" type="module"></script>
-    <script defer src="../js/SiriusListBox.js" type="module"></script>
 
 </head>
 <body>
 
-    <!-- Con HTML
-    <sirius-list-box id="listbox-1"></sirius-list-box>
-
     <script type="module">
         import sirius from '../js/Sirius.js';
-        
-        sirius.onLoaded = async () => {
-            const listbox1 = document.querySelector('#listbox-1');
-            
-            listbox1.items = `[
-                { "id": "item-1", "label": "Item 1" },
-                { "id": "item-2", "label": "Item 2" },
-                { "id": "item-3", "label": "Item 3" }
-            ]`;
-            listbox1.background-color = 'lightblue';
-            listbox1.checkboxColor = 'blue';
-        };
-    </script> -->
-
-
-    <!-- Con JS -->
-    <script type="module">
-        import sirius from '../js/Sirius.js';
-        import {SiriusListBox, SIRIUS_LIST_BOX_ATTRIBUTES} from '../js/SiriusListBox.js';
-        import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
-                SIRIUS_ELEMENT_ATTRIBUTES
-        } from "../js/SiriusElement.js";
+        import {SIRIUS_EXCHANGE_LIST_ATTRIBUTES, SiriusExchangeList} from '../js/SiriusExchangeList.js';
+        import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
 
         sirius.onLoaded = async () => {
             const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
@@ -60,18 +35,7 @@
                 [checkboxColorKey]: 'black',
                 
             });
-
-            listBox1.removeItem('item_2');
-
-            listBox1.addItem({ "id": "item_2", "label": "Item 2" });
-
-
-
-
-            
-
-            // Add the ListBox to the body
-            listBox1.addToBody();
+        
         };
     </script>
 </body>

@@ -48,12 +48,11 @@ export class SiriusListBox extends SiriusElement {
     // elements
     #checkboxElement = null;
     #labelElement = null;
+    #headElement = null;
     #head = null;
     
     // lists
     #itemsList = [];
-    #checkboxList = [];
-    #labelList = [];
     #itemContainerList = [];
     _checkedItems = [];
 
@@ -67,6 +66,7 @@ export class SiriusListBox extends SiriusElement {
 
         // Build the SiriusListBox
         this.#build().then();
+        
     }
 
     /** Define observed attributes
@@ -78,8 +78,6 @@ export class SiriusListBox extends SiriusElement {
 
     /** Build the SiriusListBox */
     async #build() {
-        // Call the parent connectedCallback
-        await super.connectedCallback();
 
         // Load Sirius ListBox HTML attributes
         this._loadAttributes({
@@ -114,6 +112,20 @@ export class SiriusListBox extends SiriusElement {
      * */
     get head() {
         return this.#head;
+    }
+
+    /** Get the head element
+     * @returns {HTMLElement|null} - ListBox head element
+     * */
+    get headElement() {
+        return this.#headElement;
+    }
+
+    /** Set the head element
+     * @param {HTMLElement} head - ListBox head element
+     * */
+    set headElement(head) {
+        this.#headElement = head;
     }
 
     /** Get the items container element
@@ -244,14 +256,83 @@ export class SiriusListBox extends SiriusElement {
         return this._checkedItems;
     }
 
-    /** Private method to set the items attribute
+    /**Public method to set the items attribute
+         * 
+         * @param {Array} items - Items attribute value
+         * @returns {void}
+         * */
+    addItem(item){
+        this.onBuilt = () => {
+            
+            const itemElement = this.#createItem(item);
+            this.#itemsListContainerElement.appendChild(itemElement);
+            this.#itemsList.push(item);
+            
+        }
+    }
+
+    /**Public method to remove an item
+     * @param {string} id - Item id
+     * @returns {void}
+     * */
+    removeItem(id) {
+        this.onBuilt = () => {
+
+            const item = this.#itemsListContainerElement.querySelector(`#${id}`);
+            
+            if(!item) return;
+            
+            this.#headElement.querySelector("sirius-checkbox").removeChildren(item.querySelector("sirius-checkbox"));
+
+            
+            this.#itemsListContainerElement.removeChild(item);
+            this.#updateList(item);
+        } 
+    }
+
+    /**Private method to update the list
+     * @param {HTMLElement} item - Item to be removed
+     * @returns {void}
+     * */
+    #updateList(item){   
+
+        this.onBuilt = () => {
+
+            const itemId= item.id;
+            
+            const checkbox = item.querySelector('sirius-checkbox');
+            const label = item.querySelector('sirius-label');
+            
+            sirius.removeInstance(label.id)
+            sirius.removeInstance(checkbox.id)
+
+            // Remove the item from the itemsList
+            this.#itemsList.forEach((item)=>{
+                if(item.id === itemId){
+                    this.#itemsList.splice(this.#itemsList.indexOf(item), 1);
+                }
+            })
+            
+    
+            // Remove the item from the itemContainerList lists
+            this.#itemContainerList.forEach((item)=>{
+                if(item.id === itemId){
+                    this.#itemContainerList.splice(this.#itemContainerList.indexOf(item), 1);
+            }})
+            
+        }
+    }
+
+    /**Private method to set the items attribute
      * @param {Array} items - Items attribute value
      */
-    #setItems(items) {
+    async #setItems(items) {
         if (!items) return
-
         this.#itemsList = items;
+
+        // Render the ListBox items
         this.#renderItems();
+    
     }
 
     /** Private method to set the head attribute
@@ -265,36 +346,34 @@ export class SiriusListBox extends SiriusElement {
      * @returns {void}
      */
     #renderItems() {
-        this.onBuilt = () => {
+        
             if (!this.#head) {
-
-                this.#headContainerElement.appendChild(this.#createHead());
-
-                // Render new items
-                this.#itemsList.forEach(item => {
-                    const itemElement = this.#createItem(item);
-                    itemElement.querySelector("sirius-checkbox").parentId = this.#checkboxList[0].id;
-                    this.#itemsListContainerElement.appendChild(itemElement);
-                });
-
-            } else {
-
+                this.#createHead();
+            }else{
                 // Hide the head container
                 this.#headContainerElement.hidden = true;
-
-                // Render new items
-                this.#itemsList.forEach(item => {
-                    this.#itemsListContainerElement.appendChild(this.#createItem(item));
-                });
             }
-        }
+
+            console.log(this.#itemsList);
+            
+
+            // Render new items
+            this.#itemsList.forEach(item => {
+                const itemElement = this.#createItem(item);
+                this.#itemsListContainerElement.appendChild(itemElement);
+            });
+    
+        
     }
 
     /** Create the head of the ListBox
      * @returns {HTMLElement} - ListBox head element
      */
     #createHead() {
-        return this.#createItem({id: 'item-0', label: 'Select all', checked: "unchecked"});
+
+        this.#headElement = this.#createItem({id: 'item_head', label: 'Select all', checked: "unchecked"});
+        this.#headContainerElement.appendChild(this.headElement);
+        
     }
 
     /** Create a ListBox item
@@ -310,8 +389,8 @@ export class SiriusListBox extends SiriusElement {
         const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
 
         // Get the derived attributes
-        const labelId = this._getDerivedId("label")
-        const checkboxId = this._getDerivedId("checkbox")
+        const labelId = `${this.id}_label_${id}`;
+        const checkboxId = `${this.id}_checkbox_${id}`;
 
         // Get the checkbox attributes
         const statusKey = SIRIUS_CHECKBOX_ATTRIBUTES.STATUS;
@@ -338,18 +417,21 @@ export class SiriusListBox extends SiriusElement {
         });
         itemContainer.appendChild(this.labelElement);
 
-
+        // Add the click event to the checkbox element
         this.checkboxElement.addEventListener('click', () => {
             console.log(this.getCheckedItems());
-
+            console.log(this.#headElement.querySelector("sirius-checkbox").children);
             this._checkedItems=[];
         });
+        
+        // Set the checkbox element parent id
+        if (!this.#head && this.#itemContainerList.length >= 1 ){
+            this.checkboxElement.parentId = this.#headElement.querySelector("sirius-checkbox").id;
+        }
 
-        /// Add the checkbox and label elements to the list
-        this.#checkboxList.push(this.checkboxElement);
-        this.#labelList.push(this.labelElement);
         this.#itemContainerList.push(itemContainer);
 
+        
         return itemContainer;
     }
 
@@ -402,11 +484,13 @@ export class SiriusListBox extends SiriusElement {
     /** Private method to set the checkbox color attribute
      * @param {string} checkboxColor - Checkbox color attribute value
      */
-#setCheckboxColor(Color) {
+    #setCheckboxColor(Color) {
         if (Color)
             this.onBuilt = () => {
-                this.#checkboxList.forEach(checkbox => {
+                this.#itemContainerList.forEach(item => {
+                    const checkbox = item.querySelector("sirius-checkbox")
                     checkbox.checkboxBorderColor = Color;
+                    checkbox.iconFill = Color;
                 });
             }
     }
@@ -442,10 +526,6 @@ export class SiriusListBox extends SiriusElement {
                 this.#setStyle(newValue);
                 break;
 
-            case SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS:
-                this.#setItems(JSON.parse(newValue));
-                break;
-
             case SIRIUS_LIST_BOX_ATTRIBUTES.HEAD:
                 this.#setHead(newValue);
                 break;
@@ -464,6 +544,9 @@ export class SiriusListBox extends SiriusElement {
 
             case SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR:
                 this.#setCheckboxColor(newValue);
+                break;
+            case SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS:
+                this.#setItems(JSON.parse(newValue));
                 break;
 
             default:
