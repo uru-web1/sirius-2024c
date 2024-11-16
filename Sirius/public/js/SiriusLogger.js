@@ -1,6 +1,7 @@
 /** Sirius logger constants */
 export const SIRIUS_LOGGER = {
     NAME: 'SiriusLogger',
+    DEBUG: true,
     PADDING: {
         WIDTH: 2,
         FILL_CHAR: ' ',
@@ -100,6 +101,8 @@ export class SiriusLogger {
      * @param {string} message - Message to log
      */
     log(message) {
+        if (!SIRIUS_LOGGER.DEBUG) return;
+
         // Get the log colors
         const cssStyle = this.#getColorCSS({
             bgColor: this.#logBgColor,
@@ -112,6 +115,8 @@ export class SiriusLogger {
      * @param {string} message - Message to log
      */
     error(message) {
+        if (!SIRIUS_LOGGER.DEBUG) return;
+
         // Get the error colors
         const cssStyle = this.#getColorCSS({
             bgColor: this.#errorBgColor,

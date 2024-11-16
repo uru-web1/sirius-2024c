@@ -2,7 +2,6 @@
     display: inline-block;
     box-sizing: border-box;
 
-    --sirius-tree-view--icon-width: 24px;
     --sirius-tree-view--gap: 10px;
     --sirius-tree-view--children-margin-left: 5px;
     --sirius-tree-view--animation-duration: 500ms;

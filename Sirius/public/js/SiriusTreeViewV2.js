@@ -8,7 +8,6 @@ export const SIRIUS_TREE_VIEW = deepFreeze({
     NAME: "SiriusTreeViewV2",
     TAG: "sirius-tree-view",
     CSS_VARIABLES: {
-        ICON_WIDTH: '--sirius-tree-view--icon-width',
         ANIMATION_DURATION: '--sirius-tree-view--animation-duration',
         CHILDREN_MARGIN_LEFT: '--sirius-tree-view--children-margin-left',
         CHILDREN_GAP: '--sirius-tree-view--children-gap',
@@ -632,10 +631,7 @@ export class SiriusTreeView extends SiriusElement {
      */
     #setIconWidth(width) {
         if (width)
-            this.onBuilt = () => {
-                this._setCSSVariable(SIRIUS_TREE_VIEW.CSS_VARIABLES.ICON_WIDTH, width);
-                this.iconElement.width = width;
-            }
+            this.onBuilt = () => this.iconElement.width = width;
     }
 
     /** Private method to set the icon height
