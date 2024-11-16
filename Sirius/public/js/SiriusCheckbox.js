@@ -89,6 +89,25 @@ export class SiriusCheckbox extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_CHECKBOX_ATTRIBUTES)];
     }
 
+    /** Get the template for the Sirius checkbox
+     * @returns {string} - Template
+     */
+    #getTemplate() {
+        // Get the checkbox classes
+        const checkboxContainerClasses = [SIRIUS_CHECKBOX.CLASSES.CHECKBOX_CONTAINER];
+        const iconContainerClasses = [SIRIUS_CHECKBOX.CLASSES.ICON_CONTAINER];
+        const labelContainerClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL_CONTAINER]
+        const labelClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL]
+
+        return `<div class="${checkboxContainerClasses.join(' ')}">
+                    <div class="${iconContainerClasses.join(' ')}">
+                    </div>
+                    <div class="${labelContainerClasses.join(' ')}">
+                        <slot name="${SIRIUS_CHECKBOX.SLOTS.LABEL}" class="${labelClasses.join(' ')}"></slot>
+                    </div>
+                </div>`;
+    }
+
     /** Build the SiriusCheckbox */
     async #build() {
         // Load Sirius checkbox HTML attributes
@@ -470,13 +489,13 @@ export class SiriusCheckbox extends SiriusElement {
         this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID, value);
     }
 
+
     /** Get parent ID attribute
      * @returns {string} - Parent ID attribute
      */
     get parentId() {
         return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID);
     }
-
 
     /** Private method to set the status attribute
      * @param {string} status - Status attribute value
@@ -773,25 +792,6 @@ export class SiriusCheckbox extends SiriusElement {
             // Remove the child element
             child.parentId = "";
         }
-    }
-
-    /** Get the template for the Sirius checkbox
-     * @returns {string} - Template
-     */
-    #getTemplate() {
-        // Get the checkbox classes
-        const checkboxContainerClasses = [SIRIUS_CHECKBOX.CLASSES.CHECKBOX_CONTAINER];
-        const iconContainerClasses = [SIRIUS_CHECKBOX.CLASSES.ICON_CONTAINER];
-        const labelContainerClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL_CONTAINER]
-        const labelClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL]
-
-        return `<div class="${checkboxContainerClasses.join(' ')}">
-                    <div class="${iconContainerClasses.join(' ')}">
-                    </div>
-                    <div class="${labelContainerClasses.join(' ')}">
-                        <slot name="${SIRIUS_CHECKBOX.SLOTS.LABEL}" class="${labelClasses.join(' ')}"></slot>
-                    </div>
-                </div>`;
     }
 
     /** Private method to handle attribute changes

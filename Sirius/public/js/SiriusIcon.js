@@ -65,6 +65,17 @@ export class SiriusIcon extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_ICON_ATTRIBUTES)]
     }
 
+    /** Get the template for the Sirius icon
+     * @returns {string} - Template
+     * */
+    #getTemplate() {
+        // Get the icon classes
+        const iconContainerClasses = [SIRIUS_ICON.CLASSES.ICON_CONTAINER];
+
+        return `<div class="${iconContainerClasses.join(' ')}">
+                </div>`;
+    }
+
     /** Build the SiriusIcon */
     async #build() {
         // Load SiriusIcon attributes
@@ -384,17 +395,6 @@ export class SiriusIcon extends SiriusElement {
     set events(events) {
         if (events)
             this._setEvents(events, this);
-    }
-
-    /** Get the template for the Sirius icon
-     * @returns {string} - Template
-     * */
-    #getTemplate() {
-        // Get the icon classes
-        const iconContainerClasses = [SIRIUS_ICON.CLASSES.ICON_CONTAINER];
-
-        return `<div class="${iconContainerClasses.join(' ')}">
-                </div>`;
     }
 
     /** Private method to handle attribute changes

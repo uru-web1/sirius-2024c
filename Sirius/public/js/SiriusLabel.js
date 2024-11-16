@@ -58,6 +58,17 @@ export class SiriusLabel extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_LABEL_ATTRIBUTES)];
     }
 
+    /** Get the template for the Sirius label
+     * @returns {string} - Template
+     * */
+    #getTemplate() {
+        return `<div class="${SIRIUS_LABEL.CLASSES.LABEL_CONTAINER}">
+                    <div class ="${SIRIUS_LABEL.CLASSES.CAPTION_CONTAINER}">
+                        ${this.caption}
+                    </div>
+                </div>`;
+    }
+
     /** Build the SiriusLabel */
     async #build() {
         // Load Sirius Label attributes
@@ -267,17 +278,6 @@ export class SiriusLabel extends SiriusElement {
     set events(events) {
         if (events)
             this.onBuilt = () => this._setEvents(events, this.captionContainerElement);
-    }
-
-    /** Get the template for the Sirius label
-     * @returns {string} - Template
-     * */
-    #getTemplate() {
-        return `<div class="${SIRIUS_LABEL.CLASSES.LABEL_CONTAINER}">
-                    <div class ="${SIRIUS_LABEL.CLASSES.CAPTION_CONTAINER}">
-                        ${this.caption}
-                    </div>
-                </div>`;
     }
 
     /** Private method to handle attribute changes

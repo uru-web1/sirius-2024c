@@ -1,6 +1,6 @@
 import deepFreeze from "./utils/deep-freeze.js";
 import {SIRIUS_ELEMENT, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
-import {SiriusCheckbox} from "./SiriusCheckbox.js";
+import {SIRIUS_CHECKBOX, SiriusCheckbox} from "./SiriusCheckbox.js";
 import {SIRIUS_ICON_ATTRIBUTES, SIRIUS_ICON_ATTRIBUTES_DEFAULT, SiriusIcon} from "./SiriusIcon.js";
 
 /** Sirius Tree View constants */
@@ -21,6 +21,7 @@ export const SIRIUS_TREE_VIEW = deepFreeze({
     CLASSES: {
         TREE_VIEW_CONTAINER: 'container-element',
         PARENT_CONTAINER: 'parent-container',
+        HAS_PARENT: 'has-parent',
         ICON_CONTAINER: 'icon-container',
         PARENT: 'parent',
         CHILDREN_CONTAINER: 'children-container',
@@ -63,9 +64,14 @@ export class SiriusTreeView extends SiriusElement {
     #parentContainerElement = null
     #iconContainerElement = null
     #iconElement = null
-    #parent = null
+    #parentSlotElement = null
     #childrenContainerElement = null
-    #children = null
+    #childrenSlotElement = null
+    #parentId = ""
+    #childrenParent = null
+    #children = []
+    #parentObserver=null
+    #childrenObserver=null
 
     /**
      * Create a Sirius icon element
@@ -73,11 +79,136 @@ export class SiriusTreeView extends SiriusElement {
      */
     constructor(properties) {
         super(properties, SIRIUS_TREE_VIEW.NAME);
+
+        // Build the SiriusTreeView
+        this.#build().then();
     }
 
     /** Define observed attributes */
     static get observedAttributes() {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_TREE_VIEW_ATTRIBUTES)];
+    }
+
+    /** Get the template for the Sirius Tree View
+     * @returns {string} - Template
+     * */
+    #getTemplate() {
+        // Get the Tree View classes
+        const treeViewContainerClasses = [SIRIUS_TREE_VIEW.CLASSES.TREE_VIEW_CONTAINER];
+        const parentContainerClasses = [SIRIUS_TREE_VIEW.CLASSES.PARENT_CONTAINER];
+        const iconContainerClasses = [SIRIUS_TREE_VIEW.CLASSES.ICON_CONTAINER];
+        const parentClasses = [SIRIUS_TREE_VIEW.CLASSES.PARENT];
+        const childrenContainerClasses = [SIRIUS_TREE_VIEW.CLASSES.CHILDREN_CONTAINER];
+        const childrenClasses = [SIRIUS_TREE_VIEW.CLASSES.CHILDREN];
+
+        return `<div class="${treeViewContainerClasses.join(' ')}">
+                    <div class="${parentContainerClasses.join(' ')}">
+                        <div class="${iconContainerClasses.join(' ')}">
+                        </div>
+                        <slot name="${SIRIUS_TREE_VIEW.SLOTS.PARENT}" class="${parentClasses.join(' ')}"></slot>
+                    </div>
+                    <div class="${childrenContainerClasses.join(' ')}">
+                        <slot name="${SIRIUS_TREE_VIEW.SLOTS.CHILDREN}" class="${childrenClasses.join(' ')}"></slot>
+                        </div>
+                </div>`;
+    }
+
+    /** Build the SiriusTreeView */
+    async #build() {
+        // Load Sirius Tree View attributes
+        this._loadAttributes({
+            instanceProperties: this._properties,
+            attributes: SIRIUS_TREE_VIEW_ATTRIBUTES,
+            attributesDefault: SIRIUS_TREE_VIEW_ATTRIBUTES_DEFAULT
+        });
+
+        // Create the CSS stylesheet and add it to the shadow DOM
+        await this._loadAndAdoptStyles()
+
+        // Create derived IDs
+        const iconId = this._getDerivedId("icon")
+
+        // Get the required keys
+        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
+        const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON
+
+        // Create SiriusIcon element
+        this.#iconElement = new SiriusIcon({
+            [idKey]: iconId,
+            [iconKey]: "arrow",
+        })
+
+        // Get HTML inner content
+        const innerHTML = this.#getTemplate();
+
+        // Create the HTML template
+        await this._createTemplate(innerHTML);
+
+        // Add label to the shadow DOM
+        this.#treeViewContainerElement = this._containerElement = this._templateContent.firstChild;
+        this.#parentContainerElement = this.treeViewContainerElement.firstElementChild;
+        this.#iconContainerElement = this.parentContainerElement.firstElementChild;
+        this.#parentSlotElement = this.parentContainerElement.lastElementChild;
+        this.#childrenContainerElement = this.treeViewContainerElement.lastElementChild;
+        this.#childrenSlotElement = this.childrenContainerElement.firstElementChild;
+        this.shadowRoot.appendChild(this.containerElement);
+
+        // Add icon to the icon container
+        this.iconContainerElement.appendChild(this.iconElement);
+
+        // Add event listeners
+        this.iconElement.events = {
+            "click": () => this.toggleStatus()
+        }
+
+        // Set up MutationObserver to detect parent slot changes
+        this.#parentObserver = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList)
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === Node.ELEMENT_NODE && node.slot)
+                            this.addChildrenParentNode(node)
+                    });
+                    mutation.removedNodes.forEach(node => {
+                        if (node.nodeType === Node.ELEMENT_NODE && node.slot)
+                            this.removeChildrenParent()
+                    })
+                }
+        });
+
+        // Set up MutationObserver to detect parent slot changes
+        this.#childrenObserver = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList)
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === Node.ELEMENT_NODE && node.slot)
+                            this.addChildrenNode(node)
+                    });
+                    mutation.removedNodes.forEach(node => {
+                        if (node.nodeType === Node.ELEMENT_NODE && node.slot)
+                            this.removeChildElementById(node.id)
+                    })
+                }
+        });
+
+        // Start observing the parent slot element
+        this.#parentObserver.observe(this.parentSlotElement, { childList: true });
+
+        // Start observing the children slot element
+        this.#childrenObserver.observe(this.childrenSlotElement, { childList: true });
+
+        // Manually call parent slot observer to add existing children
+        this.parentSlotElement.assignedElements().forEach(node => {
+            this.addChildrenParentNode(node,false);
+        });
+
+        // Manually call children slot observer to add existing children
+        this.childrenSlotElement.assignedElements().forEach(node => {
+            this.addChildrenNode(node, false);
+        })
+
+        // Dispatch the built event
+        this.dispatchBuiltEvent();
     }
 
     /** Get the Tree View container element
@@ -108,11 +239,11 @@ export class SiriusTreeView extends SiriusElement {
         return this.#iconElement;
     }
 
-    /** Get the parent element
-     * @returns {SiriusCheckbox} - Parent element
+    /** Get the parent slot element
+     * @returns {HTMLSlotElement} - Parent slot element
      */
-    get parent() {
-        return this.#parent;
+    get parentSlotElement(){
+        return this.#parentSlotElement
     }
 
     /** Get the children container element
@@ -122,11 +253,196 @@ export class SiriusTreeView extends SiriusElement {
         return this.#childrenContainerElement
     }
 
+    /** Get the children slot element
+     * @returns {HTMLSlotElement} - Children slot element
+     */
+    get childrenSlotElement(){
+        return this.#childrenSlotElement
+    }
+
+    /** Get the parent element ID
+     * @returns {string} - Parent element ID
+     */
+    get parentId() {
+        return this.#parentId;
+    }
+
+    /** Set parent checkbox element ID
+     * @param {string} parentId - Parent checkbox element ID
+     */
+    set parentId(parentId){
+        this.onBuilt = () => {
+            // Set the parent ID
+            this.#parentId = parentId;
+
+            if (this.childrenParent)
+                this.childrenParent.parentId = parentId;
+
+            // Set the has parent class
+            if (parentId)
+                this.classList.add(SIRIUS_TREE_VIEW.CLASSES.HAS_PARENT);
+            else
+                this.classList.remove(SIRIUS_TREE_VIEW.CLASSES.HAS_PARENT);
+        }
+    }
+
+    /** Get the children parent element
+     * @returns {SiriusCheckbox} - Children parent element
+     */
+    get childrenParent() {
+        return this.#childrenParent;
+    }
+
+    /** Add children parent element
+     * @param {SiriusCheckbox} childrenParent - Children parent element
+     * @param {boolean} append - Append to the parent element
+     */
+    #addChildrenParent(childrenParent, append) {
+        this.onBuilt = () => {
+            // Remove the current parent
+            this.removeChildrenParent()
+
+            // Add the new parent
+            if (append)
+                this.parentSlotElement.appendChild(childrenParent);
+
+            // Set the parent ID
+            this.children.forEach(child => child.parentId = childrenParent.id);
+
+            // Set the children parent
+            this.#childrenParent = childrenParent
+            if (childrenParent && this.parentId)
+                this.#childrenParent.parentId = this.parentId
+        }
+    }
+
+    /** Add children parent element node
+     * @param {HTMLElement} node - Children parent element node
+     * @param {boolean} append - Append to the parent element
+     */
+    addChildrenParentNode(node, append = true) {
+        if (node!==null&&node.tagName.toLowerCase() !== SIRIUS_CHECKBOX.TAG)
+            this.logger.error("The parent element must be a SiriusCheckbox element");
+
+        this.#addChildrenParent(node, append);
+    }
+
+    /** Add children parent element instance
+     * @param {SiriusCheckbox} instance - Children parent element instance
+     * @param {boolean} append - Append to the parent element
+     */
+    addChildrenParentInstance(instance, append= true) {
+        if (instance!==null&&!instance instanceof SiriusCheckbox)
+            this.logger.error("The parent element must be a SiriusCheckbox element");
+
+        this.#addChildrenParent(instance, append);
+    }
+
+    /** Remove children parent element */
+    removeChildrenParent() {
+        this.onBuilt = () => {
+            // Remove the current parent
+            if (this.childrenParent) {
+                this.parentSlotElement.removeChild(this.childrenParent);
+
+                // Remove the child-parent relationship
+                this.childrenParent.parentId = "";
+            }
+
+            // Remove the existing parent
+            this.children.forEach(child => child.parentId = "");
+
+            // Clear the children parent
+            this.#childrenParent = null;
+        }
+    }
+
     /** Get the children elements
-     * @returns {(SiriusCheckbox|SiriusTreeView)[]} - Children element
+     * @returns {(SiriusCheckbox|SiriusTreeView)[]} - Children elements
      */
     get children() {
-        return this.#children;
+        return this.#children
+    }
+
+    /** Add child element
+     * @param {SiriusCheckbox|SiriusTreeView|HTMLElement} child - Child element
+     * @param {boolean} append - Append to the children container
+     */
+    #addChildren(child, append) {
+        this.onBuilt=()=> {
+            // Add the children to the children container
+            if (append)
+                this.childrenContainerElement.appendChild(child);
+
+            // Add to the children list
+            if (!this.children.find(c => c.id === child.id))
+                this.children.push(child);
+
+            // Set the parent ID
+            if (this.childrenParent)
+                child.parentId = this.childrenParent.id;
+        }
+    }
+
+    /** Add child element node
+     * @param {HTMLElement} node - Child element node
+     * @param {boolean} append - Append to the children container
+     */
+    addChildrenNode(node, append = true) {
+        const tagName = node.tagName.toLowerCase()
+        if (tagName!==SIRIUS_CHECKBOX.TAG && tagName!==SIRIUS_TREE_VIEW.TAG)
+            this.logger.error("The child element must be a SiriusCheckbox or SiriusTreeView element");
+
+        this.#addChildren(node, append);
+    }
+
+    /** Add child element instance
+     * @param {SiriusCheckbox|SiriusTreeView} instance - Child element instance
+     * @param {boolean} append - Append to the children container
+     */
+    addChildrenInstance(instance, append=true) {
+        if (!instance instanceof SiriusCheckbox && !instance instanceof SiriusTreeView)
+            this.logger.error("The child element must be a SiriusCheckbox or SiriusTreeView element");
+
+        this.#addChildren(instance, append);
+    }
+
+    /** Remove children elements */
+    removeChildren() {
+        this.onBuilt = () => {
+            if (!this.children) return
+
+            this.children.forEach(child =>{
+                // Remove the children from the children container
+                this.childrenContainerElement.removeChild(child);
+
+                // Remove the parent ID
+                this.children.forEach(child => child.parentId = "")
+            })
+
+            // Clear the children list
+            this.#children = [];
+        }
+    }
+
+    /** Remove child element by ID
+     * @param {string} id - Child element ID
+     */
+    removeChildElementById(id) {
+        this.onBuilt = () => {
+            // Get the child element by ID
+            const child = this.children.find(child => child.id === id);
+            if (!child) return;
+
+            // Remove the children from the children container
+            this.childrenContainerElement.removeChild(child);
+
+            // Remove the parent ID
+            child.parentId = "";
+
+            // Remove the children element from the children list
+            this.#children = this.children.filter(child => child.id !== id);
+        }
     }
 
     /** Get the status attribute
@@ -378,30 +694,6 @@ export class SiriusTreeView extends SiriusElement {
             this.onBuilt = () => this._setKeyframeRules(SIRIUS_TREE_VIEW.CSS_VARIABLES.ANIMATION_DURATION, rules);
     }
 
-    /** Get the template for the Sirius Tree View
-     * @returns {string} - Template
-     * */
-    #getTemplate() {
-        // Get the Tree View classes
-        const treeViewContainerClasses = [SIRIUS_TREE_VIEW.CLASSES.TREE_VIEW_CONTAINER];
-        const parentContainerClasses = [SIRIUS_TREE_VIEW.CLASSES.PARENT_CONTAINER];
-        const iconContainerClasses = [SIRIUS_TREE_VIEW.CLASSES.ICON_CONTAINER];
-        const parentClasses = [SIRIUS_TREE_VIEW.CLASSES.PARENT];
-        const childrenContainerClasses = [SIRIUS_TREE_VIEW.CLASSES.CHILDREN_CONTAINER];
-        const childrenClasses = [SIRIUS_TREE_VIEW.CLASSES.CHILDREN];
-
-        return `<div class="${treeViewContainerClasses.join(' ')}">
-                    <div class="${parentContainerClasses.join(' ')}">
-                        <div class="${iconContainerClasses.join(' ')}">
-                        </div>
-                        <slot name="${SIRIUS_TREE_VIEW.SLOTS.PARENT}" class="${parentClasses.join(' ')}"></slot>
-                    </div>
-                    <div class="${childrenContainerClasses.join(' ')}">
-                        <slot name="${SIRIUS_TREE_VIEW.SLOTS.CHILDREN}" class="${childrenClasses.join(' ')}"></slot>
-                        </div>
-                </div>`;
-    }
-    
     /** Toggle status */
     toggleStatus() {
         if (this.status === SIRIUS_TREE_VIEW_STATUS.OPEN)
@@ -410,59 +702,55 @@ export class SiriusTreeView extends SiriusElement {
             this.status = SIRIUS_TREE_VIEW_STATUS.OPEN;
     }
 
-    /** Attribute change callback
+    /** Private method to handle attribute changes
      * @param {string} name - Attribute name
      * @param {string} oldValue - Old attribute value
      * @param {string} newValue - New attribute value
      */
-    attributeChangedCallback(name, oldValue, newValue) {
-        // Call the pre-attribute changed callback
-        const {formattedValue, shouldContinue} = this._preAttributeChangedCallback(name, oldValue, newValue);
-        if (!shouldContinue) return;
-
+    #attributeChangeHandler(name, oldValue, newValue) {
         switch (name) {
             case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
-                this._setId(formattedValue)
+                this._setId(newValue)
                 break;
 
             case SIRIUS_TREE_VIEW_ATTRIBUTES.STATUS:
-                this.#setStatus(formattedValue);
+                this.#setStatus(newValue);
                 break;
 
             case SIRIUS_TREE_VIEW_ATTRIBUTES.GAP:
-                this.#setGap(formattedValue);
+                this.#setGap(newValue);
                 break;
 
             case SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_WIDTH:
-                this.#setIconWidth(formattedValue);
+                this.#setIconWidth(newValue);
                 break;
 
             case SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_HEIGHT:
-                this.#setIconHeight(formattedValue);
+                this.#setIconHeight(newValue);
                 break;
 
             case SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_FILL:
-                this.#setIconFill(formattedValue);
+                this.#setIconFill(newValue);
                 break;
 
             case SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_TRANSITION_DURATION:
-                this.#setIconTransitionDuration(formattedValue);
+                this.#setIconTransitionDuration(newValue);
                 break;
 
             case SIRIUS_TREE_VIEW_ATTRIBUTES.SHOW_ANIMATION:
-                this.#setShowAnimation(formattedValue);
+                this.#setShowAnimation(newValue);
                 break;
 
             case SIRIUS_TREE_VIEW_ATTRIBUTES.HIDING_ANIMATION:
-                this.#setHidingAnimation(formattedValue);
+                this.#setHidingAnimation(newValue);
                 break;
 
             case SIRIUS_TREE_VIEW_ATTRIBUTES.CHILDREN_GAP:
-                this.#setChildrenGap(formattedValue);
+                this.#setChildrenGap(newValue);
                 break;
 
             case SIRIUS_TREE_VIEW_ATTRIBUTES.CHILDREN_MARGIN_LEFT:
-                this.#setChildrenMarginLeft(formattedValue);
+                this.#setChildrenMarginLeft(newValue);
                 break;
 
             default:
@@ -471,60 +759,18 @@ export class SiriusTreeView extends SiriusElement {
         }
     }
 
-    /** Lifecycle method called when the component is connected to the DOM
+    /** Attribute change callback
+     * @param {string} name - Attribute name
+     * @param {string} oldValue - Old attribute value
+     * @param {string} newValue - New attribute value
      */
-    async connectedCallback() {
-        // Call the parent connected callback
-        await super.connectedCallback()
+    attributeChangedCallback(name, oldValue, newValue) {
+        // Call the attribute change pre-handler
+        const {formattedValue, shouldContinue} = this._attributeChangePreHandler(name, oldValue, newValue);
+        if (!shouldContinue) return;
 
-        // Load Sirius Tree View attributes
-        this._loadAttributes({
-            instanceProperties: this._properties,
-            attributes: SIRIUS_TREE_VIEW_ATTRIBUTES,
-            attributesDefault: SIRIUS_TREE_VIEW_ATTRIBUTES_DEFAULT
-        });
-
-        // Create the CSS stylesheet and add it to the shadow DOM
-        await this._loadAndAdoptStyles()
-
-        // Create derived IDs
-        const iconId = this._getDerivedId("icon")
-
-        // Get the required keys
-        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
-        const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON
-
-        // Create SiriusIcon element
-        this.#iconElement = new SiriusIcon({
-            [idKey]: iconId,
-            [iconKey]: "arrow",
-        })
-
-        // Get HTML inner content
-        const innerHTML = this.#getTemplate();
-
-        // Create the HTML template
-        await this._createTemplate(innerHTML);
-
-        // Add label to the shadow DOM
-        this.#treeViewContainerElement = this._containerElement = this._templateContent.firstChild;
-        this.#parentContainerElement = this.treeViewContainerElement.firstElementChild;
-        this.#iconContainerElement = this.parentContainerElement.firstElementChild;
-        this.#parent = this.parentContainerElement.lastElementChild;
-        this.#childrenContainerElement = this.treeViewContainerElement.lastElementChild;
-        this.#children = this.childrenContainerElement.firstElementChild;
-        this.shadowRoot.appendChild(this.containerElement);
-
-        // Add icon to the icon container
-        this.iconContainerElement.appendChild(this.iconElement);
-        
-        // Add event listeners
-        this.iconElement.events = {
-            "click": () => this.toggleStatus()
-        }
-
-        // Dispatch the built event
-        this.dispatchBuiltEvent();
+        // Call the attribute change handler
+        this.onBuilt=()=>this.#attributeChangeHandler(name, oldValue, formattedValue);
     }
 }
 

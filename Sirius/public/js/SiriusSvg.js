@@ -175,6 +175,23 @@ export class SiriusSvg extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_SVG_ATTRIBUTES)];
     }
 
+    /** Get the template for the Sirius SVG
+     * @returns {string} - Template
+     */
+    #getTemplate() {
+        // Get the SVG container element classes
+        const svgContainerClasses = [SIRIUS_SVG.CLASSES.SVG_CONTAINER];
+
+        // Get the icon
+        const icon = this.icon || SIRIUS_SVG_ATTRIBUTES_DEFAULT[SIRIUS_SVG_ATTRIBUTES.ICON];
+
+        return `<div class="${svgContainerClasses.join(' ')}">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                        ${this.#getSvgInnerHtml(icon)}
+                    </svg>
+                </div>`;
+    }
+
     /** Build the SiriusSvg */
     async #build() {
         // Load Sirius Label attributes
@@ -475,23 +492,6 @@ export class SiriusSvg extends SiriusElement {
      */
     #getSvgInnerHtml(icon) {
         return SIRIUS_SVG_ICONS_INNER_HTML[icon] || SIRIUS_SVG_ICONS_INNER_HTML[SIRIUS_SVG_ATTRIBUTES_DEFAULT[SIRIUS_SVG_ATTRIBUTES.ICON]]
-    }
-
-    /** Get the template for the Sirius SVG
-     * @returns {string} - Template
-     */
-    #getTemplate() {
-        // Get the SVG container element classes
-        const svgContainerClasses = [SIRIUS_SVG.CLASSES.SVG_CONTAINER];
-
-        // Get the icon
-        const icon = this.icon || SIRIUS_SVG_ATTRIBUTES_DEFAULT[SIRIUS_SVG_ATTRIBUTES.ICON];
-
-        return `<div class="${svgContainerClasses.join(' ')}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
-                        ${this.#getSvgInnerHtml(icon)}
-                    </svg>
-                </div>`;
     }
 
     /** Private method to handle attribute changes
