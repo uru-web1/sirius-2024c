@@ -22,7 +22,8 @@
 
 .container-element {
     display: grid;
-    grid-template-columns: min-content 1fr;
+    grid-template-columns: max-content 1fr;
+    grid-auto-rows: max-content;
     gap: var(--sirius-tree-view--gap);
 }
 
@@ -50,14 +51,26 @@
     display: grid;
     grid-row: 2/3;
     grid-column: 2/-1;
-    transition: min-height var(--sirius-tree-view--animation-duration);
-    transition-timing-function: linear;
+    max-height: 0;
+    transition: max-height var(--sirius-tree-view--animation-duration) linear;
     margin-left: var(--sirius-tree-view--children-margin-left);
+}
+
+.children-container:not(.hiding) {
+    max-height: 100%;
+}
+
+.children-container:not(.hiding) {
+    animation: show-animation var(--sirius-tree-view--animation-duration);
+}
+
+.children-container.hiding {
+    animation: hiding-animation var(--sirius-tree-view--animation-duration);
 }
 
 .children{
     display: grid;
-    grid-template-columns: min-content 1fr;
+    grid-template-columns: max-content 1fr;
     overflow-y: hidden;
     gap: var(--sirius-tree-view--children-gap);
 }
@@ -70,24 +83,14 @@
     grid-column: 1/-1;
 }
 
-.children-container:not(.hiding) {
-    animation: show-animation var(--sirius-tree-view--animation-duration) forwards;
-}
-
-.children-container.hiding {
-    animation: hiding-animation var(--sirius-tree-view--animation-duration) forwards;
-}
-
 @keyframes show-animation {
     0% {
         opacity: 0;
-        min-height: 0;
         max-height: 0;
     }
 
     100% {
         opacity: 1;
-        min-height: 100%;
         max-height: 100%;
     }
 }
@@ -95,13 +98,11 @@
 @keyframes hiding-animation {
     0% {
         opacity: 1;
-        min-height: 100%;
         max-height: 100%;
     }
 
     100% {
         opacity: 0;
-        min-height: 0;
         max-height: 0;
     }
 }
