@@ -66,7 +66,6 @@ export class SiriusListBox extends SiriusElement {
 
         // Build the SiriusListBox
         this.#build().then();
-        
     }
 
     /** Define observed attributes
@@ -345,8 +344,7 @@ export class SiriusListBox extends SiriusElement {
     /** Render the ListBox items
      * @returns {void}
      */
-    #renderItems() {
-        
+    #renderItems() {        
             if (!this.#head) {
                 this.#createHead();
             }else{
@@ -362,18 +360,14 @@ export class SiriusListBox extends SiriusElement {
                 const itemElement = this.#createItem(item);
                 this.#itemsListContainerElement.appendChild(itemElement);
             });
-    
-        
     }
 
     /** Create the head of the ListBox
      * @returns {HTMLElement} - ListBox head element
      */
     #createHead() {
-
         this.#headElement = this.#createItem({id: 'item_head', label: 'Select all', checked: "unchecked"});
         this.#headContainerElement.appendChild(this.headElement);
-        
     }
 
     /** Create a ListBox item
@@ -431,7 +425,7 @@ export class SiriusListBox extends SiriusElement {
 
         this.#itemContainerList.push(itemContainer);
 
-        
+
         return itemContainer;
     }
 
@@ -494,7 +488,6 @@ export class SiriusListBox extends SiriusElement {
                 });
             }
     }
-
 
     /** Get the template for the Sirius ListBox
      * @returns {string} - Template

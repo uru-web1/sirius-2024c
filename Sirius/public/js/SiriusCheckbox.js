@@ -83,7 +83,7 @@ export class SiriusCheckbox extends SiriusElement {
      */
     constructor(properties) {
         super(properties, SIRIUS_CHECKBOX.NAME);
-
+      
         // Build the SiriusCheckbox
         this.#build().then();
     }

@@ -689,7 +689,7 @@ export class SiriusTreeView extends SiriusElement {
         if (rules)
             this.onBuilt = () => this._setKeyframeRules(SIRIUS_TREE_VIEW.CSS_VARIABLES.ANIMATION_DURATION, rules);
     }
-
+  
     /** Toggle status */
     toggleStatus() {
         if (this.status === SIRIUS_TREE_VIEW_STATUS.OPEN)
