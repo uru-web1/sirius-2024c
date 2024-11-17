@@ -135,34 +135,21 @@ export class SiriusElement extends HTMLElement {
             attributes: SIRIUS_ELEMENT_ATTRIBUTES,
             attributesDefault: SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT,
         });
-    }
 
-    /** Set hidden icon state
-     * @param {string} hide - Icon hidden state
-     */
-    set hide(hide) {
-        this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.HIDE, hide);
-    }
+        // Attach shadow DOM
+        this.attachShadow({mode: "open"});
 
-    /** Get the icon disabled state
-     * @returns {string} - Icon disabled state
-     */
-    get disabled() {
-        return this.getAttribute(SIRIUS_ELEMENT_ATTRIBUTES.DISABLED);
-    }
+        // Built event listener
+        this.addEventListener(SIRIUS_ELEMENT.EVENTS.BUILT, async () => {
+            // Set the element as built
+            this.#isBuilt = true;
 
-    /** Set the icon disabled state
-     * @param {string} disable - Icon disabled state
-     * */
-    set disabled(disable) {
-        this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.DISABLED, disable);
-    }
+            // Call the initialization callbacks
+            for (const callback of this.#onBuilt) await callback();
 
-    /** Get element ID attribute
-     * @returns {string} - Element ID
-     */
-    get id() {
-        return this.getAttribute(SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID)
+            // Clear the initialization callbacks
+            this.#onBuilt = [];
+        });
     }
 
     /** Get the element container
