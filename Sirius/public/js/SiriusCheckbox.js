@@ -73,7 +73,6 @@ export class SiriusCheckbox extends SiriusElement {
     #iconContainerElement = null;
     #iconElement = null;
     #previousStatus = null
-    #changingChildrenStatus = false
     #changedChildrenStatus = 0
     #changingStatusByParent = false
     #changingStatusByChildren = false
@@ -244,7 +243,6 @@ export class SiriusCheckbox extends SiriusElement {
         if (!this.children || !status) return;
 
         // Set the changing children status flag
-        this.#changingChildrenStatus = true;
         this.#changedChildrenStatus = this.children.reduce((acc, child) => {
             if (child.status === status) return acc+1;
             return acc;
@@ -548,10 +546,8 @@ export class SiriusCheckbox extends SiriusElement {
             this.#changingStatusByParent = false;
 
             // Check if all children status have been changed
-            if (++this.parentElement.#changedChildrenStatus === this.children.length) {
-                this.parentElement.#changingChildrenStatus = false;
+            if (++this.parentElement.#changedChildrenStatus === this.children.length)
                 this.parentElement.#changedChildrenStatus = 0;
-            }
         }
 
         // Check if is the same status
