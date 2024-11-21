@@ -1,7 +1,7 @@
 import deepFreeze from "./utils/deep-freeze.js";
-import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
+import SiriusElement, {SIRIUS_ELEMENT_ATTRIBUTES} from "./SiriusElement.js";
 
-/** Sirius SVG constants */
+/** SiriusSVG constants */
 export const SIRIUS_SVG = deepFreeze({
     NAME: "SiriusSvg",
     TAG: "sirius-svg",
@@ -18,7 +18,7 @@ export const SIRIUS_SVG = deepFreeze({
     }
 })
 
-/** Sirius icons */
+/** SiriusSVG icons */
 export const SIRIUS_SVG_ICONS = {
     ARROW: 'arrow',
     DOUBLE_ARROW: 'double-arrow',
@@ -40,7 +40,7 @@ export const SIRIUS_SVG_ICONS = {
     RADIO_UNCHECKED: 'radio-unchecked',
 }
 
-/** Sirius icons inner HTML */
+/** SiriusSVG icons inner HTML */
 export const SIRIUS_SVG_ICONS_INNER_HTML = {
     // Arrow icon
     [SIRIUS_SVG_ICONS.ARROW]:
@@ -115,7 +115,7 @@ export const SIRIUS_SVG_ICONS_INNER_HTML = {
         `<path d="M480-280q83 0 141.5-58.5T680-480q0-83-58.5-141.5T480-680q-83 0-141.5 58.5T280-480q0 83 58.5 141.5T480-280Zm0 200q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>`,
 }
 
-/** Sirius SVG attributes */
+/** SiriusSVG attributes */
 export const SIRIUS_SVG_ATTRIBUTES = deepFreeze({
     ICON: 'icon',
     WIDTH: 'width',
@@ -128,9 +128,7 @@ export const SIRIUS_SVG_ATTRIBUTES = deepFreeze({
     HIDING_ANIMATION: 'hiding-animation',
 })
 
-/** Sirius SVG attributes default values
- * If an attribute is not present in the object, the default value is null
- * */
+/** SiriusSVG attributes default values */
 export const SIRIUS_SVG_ATTRIBUTES_DEFAULT = deepFreeze({
     [SIRIUS_SVG_ATTRIBUTES.ICON]: SIRIUS_SVG_ICONS.WARNING,
 })
@@ -152,7 +150,7 @@ export const SIRIUS_SVG_ROTATION_DEGREES = deepFreeze({
 })
 
 /** Sirius class that represents the SVG icon */
-export class SiriusSvg extends SiriusElement {
+export default class SiriusSvg extends SiriusElement {
     #icon = null
     #rotation = null
     #svgContainerElement = null
@@ -175,7 +173,7 @@ export class SiriusSvg extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_SVG_ATTRIBUTES)];
     }
 
-    /** Get the template for the Sirius SVG
+    /** Get the template for the SiriusSVG
      * @returns {string} - Template
      */
     #getTemplate() {

@@ -1,4 +1,4 @@
-/** Sirius logger constants */
+/** SiriusLogger constants */
 export const SIRIUS_LOGGER = {
     NAME: 'SiriusLogger',
     DEBUG: true,
@@ -16,7 +16,7 @@ export const SIRIUS_LOGGER = {
     }
 }
 
-/** Sirius logger */
+/** SiriusLogger */
 export class SiriusLogger {
     #name
     #elementId
@@ -25,7 +25,7 @@ export class SiriusLogger {
     #errorBgColor
     #errorColor
 
-    /** Create a Sirius logger
+    /** Create a SiriusLogger
      * @param {string} name - Logger name
      * @param {string} elementId - Element ID
      * @param {string} logBgColor - Log background color
@@ -97,7 +97,7 @@ export class SiriusLogger {
         return `background-color: ${bgColor}; color: ${color};`
     }
 
-    /** Sirius logger
+    /** SiriusLogger
      * @param {string} message - Message to log
      */
     log(message) {
@@ -111,7 +111,7 @@ export class SiriusLogger {
         console.log(this.format(message), cssStyle);
     }
 
-    /** Sirius logger on error
+    /** SiriusLogger on error
      * @param {string} message - Message to log
      */
     error(message) {

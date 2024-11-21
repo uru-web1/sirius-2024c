@@ -1,9 +1,9 @@
 import deepFreeze from "./utils/deep-freeze.js";
-import {SIRIUS_ELEMENT, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
-import {SIRIUS_CHECKBOX, SiriusCheckbox} from "./SiriusCheckbox.js";
-import {SIRIUS_ICON_ATTRIBUTES, SIRIUS_ICON_ATTRIBUTES_DEFAULT, SiriusIcon} from "./SiriusIcon.js";
+import SiriusElement, {SIRIUS_ELEMENT, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
+import SiriusControlElement, {SIRIUS_CONTROL_ELEMENT} from "./SiriusControlElement.js";
+import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES, SIRIUS_ICON_ATTRIBUTES_DEFAULT} from "./SiriusIcon.js";
 
-/** Sirius Tree View constants */
+/** SiriusTreeView constants */
 export const SIRIUS_TREE_VIEW = deepFreeze({
     NAME: "SiriusTreeViewV2",
     TAG: "sirius-tree-view",
@@ -28,7 +28,7 @@ export const SIRIUS_TREE_VIEW = deepFreeze({
     }
 });
 
-/** Sirius Tree View attributes */
+/** SiriusTreeView attributes */
 export const SIRIUS_TREE_VIEW_ATTRIBUTES = deepFreeze({
     STATUS: "status",
     GAP: "gap",
@@ -42,13 +42,13 @@ export const SIRIUS_TREE_VIEW_ATTRIBUTES = deepFreeze({
     CHILDREN_MARGIN_LEFT: "children-margin-left",
 })
 
-/** Sirius Tree View status */
+/** SiriusTreeView status */
 export const SIRIUS_TREE_VIEW_STATUS = deepFreeze({
     OPEN: "open",
     CLOSE: "close",
 })
 
-/** Sirius Tree View attributes default values
+/** SiriusTreeView attributes default values
  * If an attribute is not present in the object, the default value is null
  * */
 export const SIRIUS_TREE_VIEW_ATTRIBUTES_DEFAULT = deepFreeze({
@@ -58,7 +58,7 @@ export const SIRIUS_TREE_VIEW_ATTRIBUTES_DEFAULT = deepFreeze({
 })
 
 /** Sirius class that represents a Tree View component */
-export class SiriusTreeView extends SiriusElement {
+export default class SiriusTreeView extends SiriusElement {
     #treeViewContainerElement = null
     #parentContainerElement = null
     #iconContainerElement = null
@@ -88,7 +88,7 @@ export class SiriusTreeView extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_TREE_VIEW_ATTRIBUTES)];
     }
 
-    /** Get the template for the Sirius Tree View
+    /** Get the template for the SiriusTreeView
      * @returns {string} - Template
      * */
     #getTemplate() {
@@ -114,7 +114,7 @@ export class SiriusTreeView extends SiriusElement {
 
     /** Build the SiriusTreeView */
     async #build() {
-        // Load Sirius Tree View attributes
+        // Load SiriusTreeView attributes
         this._loadAttributes({
             instanceProperties: this._properties,
             attributes: SIRIUS_TREE_VIEW_ATTRIBUTES,
@@ -166,7 +166,7 @@ export class SiriusTreeView extends SiriusElement {
                 if (mutation.type === 'childList') {
                     mutation.addedNodes.forEach(node => {
                         if (node.nodeType === Node.ELEMENT_NODE && node.slot)
-                            this.addChildrenParentNode(node)
+                            this.addChildrenParent(node)
                     });
                     mutation.removedNodes.forEach(node => {
                         if (node.nodeType === Node.ELEMENT_NODE && node.slot)
@@ -181,7 +181,7 @@ export class SiriusTreeView extends SiriusElement {
                 if (mutation.type === 'childList') {
                     mutation.addedNodes.forEach(node => {
                         if (node.nodeType === Node.ELEMENT_NODE && node.slot)
-                            this.addChildrenNode(node)
+                            this.addChildren(node)
                     });
                     mutation.removedNodes.forEach(node => {
                         if (node.nodeType === Node.ELEMENT_NODE && node.slot)
@@ -198,7 +198,7 @@ export class SiriusTreeView extends SiriusElement {
 
         // Manually call parent slot observer to add existing children
         this.parentSlotElement.assignedElements().forEach(node => {
-            this.addChildrenParentNode(node,false);
+            this.addChildrenParent(node,false);
         });
 
         // Manually call children slot observer to add existing children
@@ -286,14 +286,14 @@ export class SiriusTreeView extends SiriusElement {
     }
 
     /** Get the children parent element
-     * @returns {SiriusCheckbox} - Children parent element
+     * @returns {SiriusControlElement} - Children parent element
      */
     get childrenParent() {
         return this.#childrenParent;
     }
 
     /** Add children parent element
-     * @param {SiriusCheckbox} childrenParent - Children parent element
+     * @param {SiriusControlElement} childrenParent - Children parent element
      * @param {boolean} append - Append to the parent element
      */
     #addChildrenParent(childrenParent, append) {
@@ -316,25 +316,14 @@ export class SiriusTreeView extends SiriusElement {
     }
 
     /** Add children parent element node
-     * @param {HTMLElement} node - Children parent element node
+     * @param {HTMLElement|SiriusControlElement} element - Children parent element node/instance
      * @param {boolean} append - Append to the parent element
      */
-    addChildrenParentNode(node, append = true) {
-        if (node!==null&&node.tagName.toLowerCase() !== SIRIUS_CHECKBOX.TAG)
-            this.logger.error("The parent element must be a SiriusCheckbox element");
+    addChildrenParent(element, append = true) {
+        if (element!==null&&element instanceof SIRIUS_CONTROL_ELEMENT.TAG)
+            this.logger.error("The parent element must be a SiriusControlElement");
 
-        this.#addChildrenParent(node, append);
-    }
-
-    /** Add children parent element instance
-     * @param {SiriusCheckbox} instance - Children parent element instance
-     * @param {boolean} append - Append to the parent element
-     */
-    addChildrenParentInstance(instance, append= true) {
-        if (instance!==null&&!instance instanceof SiriusCheckbox)
-            this.logger.error("The parent element must be a SiriusCheckbox element");
-
-        this.#addChildrenParent(instance, append);
+        this.#addChildrenParent(element, append);
     }
 
     /** Remove children parent element */
@@ -357,14 +346,14 @@ export class SiriusTreeView extends SiriusElement {
     }
 
     /** Get the children elements
-     * @returns {(SiriusCheckbox|SiriusTreeView)[]} - Children elements
+     * @returns {(SiriusControlElement|SiriusTreeView)[]} - Children elements
      */
     get children() {
         return this.#children
     }
 
     /** Add child element
-     * @param {SiriusCheckbox|SiriusTreeView|HTMLElement} child - Child element
+     * @param {SiriusControlElement|SiriusTreeView|HTMLElement} child - Child element
      * @param {boolean} append - Append to the children container
      */
     #addChildren(child, append) {
@@ -384,26 +373,14 @@ export class SiriusTreeView extends SiriusElement {
     }
 
     /** Add child element node
-     * @param {HTMLElement} node - Child element node
+     * @param {HTMLElement|SiriusControlElement|SiriusTreeView} element - Child element node/instance
      * @param {boolean} append - Append to the children container
      */
-    addChildrenNode(node, append = true) {
-        const tagName = node.tagName.toLowerCase()
-        if (tagName!==SIRIUS_CHECKBOX.TAG && tagName!==SIRIUS_TREE_VIEW.TAG)
-            this.logger.error("The child element must be a SiriusCheckbox or SiriusTreeView element");
+    addChildren(element, append = true) {
+        if (!(element instanceof SiriusControlElement) && !(element instanceof SiriusTreeView))
+            this.logger.error("The child element must be a SiriusControlElement or SiriusTreeView");
 
-        this.#addChildren(node, append);
-    }
-
-    /** Add child element instance
-     * @param {SiriusCheckbox|SiriusTreeView} instance - Child element instance
-     * @param {boolean} append - Append to the children container
-     */
-    addChildrenInstance(instance, append=true) {
-        if (!instance instanceof SiriusCheckbox && !instance instanceof SiriusTreeView)
-            this.logger.error("The child element must be a SiriusCheckbox or SiriusTreeView element");
-
-        this.#addChildren(instance, append);
+        this.#addChildren(element, append);
     }
 
     /** Remove children elements */

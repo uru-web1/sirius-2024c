@@ -1,6 +1,6 @@
-import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
-import {SIRIUS_CHECKBOX_ATTRIBUTES, SiriusCheckbox} from "./SiriusCheckbox.js";
-import {SIRIUS_LABEL_ATTRIBUTES, SiriusLabel} from "./SiriusLabel.js";
+import SiriusElement, {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
+import SiriusCheckbox, {SIRIUS_CHECKBOX_ATTRIBUTES} from "./SiriusCheckbox.js";
+import SiriusLabel, {SIRIUS_LABEL_ATTRIBUTES} from "./SiriusLabel.js";
 
 import deepFreeze from "./utils/deep-freeze.js";
 
@@ -38,7 +38,7 @@ export const SIRIUS_LIST_BOX_ATTRIBUTES_DEFAULT = deepFreeze({
 });
 
 /** Sirius class that represents a ListBox component */
-export class SiriusListBox extends SiriusElement {
+export default class SiriusListBoxV1 extends SiriusElement {
 
     // container elements
     #listBoxContainerElement = null;
@@ -59,7 +59,7 @@ export class SiriusListBox extends SiriusElement {
 
 
     /**
-     * Create a Sirius ListBox element
+     * Create a SiriusListBox element
      * @param {object} properties - Element properties
      */
     constructor(properties) {
@@ -79,8 +79,7 @@ export class SiriusListBox extends SiriusElement {
 
     /** Build the SiriusListBox */
     async #build() {
-
-        // Load Sirius ListBox HTML attributes
+        // Load SiriusListBox HTML attributes
         this._loadAttributes({
             instanceProperties: this._properties,
             attributes: SIRIUS_LIST_BOX_ATTRIBUTES,
@@ -507,7 +506,7 @@ async #setItems(ruta) {
             }
     }
 
-    /** Get the template for the Sirius ListBox
+    /** Get the template for the SiriusListBox
      * @returns {string} - Template
      */
     #getTemplate() {
@@ -584,4 +583,4 @@ async #setItems(ruta) {
 }
 
 // Register custom element
-customElements.define(SIRIUS_LIST_BOX.TAG, SiriusListBox);
+customElements.define(SIRIUS_LIST_BOX.TAG, SiriusListBoxV1);

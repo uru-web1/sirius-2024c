@@ -1,9 +1,8 @@
-import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
-import {SiriusSvg} from "./SiriusSvg.js";
+import SiriusElement, {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
+import SiriusSvg from "./SiriusSvg.js";
 import deepFreeze from "./utils/deep-freeze.js";
-import {SIRIUS_CHECKBOX_ATTRIBUTES} from "./SiriusCheckbox.js";
 
-/** Sirius icon constants */
+/** SiriusIcon constants */
 export const SIRIUS_ICON = deepFreeze({
     NAME: "SiriusIcon",
     TAG: "sirius-icon",
@@ -20,7 +19,7 @@ export const SIRIUS_ICON = deepFreeze({
     }
 })
 
-/** Sirius icon attributes */
+/** SiriusIcon attributes */
 export const SIRIUS_ICON_ATTRIBUTES = deepFreeze({
     ICON: "icon",
     WIDTH: "width",
@@ -34,7 +33,7 @@ export const SIRIUS_ICON_ATTRIBUTES = deepFreeze({
     PADDING: 'padding',
 })
 
-/** Sirius icon attributes default values
+/** SiriusIcon attributes default values
  * If an attribute is not present in the object, the default value is null
  * */
 export const SIRIUS_ICON_ATTRIBUTES_DEFAULT = deepFreeze({
@@ -43,12 +42,12 @@ export const SIRIUS_ICON_ATTRIBUTES_DEFAULT = deepFreeze({
 })
 
 /** Sirius class that represents an icon component */
-export class SiriusIcon extends SiriusElement {
+export default class SiriusIcon extends SiriusElement {
     #iconContainerElement = null
     #svgElement = null
 
     /**
-     * Create a Sirius icon element
+     * Create a SiriusIcon element
      * @param {object} properties - Element properties
      */
     constructor(properties) {
@@ -65,7 +64,7 @@ export class SiriusIcon extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_ICON_ATTRIBUTES)]
     }
 
-    /** Get the template for the Sirius icon
+    /** Get the template for the SiriusIcon
      * @returns {string} - Template
      * */
     #getTemplate() {

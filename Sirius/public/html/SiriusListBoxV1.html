@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>SiriusListBox Example</title>
+    <title>SiriusListBoxV1 Example</title>
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusCheckbox.js" type="module"></script>
-    <script defer src="../js/SiriusListBox.js" type="module"></script>
+    <script defer src="../js/SiriusListBoxV1.js" type="module"></script>
 
 </head>
 <body>
@@ -17,12 +17,12 @@
     </style>
 
     <sirius-list-box id="listbox-1"  background-color = 'lightblue' 
-    checkbox-color='black' items='../data/item.json'></sirius-list-box>
+    checkbox-color='black' items='../data/SiriusListBoxV1.json'></sirius-list-box>
 
-    <!-- Con JS -->
+    <!-- With JS -->
     <script type="module">
         import sirius from '../js/Sirius.js';
-        import {SiriusListBox, SIRIUS_LIST_BOX_ATTRIBUTES} from '../js/SiriusListBox.js';
+        import SiriusListBoxV1, {SIRIUS_LIST_BOX_ATTRIBUTES} from '../js/SiriusListBoxV1.js';
         import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
                 SIRIUS_ELEMENT_ATTRIBUTES
         } from "../js/SiriusElement.js";
@@ -36,7 +36,7 @@
             const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
 
             // Create a new ListBox
-            const listBox1 = new SiriusListBox({
+            const listBox1 = new SiriusListBoxV1({
                 [idKey]: 'listbox-2',
                 // [headKey]: 'false',
                 [itemsKey]: '../data/item.json',
@@ -45,7 +45,7 @@
                 // [styleKey]: 'margin: 400px'
             });
 
-            const listBox3 = new SiriusListBox({
+            const listBox3 = new SiriusListBoxV1({
                 [idKey]: 'listbox-3',
                 [itemsKey]: '../data/item.json',
                 [checkboxColorKey]: 'black',

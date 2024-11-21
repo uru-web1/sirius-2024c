@@ -1,14 +1,16 @@
-import {
-    SIRIUS_ELEMENT,
+import SiriusElement, {
     SIRIUS_ELEMENT_ATTRIBUTES,
-    SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
-    SiriusElement
+    SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES
 } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
-import {SIRIUS_ICON_ATTRIBUTES, SiriusIcon} from "./SiriusIcon.js";
+import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES} from "./SiriusIcon.js";
 import sirius from "./Sirius.js";
+import SiriusControlElement, {
+    SIRIUS_CONTROL_ELEMENT,
+    SIRIUS_CONTROL_ELEMENT_ATTRIBUTES, SIRIUS_CONTROL_ELEMENT_ATTRIBUTES_DEFAULT
+} from "./SiriusControlElement.js";
 
-/** Sirius checkbox constants */
+/** SiriusCheckbox constants */
 export const SIRIUS_CHECKBOX = deepFreeze({
     NAME: "SiriusCheckbox",
     TAG: "sirius-checkbox",
@@ -35,9 +37,8 @@ export const SIRIUS_CHECKBOX = deepFreeze({
     }
 })
 
-/** Sirius checkbox attributes */
+/** SiriusCheckbox attributes */
 export const SIRIUS_CHECKBOX_ATTRIBUTES = deepFreeze({
-    STATUS: "status",
     GAP: "gap",
     PADDING: "padding",
     BACKGROUND_COLOR: "background-color",
@@ -54,32 +55,24 @@ export const SIRIUS_CHECKBOX_ATTRIBUTES = deepFreeze({
     CHECKBOX_BORDER_LINE_STYLE: "checkbox-border-line-style",
     CHECKBOX_BORDER_RADIUS: "checkbox-border-radius",
     CHECKBOX_BORDER_WIDTH: "checkbox-border-width",
-    PARENT_ID: 'parent-id'
 })
 
-/** Sirius checkbox default values */
+/** SiriusCheckbox default values */
 export const SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT = deepFreeze({
-    [SIRIUS_CHECKBOX_ATTRIBUTES.STATUS]: "unchecked",
     [SIRIUS_CHECKBOX_ATTRIBUTES.ICON_PADDING]: "2px",
 })
 
 /** Sirius class that represents a checkbox component */
-export class SiriusCheckbox extends SiriusElement {
-    #parentElement = null;
-    #children = []
+export default class SiriusCheckbox extends SiriusControlElement {
     #checkboxContainerElement = null;
     #labelContainerElement = null;
     #labelSlotElement=null
     #iconContainerElement = null;
     #iconElement = null;
-    #previousStatus = null
-    #changedChildrenStatus = 0
-    #changingStatusByParent = false
-    #changingStatusByChildren = false
 
     /**
-     * Create a Sirius checkbox element
-     * @param {Object} properties - The properties of the Sirius checkbox
+     * Create a SiriusCheckbox element
+     * @param {Object} properties - The properties of the SiriusCheckbox
      */
     constructor(properties) {
         super(properties, SIRIUS_CHECKBOX.NAME);
@@ -90,10 +83,10 @@ export class SiriusCheckbox extends SiriusElement {
 
     /** Define observed attributes */
     static get observedAttributes() {
-        return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_CHECKBOX_ATTRIBUTES)];
+        return [...SiriusControlElement.observedAttributes, ...Object.values(SIRIUS_CHECKBOX_ATTRIBUTES)];
     }
 
-    /** Get the template for the Sirius checkbox
+    /** Get the template for the SiriusCheckbox
      * @returns {string} - Template
      */
     #getTemplate() {
@@ -114,7 +107,7 @@ export class SiriusCheckbox extends SiriusElement {
 
     /** Build the SiriusCheckbox */
     async #build() {
-        // Load Sirius checkbox HTML attributes
+        // Load SiriusCheckbox HTML attributes
         this._loadAttributes({
             instanceProperties: this._properties,
             attributes: SIRIUS_CHECKBOX_ATTRIBUTES,
@@ -131,13 +124,13 @@ export class SiriusCheckbox extends SiriusElement {
         const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
         const hideKey = SIRIUS_ELEMENT_ATTRIBUTES.HIDE
         const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON
-        const statusKey = SIRIUS_CHECKBOX_ATTRIBUTES.STATUS
+        const statusKey = SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.STATUS
 
         // Create SiriusIcon element
         this.#iconElement = new SiriusIcon({
             [idKey]: iconId,
             [iconKey]: "check-mark",
-            [hideKey]: SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT[statusKey] === "unchecked" ? "true" : "false"
+            [hideKey]: SIRIUS_CONTROL_ELEMENT_ATTRIBUTES_DEFAULT[statusKey] === "unchecked" ? "true" : "false"
         })
 
         // Get HTML inner content
@@ -198,94 +191,6 @@ export class SiriusCheckbox extends SiriusElement {
      */
     get iconElement() {
         return this.#iconElement;
-    }
-
-    /** Get parent element
-     * @returns {SiriusCheckbox|null} - Parent element
-     */
-    get parentElement() {
-        return this.#parentElement;
-    }
-
-    /** Get children elements
-     * @returns {SiriusCheckbox[]} - Children elements
-     */
-    get children() {
-        return Object.freeze([...this.#children]);
-    }
-
-    /** Get status attribute
-     * @returns {string} - Status attribute
-     */
-    get status() {
-        return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.STATUS);
-    }
-
-    /** Set status attribute
-     * @param {string} value - Status attribute
-     */
-    set status(value) {
-        // Store the previous status
-        this.#previousStatus = this.status;
-
-        this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.STATUS, value);
-    }
-
-    /** Toggle the status attribute */
-    toggleStatus() {
-        this.status = this.status === "checked" ? "unchecked" : "checked";
-    }
-
-    /** Set the status attribute for the children elements
-     * @param {string} status - Status attribute
-     */
-    #setChildrenStatus(status) {
-        if (!this.children || !status) return;
-
-        // Set the changing children status flag
-        this.#changedChildrenStatus = this.children.reduce((acc, child) => {
-            if (child.status === status) return acc+1;
-            return acc;
-        },0);
-
-        // Set the status attribute for the children elements
-        this.children.forEach(child => {
-            if (child.status === status) return;
-
-            child.#changingStatusByParent = true;
-            child.status = status === "checked" ? "checked" : "unchecked"
-        });
-    }
-
-    /** Check the children elements status attribute value */
-    #checkChildrenStatus() {
-        if (!this.children) return;
-
-        // Check the children elements status attribute
-        const numberChildren = this.children.length;
-        let numberChildrenChecked=0
-        let numberChildrenIndeterminate=0
-
-        this.children.map(child => child.status).forEach(status => {
-            if (status === "checked") numberChildrenChecked++;
-            else if (status === "indeterminate") numberChildrenIndeterminate++;
-        })
-
-        // Set the checked attribute value
-        let status
-        if (numberChildrenChecked === 0&&numberChildrenIndeterminate===0) status = "unchecked";
-        else if (numberChildrenChecked === numberChildren) status = "checked";
-        else status = "indeterminate";
-
-        // Check if the status has changed
-        if (status === this.status) {
-            if (this.#changingStatusByChildren)
-                this.#changingStatusByChildren = false;
-            return;
-        }
-
-        // Set the status attribute
-        this.status = status;
     }
 
     /** Get gap attribute
@@ -513,76 +418,25 @@ export class SiriusCheckbox extends SiriusElement {
         this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.CHECKBOX_BORDER_WIDTH, value);
     }
 
-    /** Set parent ID attribute
-     * @param {string} value - Parent ID attribute
-     */
-    set parentId(value) {
-        this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID, value);
-    }
-
-    /** Get parent ID attribute
-     * @returns {string} - Parent ID attribute
-     */
-    get parentId() {
-        return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID);
-    }
-
-    /** Private method to set the status attribute
-     * @param {string} status - Status attribute value
-     */
-    #setStatus(status) {
-        if (!status) return
-
-        // Store current changing status by parent and children flags
-        const changingStatusByParent = this.#changingStatusByParent;
-        const changingStatusByChildren = this.#changingStatusByChildren;
-
-        // Check if the status is being changed by the children elements
-        if (changingStatusByChildren)
-            this.#changingStatusByChildren = false;
-
-        // Check if the status is being changed by the parent element
-        if (changingStatusByParent) {
-            this.#changingStatusByParent = false;
-
-            // Check if all children status have been changed
-            if (++this.parentElement.#changedChildrenStatus === this.children.length)
-                this.parentElement.#changedChildrenStatus = 0;
+    /** Protected method to handle the status attribute change to checked */
+    _statusCheckedHandler() {
+        this.onBuilt = () => {
+            this.iconElement.hide = "false";
+            this.iconElement.icon = "check-mark";
         }
+    }
 
-        // Check if is the same status
-        if (status === this.#previousStatus) return;
+    /** Protected method to handle the status attribute change to unchecked */
+    _statusUncheckedHandler() {
+        this.onBuilt = () => this.iconElement.hide = "true";
+    }
 
-        // Update the children elements
-        if (!changingStatusByChildren&&status !== "indeterminate" && this.children)
-            this.#setChildrenStatus(status);
-
-        // Update the icon element
-        if (status === "unchecked")
-            this.onBuilt = () => this.iconElement.hide = "true";
-
-        else if (status === "checked")
-            this.onBuilt = () => {
-                this.iconElement.hide = "false";
-                this.iconElement.icon = "check-mark";
-            }
-
-        else if (status === "indeterminate")
-            this.onBuilt = () => {
+    /** Protected method to handle the status attribute change to indeterminate */
+    _statusIndeterminateHandler() {
+        this.onBuilt = () => {
                 this.iconElement.hide = "false";
                 this.iconElement.icon = "indeterminate";
             }
-
-        else {
-            this.logger.error(`Invalid status attribute value: ${status}`);
-            return;
-        }
-
-        // Trigger parent element to check children status
-        if (this.parentElement && !changingStatusByParent) {
-            this.parentElement.#changingStatusByChildren = true;
-            this.parentElement.#checkChildrenStatus();
-        }
     }
 
     /** Private method to set the gap attribute
@@ -713,65 +567,6 @@ export class SiriusCheckbox extends SiriusElement {
             this._setCSSVariable(SIRIUS_CHECKBOX.CSS_VARIABLES.CHECKBOX_BORDER_WIDTH, width);
     }
 
-    /** Private method to the parent ID
-     * @param {string} parentId - Parent ID attribute value
-     */
-    #setParentId(parentId) {
-        if (!parentId) {
-            this.#removeParentElement()
-            return
-        }
-
-        this.onBuilt = () => {
-            // Check if the parent element is the same as the current element
-            if (this.id === parentId)
-                this.logger.error("Parent element cannot be the same as the current element")
-
-            const parent = sirius.getInstance(parentId);
-
-            // Check if the parent element exists
-            if (!parent) {
-                this.logger.error(`Parent with ID '${parentId}' not found`);
-                return;
-            }
-
-            // Check if it's a checkbox element
-            if (!(parent instanceof SiriusCheckbox)) {
-                this.logger.error("Element is not a SiriusCheckbox element");
-                return;
-            }
-
-            // Check if the parent element to set is the current parent element
-            if (this.#parentElement === parent)
-                return
-
-            // Remove the current parent element
-            if (this.#parentElement)
-                this.#removeParentElement()
-
-            // Add the parent element
-            this.#addParentElement(parent);
-        }
-    }
-
-    /** Private method to add the parent element
-     * @param {SiriusCheckbox} parent - Parent element
-     * */
-    #addParentElement(parent) {
-        this.onBuilt = () => {
-            this.#parentElement = parent;
-            parent.#children.push(this);
-        }
-    }
-
-    /** Private method to remove the parent element */
-    #removeParentElement() {
-        this.onBuilt = () => {
-            this.#parentElement.#children = this.#parentElement.#children.filter(child => child !== this);
-            this.#parentElement = null;
-        }
-    }
-
     /** Private method to set the checkbox container style
      * @param {string} style - Style attribute value
      */
@@ -810,47 +605,6 @@ export class SiriusCheckbox extends SiriusElement {
         this.onBuilt = () => this.labelSlotElement.innerHTML = "";
     }
 
-    /** Add children elements
-     * @param {SiriusCheckbox[]} children - Children elements
-     */
-    addChildrenElement(children) {
-        if (!children) return;
-
-        // Add the children elements
-        this.onBuilt = () => children.forEach(child => child.parentId = this.id)
-    }
-
-    /** Remove children elements
-     * @param {SiriusCheckbox[]} children - Children elements
-     */
-    removeChildrenElement(children) {
-        if (!children) return;
-
-        // Remove the children elements
-        this.onBuilt = () => children.forEach(child => child.parentId = "")
-    }
-
-    /** Remove child element by ID
-     * @param {string} id - Child ID
-     */
-    removeChildElementById(id) {
-        if (!id) return;
-
-        // Remove the child element
-        this.onBuilt = () => {
-            // Get the child element by ID
-            const child = this.children.find(child => child.id === id);
-            console.log(this.children);
-            console.log(child)
-            if (!child) return;
-            
-        
-            // Remove the child element
-            child.parentId = "";
-            console.log(this.children);
-        }
-    }
-
     /** Private method to handle attribute changes
      * @param {string} name - Attribute name
      * @param {string} oldValue - Old value
@@ -866,8 +620,12 @@ export class SiriusCheckbox extends SiriusElement {
                 this.#setStyle(newValue);
                 break;
 
-            case SIRIUS_CHECKBOX_ATTRIBUTES.STATUS:
-                this.#setStatus(newValue);
+            case SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.PARENT_ID:
+                this._setParentId(newValue);
+                break
+
+            case SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.STATUS:
+                this._setStatus(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.GAP:
@@ -932,10 +690,6 @@ export class SiriusCheckbox extends SiriusElement {
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.CHECKBOX_BORDER_WIDTH:
                 this.#setCheckboxBorderWidth(newValue);
-                break;
-
-            case SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID:
-                this.#setParentId(newValue);
                 break;
 
             default:

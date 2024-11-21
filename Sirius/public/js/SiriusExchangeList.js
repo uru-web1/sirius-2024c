@@ -1,6 +1,6 @@
-import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
-import {SIRIUS_LIST_BOX, SIRIUS_LIST_BOX_ATTRIBUTES, SiriusListBox} from "./SiriusListBox.js";
-import { SIRIUS_ICON, SiriusIcon } from "./SiriusIcon.js";
+import SiriusElement, {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
+import SiriusListBoxV1, {SIRIUS_LIST_BOX, SIRIUS_LIST_BOX_ATTRIBUTES} from "./SiriusListBoxV1.js";
+import SiriusIcon, { SIRIUS_ICON } from "./SiriusIcon.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 /** SiriusListBox class */
@@ -19,7 +19,7 @@ export const SIRIUS_EXCHANGE_LIST = deepFreeze({
     }
 })
 
-export class SiriusExchangeList extends SiriusElement { 
+export default class SiriusExchangeList extends SiriusElement {
 
     // container elements
     #listBoxElement1 = null;
@@ -143,7 +143,7 @@ export class SiriusExchangeList extends SiriusElement {
         const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
 
         // Create SiriusIcon element
-        this.#listBoxElement1 = new SiriusListBox({
+        this.#listBoxElement1 = new SiriusListBoxV1({
             [idKey]: 'listbox-1',
             [itemsKey]:`[
                 { "id": "item_1", "label": "Item 1"},
@@ -156,7 +156,7 @@ export class SiriusExchangeList extends SiriusElement {
             
         })
 
-        this.#listBoxElement2 = new SiriusListBox({
+        this.#listBoxElement2 = new SiriusListBoxV1({
             [idKey]: 'listbox-2',
             [itemsKey]:`[
                 { "id": "item_4", "label": "Item 4"},

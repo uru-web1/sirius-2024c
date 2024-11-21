@@ -1,7 +1,7 @@
-import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
+import SiriusElement, {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
-/** Sirius label constants */
+/** SiriusLabel constants */
 export const SIRIUS_LABEL = deepFreeze({
     NAME: "SiriusLabel",
     TAG: "sirius-label",
@@ -19,7 +19,7 @@ export const SIRIUS_LABEL = deepFreeze({
     }
 });
 
-/** Sirius label attributes */
+/** SiriusLabel attributes */
 export const SIRIUS_LABEL_ATTRIBUTES = deepFreeze({
     CAPTION: "caption",
     CAPTION_TEXT_ALIGN: "caption-text-align",
@@ -30,18 +30,18 @@ export const SIRIUS_LABEL_ATTRIBUTES = deepFreeze({
     CAPTION_PADDING: "caption-padding"
 })
 
-/** Sirius label attributes default values */
+/** SiriusLabel attributes default values */
 export const SIRIUS_LABEL_ATTRIBUTES_DEFAULT = deepFreeze({
     [SIRIUS_LABEL_ATTRIBUTES.CAPTION]: "Please enter a caption",
 })
 
 /** Sirius class that represents a label component */
-export class SiriusLabel extends SiriusElement {
+export default class SiriusLabel extends SiriusElement {
     #labelContainerElement = null
     #captionContainerElement = null
 
     /**
-     * Create a Sirius label element
+     * Create a SiriusLabel element
      * @param {object} properties - Element properties
      */
     constructor(properties) {
@@ -58,7 +58,7 @@ export class SiriusLabel extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_LABEL_ATTRIBUTES)];
     }
 
-    /** Get the template for the Sirius label
+    /** Get the template for the SiriusLabel
      * @returns {string} - Template
      * */
     #getTemplate() {

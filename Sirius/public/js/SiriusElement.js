@@ -14,7 +14,7 @@ export const SIRIUS_TYPES = deepFreeze({
     ANY: 'any'
 })
 
-/** Sirius element constants */
+/** SiriusElement constants */
 export const SIRIUS_ELEMENT = deepFreeze({
     NAME: 'SiriusElement',
     STYLE_SHEETS: {
@@ -33,33 +33,35 @@ export const SIRIUS_ELEMENT = deepFreeze({
     }
 })
 
-/** Sirius element required attributes */
+/** SiriusElement required attributes */
 export const SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES = deepFreeze({
     ID: 'id'
 })
 
-/** Sirius element attributes */
+/** SiriusElement attributes */
 export const SIRIUS_ELEMENT_ATTRIBUTES = deepFreeze({
     STYLE: 'style',
     HIDE: 'hide',
     DISABLED: 'disabled'
 })
 
-/** Sirius element attributes default values */
+/** SiriusElement attributes default values
+ * If an attribute is not present in the object, the default value is null
+ * */
 export const SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT = deepFreeze({})
 
-/** Sirius element properties */
+/** SiriusElement properties */
 export const SIRIUS_ELEMENT_PROPERTIES = deepFreeze({
     EVENTS: 'events',
 })
 
-/** Sirius element properties details */
+/** SiriusElement properties details */
 export const SIRIUS_ELEMENT_PROPERTIES_DETAILS = deepFreeze({
     [SIRIUS_ELEMENT_PROPERTIES.EVENTS]: {DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
 })
 
 /** Sirius class that represents an element component */
-export class SiriusElement extends HTMLElement {
+export default class SiriusElement extends HTMLElement {
     _properties = {}
     _styleSheets = {}
     _elementStyleSheetRules = new Map()
@@ -76,7 +78,7 @@ export class SiriusElement extends HTMLElement {
     #onInjectedLogger = []
 
     /**
-     * Create a Sirius element
+     * Create a SiriusElement
      * @param {object} properties - Element properties
      * @param {string} elementName - Element name
      */
@@ -114,7 +116,7 @@ export class SiriusElement extends HTMLElement {
             this.#onInjectedLogger = [];
         });
 
-        // Load Sirius element required HTML attributes
+        // Load SiriusElement required HTML attributes
         this._loadRequiredAttributes({
             instanceProperties: this._properties,
             attributes: SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
@@ -129,7 +131,7 @@ export class SiriusElement extends HTMLElement {
         // Dispatch injected logger event
         this.dispatchInjectedLoggerEvent();
 
-        // Load Sirius element HTML attributes
+        // Load SiriusElement HTML attributes
         this._loadAttributes({
             instanceProperties: this._properties,
             attributes: SIRIUS_ELEMENT_ATTRIBUTES,
@@ -703,7 +705,7 @@ export class SiriusElement extends HTMLElement {
     }
 
     /**
-     * Get the Sirius element style sheets
+     * Get the SiriusElement style sheets
      * @param {string} cssFilename - CSS filename
      * @returns {Promise<void>} - Stylesheets
      */
@@ -719,14 +721,14 @@ export class SiriusElement extends HTMLElement {
         };
     }
 
-    /** Get the Sirius element style sheet
+    /** Get the SiriusElement style sheet
      * @returns {CSSStyleSheet} - Element style sheet
      */
     _getElementStyleSheet() {
         return this._styleSheets[SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT];
     }
 
-    /** Get the Sirius element general style sheet
+    /** Get the SiriusElement general style sheet
      * @returns {CSSStyleSheet} - General style sheet
      */
     _getGeneralStyleSheet() {
