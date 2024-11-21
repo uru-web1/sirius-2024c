@@ -1,0 +1,83 @@
+:host {
+    --sirius-edit--input-background: transparent;
+    --sirius-edit--input-font-size: 2.9em;
+    --sirius-edit--input-color-font: #ebebeb;
+
+    --sirius-edit--labeline-background-color: #1c2841;
+    --sirius-edit--labeline-color-font: #1acbcb;
+    --sirius-edit--labeline-color-border: #1acbcb;
+    --sirius-edit--labeline-color-font-onfocus: #66ff00;
+    --sirius-edit--labeline-color-border-onfocus: #66ff00;
+    
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.edit-container {
+    width: 680px;
+}
+
+.edit-area {
+    position: relative;
+    height: 80px;
+    line-height: 80px;
+}
+
+input {
+    position: absolute;
+    width: 100%;
+    outline: none;
+    font-size: var(--sirius-edit--input-font-size);
+    padding: 0 30px;
+    line-height: 80px;
+    border-radius: 10px;
+    border: 2px solid var(--sirius-edit--labeline-color-border);
+    background: var(--sirius-edit--input-background);
+    transition: 0.1s ease;
+    z-index: 1111;
+    color: var(--sirius-edit--input-color-font);
+}
+
+.labelline {
+    position: absolute;
+    font-size: 1.6em;
+    color: var(--sirius-edit--labeline-color-font);
+    padding: 0 25px;
+    margin: 0 20px;
+    background-color: var(--sirius-edit--labeline-background-color);
+    transition: color 0.2s ease, height 0.2s ease, line-height 0.2s ease, padding 0.2s ease, transform 0.2s ease;
+}
+
+/* Cuando el input tiene foco */
+input:focus {
+    border: 4px solid var(--sirius-edit--labeline-color-border-onfocus);
+}
+
+/* Cuando el input tiene foco o es válido (tiene un valor) */
+input:focus + .labelline,
+input:valid + .labelline {
+    color: var(--sirius-edit--labeline-color-font-onfocus);
+    height: 30px;
+    line-height: 30px;
+    padding: 0 12px;
+    transform: translate(-15px, -16px) scale(0.88);
+    z-index: 1111;
+}
+
+/* Cuando pierde el foco y tiene un valor */
+input:valid:not(:focus) + .labelline {
+    color: var(--sirius-edit--labeline-color-font); /* Vuelve al color original */
+}
+
+/* Cuando pierde el foco y no tiene valor (por defecto) */
+input:not(:focus):placeholder-shown + .labelline {
+    color: #f0ffff;
+    height: 80px;
+    line-height: 80px;
+    padding: 0 25px;
+    transform: translate(0, 0) scale(1);
+}
