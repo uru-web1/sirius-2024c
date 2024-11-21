@@ -3,37 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Sirius Combobox</title>
-    <!-- Importar los scripts necesarios -->
-    <script defer src="../js/Sirius.js" type="module"></script>
+    <title>Combobox Example</title>
+    <link rel="stylesheet" href="../css/SiriusCombobox.css">
     <script defer src="../js/SiriusCombobox.js" type="module"></script>
 </head>
 <body>
-<script type="module">
-    import sirius from '../js/Sirius.js';
-    import { SIRIUS_COMBOBOX, SiriusCombobox } from '../js/SiriusCombobox.js';
-    import { SIRIUS_ELEMENT } from "../js/SiriusElement.js";
+    <sirius-combobox id="combobox1" placeholder="Select an option"></sirius-combobox>
+    
+    <script type="module">
+        const combobox = document.querySelector("#combobox1");
+        combobox.options = ["Option 1", "Option 2", "Option 3", "Option 4"];
 
-    // Atributos del Combobox
-    const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
-    const optionsKey = SIRIUS_COMBOBOX.ATTRIBUTES.OPTIONS.NAME;
-    const textKey = SIRIUS_COMBOBOX.ATTRIBUTES.TEXT.NAME;
-
-    sirius.onLoaded = async () => {
-        // Crear una instancia dinámica de SiriusCombobox
-        const siriusCombobox = new SiriusCombobox({
-            [idKey]: 'combobox-1',
-            [optionsKey]: '["Option 1", "Option 2", "Option 3"]',
-            [textKey]: 'Field'
-
+        combobox.addEventListener("option-selected", (event) => {
+            console.log("Selected option:", event.detail.value);
         });
 
-        // Añadir al body
-        siriusCombobox.addToBody();
-    };
-</script>
-
-<!-- Incluir directamente una instancia del combobox con opciones en el HTML -->
-<sirius-combobox id="combobox-2" placeholder="Select an option" text="Field" options='["Option A", "Option B", "Option C"]'></sirius-combobox>
+        combobox.addEventListener("combobox-built", () => {
+            console.log("Combobox construido correctamente.");
+        });
+    </script>
 </body>
 </html>

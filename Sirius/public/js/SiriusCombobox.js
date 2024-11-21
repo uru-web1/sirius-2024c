@@ -1,166 +1,113 @@
 import { SiriusElement } from "./SiriusElement.js";
-import { SiriusIcon } from "./SiriusIcon.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
-/** Sirius Combobox constants */
+// Constantes para el Combobox
 export const SIRIUS_COMBOBOX = deepFreeze({
     NAME: "SiriusCombobox",
     TAG: "sirius-combobox",
-    ATTRIBUTES: {
-        PLACEHOLDER: { NAME: "placeholder", DEFAULT: "Select an option", TYPE: "string" },
-        OPTIONS: { NAME: "options", DEFAULT: [], TYPE: "array" },
-        TEXT: { NAME: "text", DEFAULT: "Field", TYPE: "string" }
+    CSS_VARS: {
+        WIDTH: "--combobox-width",
+        BORDER_COLOR: "--combobox-border-color",
+        BACKGROUND: "--combobox-background",
+        TEXT_COLOR: "--combobox-text-color",
+        OPTION_HOVER: "--combobox-option-hover",
     },
     CLASSES: {
-        CONTAINER: 'sirius-combobox-container',
-        INPUT_WRAPPER: 'sirius-combobox-input-wrapper',
-        INPUT: 'sirius-combobox-input',
-        ICON: 'sirius-combobox-icon',
-        DROPDOWN: 'sirius-combobox-dropdown',
-        OPTION: 'sirius-combobox-option',
-        LABEL: 'sirius-combobox-label'
-    }
+        CONTAINER: "combobox-container",
+        PLACEHOLDER: "combobox-placeholder",
+        OPTIONS: "combobox-options",
+        OPTION: "combobox-option",
+        HIDDEN: "hidden",
+    },
 });
 
 export class SiriusCombobox extends SiriusElement {
-    constructor(props) {
-        super(props, SIRIUS_COMBOBOX.NAME);
+    #placeholderElement = null;
+    #optionsContainer = null;
 
-        // Asegurar el placeholder predeterminado si no se pasa como prop
-        this._attributes[SIRIUS_COMBOBOX.ATTRIBUTES.PLACEHOLDER.NAME] =
-            props?.placeholder || this.getAttribute(SIRIUS_COMBOBOX.ATTRIBUTES.PLACEHOLDER.NAME) ||
-            SIRIUS_COMBOBOX.ATTRIBUTES.PLACEHOLDER.DEFAULT;
-
-        // Cargar opciones desde props o atributo HTML
-        this._attributes[SIRIUS_COMBOBOX.ATTRIBUTES.OPTIONS.NAME] = this._parseOptions(
-            props?.options || this.getAttribute(SIRIUS_COMBOBOX.ATTRIBUTES.OPTIONS.NAME)
-        );
-
-        // Cargar el texto de la etiqueta
-        const text = props?.text || this.getAttribute(SIRIUS_COMBOBOX.ATTRIBUTES.TEXT.NAME);
-        this._attributes[SIRIUS_COMBOBOX.ATTRIBUTES.TEXT.NAME] = text || SIRIUS_COMBOBOX.ATTRIBUTES.TEXT.DEFAULT;
-
-        this._selectedOption = null; // Almacena la opción seleccionada
-        this._createComboboxTemplate(); // Construir estructura HTML
+    constructor(properties) {
+        super(properties, SIRIUS_COMBOBOX.NAME);
+        this._options = [];
     }
 
-    /**
-     * Método auxiliar para parsear opciones en array
-     */
-    _parseOptions(options) {
-        try {
-            return typeof options === 'string' ? JSON.parse(options) : options || [];
-        } catch (error) {
-            console.error("Error parsing options:", error);
-            return SIRIUS_COMBOBOX.ATTRIBUTES.OPTIONS.DEFAULT;
+    static get observedAttributes() {
+        return ["placeholder", "options"];
+    }
+
+    get options() {
+        return this._options;
+    }
+
+    set options(value) {
+        if (Array.isArray(value)) {
+            this._options = value;
+            this.#renderOptions();
         }
     }
 
-    /**
-     * Genera el HTML del combobox y su estructura en el shadow DOM.
-     */
-    async _createComboboxTemplate() {
-        const { PLACEHOLDER, OPTIONS } = SIRIUS_COMBOBOX.ATTRIBUTES;
-
-        // Generar el HTML para las opciones
-        const optionsHTML = this._attributes[OPTIONS.NAME].map(
-            (option) => `<div class="${SIRIUS_COMBOBOX.CLASSES.OPTION}" data-value="${option}">${option}</div>`
-        ).join("");
-
-        const textHTML = this._attributes[SIRIUS_COMBOBOX.ATTRIBUTES.TEXT.NAME];
-
-        // Estructura HTML del combobox
-        const comboboxHTML = `
-            <div id="${this._attributes.id}-container" class="${SIRIUS_COMBOBOX.CLASSES.CONTAINER}">
-                <label class="${SIRIUS_COMBOBOX.CLASSES.LABEL}">${textHTML}</label>
-                <div class="${SIRIUS_COMBOBOX.CLASSES.INPUT_WRAPPER}">
-                    <input type="text" placeholder="${this._attributes[PLACEHOLDER.NAME]}" 
-                           class="${SIRIUS_COMBOBOX.CLASSES.INPUT} placeholder-color" readonly>
-                    <sirius-icon id="${this._attributes.id}-arrow" class="${SIRIUS_COMBOBOX.CLASSES.ICON}" 
-                                 icon="arrow" width="20" height="20" rotate="down" fill="black"></sirius-icon>
+    #getTemplate() {
+        return `
+            <div class="${SIRIUS_COMBOBOX.CLASSES.CONTAINER}">
+                <div class="${SIRIUS_COMBOBOX.CLASSES.PLACEHOLDER}">
+                    ${this.getAttribute("placeholder") || "Select an option"}
                 </div>
-                <div class="${SIRIUS_COMBOBOX.CLASSES.DROPDOWN}" style="display: none;">
-                    ${optionsHTML}
-                </div>
+                <div class="${SIRIUS_COMBOBOX.CLASSES.OPTIONS} ${SIRIUS_COMBOBOX.CLASSES.HIDDEN}"></div>
             </div>
         `;
-
-        // Insertar la plantilla
-        await this._createTemplate(comboboxHTML);
-        this.containerElement = this._templateContent.querySelector(`#${this._attributes.id}-container`);
-        this.inputElement = this.containerElement.querySelector(`.${SIRIUS_COMBOBOX.CLASSES.INPUT}`);
-        this.dropdownElement = this.containerElement.querySelector(`.${SIRIUS_COMBOBOX.CLASSES.DROPDOWN}`);
-        this.arrowIcon = this.containerElement.querySelector(`#${this._attributes.id}-arrow`);
-
-        // Actualizar el valor del input al placeholder inicial
-        this.inputElement.value = this._selectedOption || this._attributes[PLACEHOLDER.NAME];
-
-        this.shadowRoot.appendChild(this._templateContent);
-        await this._loadElementStyles(SIRIUS_COMBOBOX.NAME);
-        this.dispatchBuiltEvent();
-
-        this._addEventListeners();
     }
 
-    /**
-     * Agrega listeners para manejar el dropdown y selección de opciones.
-     */
-    _addEventListeners() {
-        // Evento para mostrar/ocultar el dropdown
-        this.inputElement.addEventListener("click", () => {
-            const isHidden = this.dropdownElement.style.display === 'none' || !this.dropdownElement.style.display;
-            this.dropdownElement.style.display = isHidden ? 'block' : 'none';
-            this.arrowIcon.iconRotation = isHidden ? 'up' : 'down';
-        });
+    async connectedCallback() {
+        if (!this.shadowRoot) {
+            this.attachShadow({ mode: "open" }); // Crear shadow DOM
+        }
 
-        // Evento para seleccionar una opción del dropdown
-        this.dropdownElement.addEventListener("click", (event) => {
-            const optionElement = event.target.closest(`.${SIRIUS_COMBOBOX.CLASSES.OPTION}`);
-            if (optionElement) {
-                // Actualiza y guarda la opción seleccionada
-                this._selectedOption = optionElement.dataset.value;
-                this.inputElement.value = this._selectedOption;
-                this.dropdownElement.style.display = 'none';
-                this.arrowIcon.iconRotation = 'down';
+        const innerHTML = this.#getTemplate();
+        this.shadowRoot.innerHTML = innerHTML;
 
-                // Remover el color del placeholder
-                this.inputElement.classList.remove('placeholder-color');
+        // Inicializar elementos
+        this._containerElement = this.shadowRoot.querySelector(`.${SIRIUS_COMBOBOX.CLASSES.CONTAINER}`);
+        this.#placeholderElement = this._containerElement?.querySelector(`.${SIRIUS_COMBOBOX.CLASSES.PLACEHOLDER}`);
+        this.#optionsContainer = this._containerElement?.querySelector(`.${SIRIUS_COMBOBOX.CLASSES.OPTIONS}`);
 
-                // Dispara un evento personalizado para la selección
-                this.dispatchEvent(new CustomEvent("option-selected", { detail: { selectedOption: this._selectedOption } }));
-            }
+        if (!this._containerElement || !this.#placeholderElement || !this.#optionsContainer) {
+            console.error("Error: No se pudieron inicializar los elementos requeridos en SiriusCombobox.");
+            return;
+        }
+
+        // Agregar eventos
+        this.#placeholderElement.addEventListener("click", () => this.#toggleOptions());
+        this.#renderOptions();
+        await this._loadAndAdoptStyles();
+
+        // Despachar evento indicando que el componente está listo
+        this.dispatchEvent(new CustomEvent("combobox-built", { detail: { element: this } }));
+    }
+
+    #renderOptions() {
+        if (!this.#optionsContainer) return;
+
+        this.#optionsContainer.innerHTML = this._options
+            .map(option => `<div class="${SIRIUS_COMBOBOX.CLASSES.OPTION}" tabindex="0">${option}</div>`)
+            .join("");
+
+        this.#optionsContainer.querySelectorAll(`.${SIRIUS_COMBOBOX.CLASSES.OPTION}`).forEach(option => {
+            option.addEventListener("click", () => this.#selectOption(option.textContent));
         });
     }
 
-    /**
-     * Getter para obtener la opción seleccionada.
-     */
-    get selectedOption() {
-        return this._selectedOption;
+    #toggleOptions() {
+        const isHidden = this.#optionsContainer.classList.contains(SIRIUS_COMBOBOX.CLASSES.HIDDEN);
+        if (isHidden) {
+            this.#optionsContainer.classList.remove(SIRIUS_COMBOBOX.CLASSES.HIDDEN);
+        } else {
+            this.#optionsContainer.classList.add(SIRIUS_COMBOBOX.CLASSES.HIDDEN);
+        }
     }
 
-    /**
-     * Setter para configurar nuevas opciones.
-     */
-    set options(newOptions) {
-        this._attributes[SIRIUS_COMBOBOX.ATTRIBUTES.OPTIONS.NAME] = Array.isArray(newOptions) ? newOptions : [];
-        this._updateDropdownOptions();
-    }
-
-    /**
-     * Actualiza las opciones del dropdown.
-     */
-    _updateDropdownOptions() {
-        this.dropdownElement.innerHTML = this._attributes[SIRIUS_COMBOBOX.ATTRIBUTES.OPTIONS.NAME].map(
-            (option) => `<div class="${SIRIUS_COMBOBOX.CLASSES.OPTION}" data-value="${option}">${option}</div>`
-        ).join("");
-    }
-
-    /**
-     * Añade el combobox al DOM.
-     */
-    addToBody() {
-        document.body.appendChild(this);
+    #selectOption(value) {
+        this.#placeholderElement.textContent = value;
+        this.#optionsContainer.classList.add(SIRIUS_COMBOBOX.CLASSES.HIDDEN);
+        this.dispatchEvent(new CustomEvent("option-selected", { detail: { value } }));
     }
 }
 
