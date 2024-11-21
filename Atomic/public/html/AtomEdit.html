@@ -1,7 +1,7 @@
 <html>
 <head>
-    <script type="module" src="../js/com/Atom.js"></script>
-    <link rel="icon" href="../images/icons/favicon.png" sizes="32x32" type="image/png">
+    <script src="../js/com/Atom.js" type="module"></script>
+    <link href="../images/icons/favicon.png" rel="icon" sizes="32x32" type="image/png">
 </head>
 <body>
 <script>
@@ -60,9 +60,12 @@
     };
 </script>
 <form id="f1">
-    <atom-edit id="MyAtomEdit" required=true type="number" message="valor numerico erroneo" reactive=true
-               onblur='atom.fBlur()' hiddenValue="50" onescape='alert("se pulso esc")' caption="Edit HTML:" value="10"
-               style="position:absolute; left:10px; top:20px"></atom-edit>
+    <atom-edit caption="Edit HTML:" hiddenValue="50" id="MyAtomEdit" message="valor numerico erroneo"
+               onblur='atom.fBlur()'
+               onescape='alert("se pulso esc")' reactive=true required=true
+               style="position:absolute; left:10px; top:20px" type="number"
+               value="10">
+    </atom-edit>
 </form>
 </body>
 </html>

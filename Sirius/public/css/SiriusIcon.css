@@ -1,31 +1,16 @@
-.icon {
+:host {
+    display: inline-block;
+    box-sizing: border-box;
+
+    --sirius-icon--padding: 0;
+    --sirius-icon--width: 24px;
+    --sirius-icon--height: 24px;
+}
+
+.icon-container {
     display: grid;
     place-items: center;
+    padding: var(--sirius-icon--padding);
+    width: var(--sirius-icon--width);
+    height: var(--sirius-icon--height);
 }
-
-.icon.check > span > svg {
-    animation: draw  var(--sirius-animation-duration) forwards;
-}
-
-.icon.uncheck > span > svg {
-    animation: erase var(--sirius-animation-duration) forwards;
-}
-
-@keyframes draw {
-    0% {
-        width: 0;
-    }
-    100% {
-        width: 100%;
-    }
-}
-
-@keyframes erase {
-    0% {
-        width: 100%;
-    }
-    100% {
-        width: 0;
-    }
-}
-

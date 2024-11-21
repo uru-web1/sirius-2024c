@@ -1,17 +1,25 @@
+:host {
+    display: inline-block;
+    box-sizing: border-box;
+
+    --sirius-label--text-align: justify;
+    --sirius-label--background-color: transparent;
+    --sirius-label--color: black;
+    --sirius-label--font-family: 'Arial';
+    --sirius-label--font-size: 1rem;
+    --sirius-label--padding: 0;
+}
+
 .label-container {
-    border: 1px solid #ddd;
-    padding: 8px;
-    border-radius: 5px;
-    transition: box-shadow 0.3s ease;
-    margin-bottom: 5px;
+    height: fit-content;
+    background-color: var(--sirius-label--background-color);
 }
 
-.label-container:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.caption {
-    font-weight: bold;
-    font-size: 1.2em;
-    color: #333;
+.caption-container {
+    overflow-wrap: break-word;
+    text-align: var(--sirius-label--text-align);
+    padding: var(--sirius-label--padding);
+    font-size: var(--sirius-label--font-size);
+    font-family: var(--sirius-label--font-family), sans-serif;
+    color: var(--sirius-label--color);
 }

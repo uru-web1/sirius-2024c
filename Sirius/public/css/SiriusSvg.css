@@ -1,0 +1,52 @@
+:host {
+    display: inline-block;
+    box-sizing: border-box;
+
+    --sirius-svg--width: 24px;
+    --sirius-svg--height: 24px;
+    --sirius-svg--fill: grey;
+    --sirius-svg--rotation: 0deg;
+    --sirius-svg--transition-duration: 0ms;
+    --sirius-svg--animation-duration: 500ms;
+}
+
+.svg-container {
+    display: grid;
+    place-items: center;
+    width: var(--sirius-svg--width);
+    height: var(--sirius-svg--height);
+    fill: var(--sirius-svg--fill);
+    transform: rotate(var(--sirius-svg--rotation));
+    transition: transform var(--sirius-svg--transition-duration) ease-in-out;
+}
+
+.svg-container:not(.hidden,.hiding) > svg {
+    animation: show-animation var(--sirius-svg--animation-duration) forwards;
+}
+
+.svg-container.hiding > svg {
+    animation: hiding-animation var(--sirius-svg--animation-duration) forwards;
+}
+
+@keyframes show-animation {
+    0% {
+        scale: 0;
+        opacity: 0;
+    }
+    100% {
+        scale: 1;
+        opacity: 1;
+    }
+}
+
+@keyframes hiding-animation {
+    0% {
+        scale: 1;
+        opacity: 1;
+    }
+    100% {
+        scale: 0;
+        opacity: 0;
+    }
+}
+

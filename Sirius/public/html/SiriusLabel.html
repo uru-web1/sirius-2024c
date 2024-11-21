@@ -3,40 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Sirius Label Example</title>
+    <title>SiriusLabel Examples</title>
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusLabel.js" type="module"></script>
 </head>
 <body>
 
+<sirius-label caption="Hello world HTML" caption-color="red" caption-font-family="monospace"
+              caption-text-align="center" caption-padding="2px" id="label-2"
+              style="border: 1px solid green; width: 100px;"></sirius-label>
+
 <script type="module">
     import sirius from '../js/Sirius.js';
-    import {SIRIUS_LABEL, SiriusLabel} from "../js/SiriusLabel.js";
-    import {SIRIUS_ELEMENT} from "../js/SiriusElement.js";
+    import {SiriusLabel, SIRIUS_LABEL_ATTRIBUTES} from "../js/SiriusLabel.js";
+    import {
+        SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
+        SIRIUS_ELEMENT_ATTRIBUTES,
+        SIRIUS_ELEMENT_PROPERTIES
+    } from "../js/SiriusElement.js";
 
     // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
+
         // Get the attributes keys
-        const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
-        const captionKey = SIRIUS_LABEL.ATTRIBUTES.CAPTION.NAME;
-        const style = SIRIUS_ELEMENT.ATTRIBUTES.STYLE.NAME;
-        const style2 = SIRIUS_LABEL.ATTRIBUTES.CAPTION_STYLE.NAME;
+        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+        const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+        const captionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION;
+        const alignKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_TEXT_ALIGN;
+        const colorKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR;
+        const fontFamilyKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_FAMILY;
+
+        // Get the properties keys
+        const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
 
         // Create the label
         const siriusLabel2 = new SiriusLabel({
-            [idKey]: 'label-2',
-            [captionKey]: 'Hello world con HTML',
-            [style]: {'border': "1px solid red", 'padding': '10px'},
-            [style2]: {'color': 'red'}
+            [idKey]: 'label-1',
+            [captionKey]: 'Hello world con JS',
+            [alignKey]: 'right',
+            [colorKey]: 'blue',
+            [fontFamilyKey]: 'fantasy',
+            [styleKey]: "{'border': '1px solid red', 'padding': '20px'}"
         });
 
         // Add the label to the DOM
         siriusLabel2.addToBody()
+
+        // Add an events to the label
+        siriusLabel2.events = {
+            'click': () => siriusLabel2.logger.log('click'),
+            'mouseover': () => siriusLabel2.logger.log('mouseover'),
+            'mouseout': () => siriusLabel2.logger.log('mouseout')
+        }
     }
 </script>
-
-<sirius-label caption="Haz click si deseas editar" id="label-1" style="border-radius: 8px; background-color: #f0f0f0;" caption-style="color: blue;"></sirius-label>
-
-
 </body>
 </html>

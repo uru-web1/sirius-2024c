@@ -1,15 +1,16 @@
 <html>
 <head>
-    <script type="module" src="../js/com/Atom.js"></script>
-    <link rel="icon" href="../images/icons/favicon.png" sizes="32x32" type="image/png">
+    <script src="../js/com/Atom.js" type="module"></script>
+    <link href="../images/icons/favicon.png" rel="icon" sizes="32x32" type="image/png">
 </head>
 <body>
 <script>
+    window.valor = 50
     let atomInit = async () => {
         let c = await atom.createInstance("AtomCheck", {
             'id': 'AtomCheckJS',
             'caption': 'titulo de la opcion',
-            'style': {'left': '120px', 'top': '110px'},
+            'style': {'left': `${window.valor}px`, 'top': '110px'},
             'events': {
                 'mouseup': (e) => {
                     console.log('Hizo click...');
@@ -24,8 +25,17 @@
             // c.caption="Nuevo Caption";
         }
         c.addToBody();
+        window.valor -= 20
     };
 </script>
-<atom-check id="AtomCheckHTML" caption="Aceptar" style="position:absolute; left:120px; top:140px"></atom-check>
+<script>
+
+</script>
+<atom-check caption="Aceptar" id="AtomCheckHTML" style="position:absolute; left:100px; top:120px"></atom-check>
+<atom-check caption="Aceptar" id="AtomCheckHTML" style="position:absolute; left:80px; top:100px"></atom-check>
+<atom-check caption="Aceptar" id="AtomCheckHTML" style="position:absolute; left:40px; top:80px"></atom-check>
+<atom-check caption="Aceptar" id="AtomCheckHTML" style="position:absolute; left:20; top:40px"></atom-check>
+
+<button onclick="atomInit()">Buton para probar el dinamismo a la hora de subir el css</button>
 </body>
 </html>

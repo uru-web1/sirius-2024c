@@ -9,6 +9,26 @@ export const AtomSwitch = class extends Atom {
         this.attachShadow({mode: 'open'});
     }
 
+    get disabled() {
+        return this.mainElement.disabled
+    }
+
+    set disabled(val) {
+        this.setAttribute('disabled', val);
+        this.mainElement.disabled = val;
+        if (val) this.mainElement.animate([{opacity: 0.2}], {duration: 500, fill: 'both'});
+        else this.mainElement.animate([{opacity: 1}], {duration: 500, fill: 'both'});
+    }
+
+    get sts() {
+        return this._sts
+    }
+
+    set sts(val) {
+        this._sts = val;
+        this.#fullAnimation();
+    }
+
     #getTemplate() {
         return `
             <div class='AtomSwitch'>
@@ -98,26 +118,6 @@ export const AtomSwitch = class extends Atom {
 
     addToBody() {
         document.body.appendChild(this);
-    }
-
-    get disabled() {
-        return this.mainElement.disabled
-    }
-
-    set disabled(val) {
-        this.setAttribute('disabled', val);
-        this.mainElement.disabled = val;
-        if (val) this.mainElement.animate([{opacity: 0.2}], {duration: 500, fill: 'both'});
-        else this.mainElement.animate([{opacity: 1}], {duration: 500, fill: 'both'});
-    }
-
-    get sts() {
-        return this._sts
-    }
-
-    set sts(val) {
-        this._sts = val;
-        this.#fullAnimation();
     }
 }
 

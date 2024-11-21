@@ -10,6 +10,50 @@ export const AtomSelect = class extends Atom {
         this._reactive = false;
     }
 
+    get options() {
+        return this.selectElement.options;
+    }
+
+    get caption() {
+        return this.labelElement.innerText
+    }
+
+    set caption(val) {
+        this.setAttribute('caption', val);
+        this.labelElement.innerText = val;
+    }
+
+    get reactive() {
+        return this._reactive
+    }
+
+    set reactive(val) {
+        this.setAttribute('reactive', val);
+        this._reactive = val;
+    }
+
+    get disabled() {
+        return this.selectElement.disabled
+    }
+
+    set disabled(val) {
+        this.setAttribute('disabled', val);
+        this.selectElement.disabled = val;
+    }
+
+    get selectedIndex() {
+        return this.selectElement.selectedIndex;
+    }
+
+    set selectedIndex(val) {
+        this.selectElement.selectedIndex = val;
+        if (val >= 0) this.#animationUp(); else this.#animationDown();
+    }
+
+    get value() {
+        return this.getOption(this.selectElement.selectedIndex).text;
+    }
+
     #getTemplate() {
         return `
             <div class="AtomSelectContainer">
@@ -168,50 +212,6 @@ export const AtomSelect = class extends Atom {
             }
         }
         return this;
-    }
-
-    get options() {
-        return this.selectElement.options;
-    }
-
-    get caption() {
-        return this.labelElement.innerText
-    }
-
-    set caption(val) {
-        this.setAttribute('caption', val);
-        this.labelElement.innerText = val;
-    }
-
-    get reactive() {
-        return this._reactive
-    }
-
-    set reactive(val) {
-        this.setAttribute('reactive', val);
-        this._reactive = val;
-    }
-
-    get disabled() {
-        return this.selectElement.disabled
-    }
-
-    set disabled(val) {
-        this.setAttribute('disabled', val);
-        this.selectElement.disabled = val;
-    }
-
-    get selectedIndex() {
-        return this.selectElement.selectedIndex;
-    }
-
-    set selectedIndex(val) {
-        this.selectElement.selectedIndex = val;
-        if (val >= 0) this.#animationUp(); else this.#animationDown();
-    }
-
-    get value() {
-        return this.getOption(this.selectElement.selectedIndex).text;
     }
 }
 

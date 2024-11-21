@@ -10,6 +10,25 @@ export const AtomButton = class extends Atom {
         this.attachShadow({mode: 'open'});
     }
 
+    get caption() {
+        return this.mainElement.innerText
+    }
+
+    set caption(val) {
+        this.setAttribute('caption', val);
+        this.mainElement.innerText = val;
+        this.dispatchEvent(new CustomEvent("changeCaption", {bubbles: true}));
+    }
+
+    get disabled() {
+        return this.mainElement.disabled
+    }
+
+    set disabled(val) {
+        this.setAttribute('disabled', val);
+        this.mainElement.disabled = val;
+    }
+
     #getTemplate() {
         return `
             <button class='AtomButton'></button>
@@ -64,25 +83,6 @@ export const AtomButton = class extends Atom {
 
     addToBody() {
         document.body.appendChild(this);
-    }
-
-    get caption() {
-        return this.mainElement.innerText
-    }
-
-    set caption(val) {
-        this.setAttribute('caption', val);
-        this.mainElement.innerText = val;
-        this.dispatchEvent(new CustomEvent("changeCaption", {bubbles: true}));
-    }
-
-    get disabled() {
-        return this.mainElement.disabled
-    }
-
-    set disabled(val) {
-        this.setAttribute('disabled', val);
-        this.mainElement.disabled = val;
     }
 }
 

@@ -1,0 +1,108 @@
+:host {
+    display: inline-block;
+    box-sizing: border-box;
+
+    --sirius-tree-view--gap: 10px;
+    --sirius-tree-view--children-margin-left: 5px;
+    --sirius-tree-view--animation-duration: 500ms;
+    --sirius-tree-view--children-gap: 10px;
+}
+
+:host-context(.has-parent){
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1/-1;
+}
+
+:host-context(.has-parent) .container-element {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1/-1;
+}
+
+.container-element {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    grid-auto-rows: max-content;
+    gap: var(--sirius-tree-view--gap);
+}
+
+.parent-container {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-row: 1/2;
+    grid-column: 1/-1;
+}
+
+.icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: 1/2;
+    grid-row: 1/2;
+}
+
+.parent {
+    grid-column: 2/-1;
+    grid-row: 1/2;
+}
+
+.children-container {
+    display: grid;
+    grid-row: 2/3;
+    grid-column: 2/-1;
+    max-height: 0;
+    transition: max-height var(--sirius-tree-view--animation-duration) linear;
+    margin-left: var(--sirius-tree-view--children-margin-left);
+}
+
+.children-container:not(.hiding) {
+    max-height: 100%;
+}
+
+.children-container:not(.hiding) {
+    animation: show-animation var(--sirius-tree-view--animation-duration);
+}
+
+.children-container.hiding {
+    animation: hiding-animation var(--sirius-tree-view--animation-duration);
+}
+
+.children{
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    overflow-y: hidden;
+    gap: var(--sirius-tree-view--children-gap);
+}
+
+::slotted([slot="children"]) {
+    grid-column: 2/-1;
+}
+
+:host .children-container .children::slotted(sirius-tree-view) {
+    grid-column: 1/-1;
+}
+
+@keyframes show-animation {
+    0% {
+        opacity: 0;
+        max-height: 0;
+    }
+
+    100% {
+        opacity: 1;
+        max-height: 100%;
+    }
+}
+
+@keyframes hiding-animation {
+    0% {
+        opacity: 1;
+        max-height: 100%;
+    }
+
+    100% {
+        opacity: 0;
+        max-height: 0;
+    }
+}

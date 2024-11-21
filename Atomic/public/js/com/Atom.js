@@ -11,18 +11,54 @@ export const Atom = class extends HTMLElement {
         if (props) this.props = props;
         this.actZIndex = 0;
         this.cssFiles = new Map();
+        this.pendingCssPromises = new Map();
+    }
+
+    get callback() {
+        return this.callback
+    }
+
+    set callback(val) {
+        this._callBack = val
+    }
+
+    get callbackids() {
+        return this.mapcallbackids
+    }
+
+    set callbackids(arr) {
+        for (let id of arr) {
+            this.mapcallbackids.set(id, {});
+        }
+        ;
     }
 
     async getCssFile(fileName) {
+
         if (!this.cssFiles.has(fileName)) {
-            let css = await fetch(atom.routes.css + fileName + ".css").then((response) => response.text());
-            if (!this.cssFiles.has(fileName)) {
-                this.cssFiles.set(fileName, css);
+            // Si ya se está descargando, esperamos a la misma promesa
+            if (this.pendingCssPromises.has(fileName)) {
+                console.log("retornado por promesa");
+
+                return await this.pendingCssPromises.get(fileName);
             }
-            ;
-            return css;
+
+            // Crear la promesa y almacenarla
+            const cssPromise = fetch(atom.routes.css + fileName + ".css")
+                .then((response) => response.text())
+                .then((css) => {
+                    this.cssFiles.set(fileName, css); // Guardar el archivo CSS
+                    this.pendingCssPromises.delete(fileName); // Eliminar la promesa pendiente
+                    return css;
+                });
+
+            this.pendingCssPromises.set(fileName, cssPromise);
+
+            console.log("retornado por primera construccion");
+            return await cssPromise;
         } else {
-            return this.cssFiles.get(fileName);
+            console.log("retornado por mapa");
+            return this.cssFiles.get(fileName); // Retornar el archivo si ya está almacenado
         }
     }
 
@@ -93,25 +129,6 @@ export const Atom = class extends HTMLElement {
             console.log('No se pudo crear la instancia');
             return null;
         }
-    }
-
-    set callback(val) {
-        this._callBack = val
-    }
-
-    get callback() {
-        return this.callback
-    }
-
-    get callbackids() {
-        return this.mapcallbackids
-    }
-
-    set callbackids(arr) {
-        for (let id of arr) {
-            this.mapcallbackids.set(id, {});
-        }
-        ;
     }
 }
 

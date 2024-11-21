@@ -1,7 +1,7 @@
 <html>
 <head>
-    <script type="module" src="../js/com/Atom.js"></script>
-    <link rel="icon" href="../images/icons/favicon.png" sizes="32x32" type="image/png">
+    <script src="../js/com/Atom.js" type="module"></script>
+    <link href="../images/icons/favicon.png" rel="icon" sizes="32x32" type="image/png">
     <!-- <link rel="stylesheet" type="text/css" href="a.css"> -->
 </head>
 <body>
@@ -30,9 +30,11 @@
     };
 
 </script>
-<atom-gauge id="d1" percentaje="5"
+    <atom-gauge accumulator-style="background-color: turquoise ;"
             container-style="border-color: darkgreen; background-color: beige;"
-            accumulator-style="background-color: turquoise ;"
-            percentaje-style="color: black;"></atom-gauge>
+            id="d1"
+            percentaje="5"
+            percentaje-style="color: black;">
+    </atom-gauge>
 </body>
 </html>
