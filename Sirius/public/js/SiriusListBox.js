@@ -1,6 +1,7 @@
 import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
 import {SIRIUS_CHECKBOX_ATTRIBUTES, SiriusCheckbox} from "./SiriusCheckbox.js";
 import {SIRIUS_LABEL_ATTRIBUTES, SiriusLabel} from "./SiriusLabel.js";
+
 import deepFreeze from "./utils/deep-freeze.js";
 
 /** SiriusListBox class */
@@ -26,7 +27,7 @@ export const SIRIUS_LIST_BOX_ATTRIBUTES = deepFreeze({
     PADDING: "padding",
     GAP: "gap",
     HEAD: "head",
-    CHECKBOX_COLOR: "checkbox-border-color",
+    CHECKBOX_COLOR: "checkbox-color",
     CHECKBOX_STATUS: "checkbox-status",
     ITEMS: "items",
 })
@@ -66,6 +67,7 @@ export class SiriusListBox extends SiriusElement {
 
         // Build the SiriusListBox
         this.#build().then();
+
     }
 
     /** Define observed attributes
@@ -174,7 +176,7 @@ export class SiriusListBox extends SiriusElement {
      * @returns {Array} - Items attribute
      */
     get items() {
-        return JSON.parse(this.getAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS) || "[]");
+        return this.getAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS) || "[]";
     }
 
     /** Set items attribute
@@ -246,13 +248,17 @@ export class SiriusListBox extends SiriusElement {
      * @returns {Array} - Checked items
      */
     getCheckedItems(){
-
+    this.onBuilt = () => {
+        
+        
         this.#itemContainerList.forEach((item) => {
-            if(item.querySelector("sirius-checkbox").status === "checked" && item.id !== "item-0"){
+            if(item.querySelector("sirius-checkbox").status === "checked" && item.id !== "item_head"){
                 this._checkedItems.push(item);
             }
         });
+        console.log(this._checkedItems);
         return this._checkedItems;
+        }
     }
 
     /**Public method to set the items attribute
@@ -261,12 +267,13 @@ export class SiriusListBox extends SiriusElement {
          * @returns {void}
          * */
     addItem(item){
+
         this.onBuilt = () => {
-            
+
             const itemElement = this.#createItem(item);
             this.#itemsListContainerElement.appendChild(itemElement);
             this.#itemsList.push(item);
-            
+            this.#setCheckboxColor(this.checkboxBorderColor);
         }
     }
 
@@ -281,9 +288,11 @@ export class SiriusListBox extends SiriusElement {
             
             if(!item) return;
             
-            this.#headElement.querySelector("sirius-checkbox").removeChildren(item.querySelector("sirius-checkbox"));
+            if(!this.#head){
+            const parent = this.#headElement.querySelector("sirius-checkbox")
+            parent.removeChildElementById(item.querySelector("sirius-checkbox").id);
+            }
 
-            
             this.#itemsListContainerElement.removeChild(item);
             this.#updateList(item);
         } 
@@ -298,12 +307,6 @@ export class SiriusListBox extends SiriusElement {
         this.onBuilt = () => {
 
             const itemId= item.id;
-            
-            const checkbox = item.querySelector('sirius-checkbox');
-            const label = item.querySelector('sirius-label');
-            
-            sirius.removeInstance(label.id)
-            sirius.removeInstance(checkbox.id)
 
             // Remove the item from the itemsList
             this.#itemsList.forEach((item)=>{
@@ -322,17 +325,32 @@ export class SiriusListBox extends SiriusElement {
         }
     }
 
-    /**Private method to set the items attribute
-     * @param {Array} items - Items attribute value
-     */
-    async #setItems(items) {
-        if (!items) return
+    /** Private method to set the items attribute
+ * @param {string} ruta - Ruta del archivo JSON
+ */
+async #setItems(ruta) {
+
+    try {
+        // Fetch the JSON file from the provided route
+        const response = await fetch(ruta);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch items from ${ruta}`);
+        }
+        // Parse the JSON data
+        const items = await response.json();
+
+        // Update the items list
         this.#itemsList = items;
 
-        // Render the ListBox items
+        // Render the items
         this.#renderItems();
-    
+
+    } catch (error) {
+
+        // Log the error
+        this.logger.error(`Error setting items: ${error.message}`);
     }
+}
 
     /** Private method to set the head attribute
      * @param {string} head - Head attribute value
@@ -345,6 +363,7 @@ export class SiriusListBox extends SiriusElement {
      * @returns {void}
      */
     #renderItems() {        
+
             if (!this.#head) {
                 this.#createHead();
             }else{
@@ -352,14 +371,13 @@ export class SiriusListBox extends SiriusElement {
                 this.#headContainerElement.hidden = true;
             }
 
-            console.log(this.#itemsList);
-            
-
             // Render new items
             this.#itemsList.forEach(item => {
                 const itemElement = this.#createItem(item);
                 this.#itemsListContainerElement.appendChild(itemElement);
             });
+
+            this.dispatchEvent(new CustomEvent('itemsRendered'));
     }
 
     /** Create the head of the ListBox
@@ -373,9 +391,6 @@ export class SiriusListBox extends SiriusElement {
     /** Create a ListBox item
      *
      * @param {object} item - Item object
-     * @param {string} item.id - Item id
-     * @param {string} item.label - Item label
-     * @param {string} item.checked - Item checked status
      * @returns {HTMLElement} - ListBox item element
      */
     #createItem({id, label, checked = "unchecked"}) {
@@ -387,6 +402,8 @@ export class SiriusListBox extends SiriusElement {
         const checkboxId = `${this.id}_checkbox_${id}`;
 
         // Get the checkbox attributes
+        const iconWidthKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_WIDTH;
+        const iconHeightKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_HEIGHT;
         const statusKey = SIRIUS_CHECKBOX_ATTRIBUTES.STATUS;
 
         // Get the label attributes
@@ -401,6 +418,8 @@ export class SiriusListBox extends SiriusElement {
         this.#checkboxElement = new SiriusCheckbox({
             [idKey]: checkboxId,
             [statusKey]: checked,
+            [iconWidthKey]: '14px',
+            [iconHeightKey]: '14px',
         });
         itemContainer.appendChild(this.checkboxElement);
 
@@ -413,8 +432,7 @@ export class SiriusListBox extends SiriusElement {
 
         // Add the click event to the checkbox element
         this.checkboxElement.addEventListener('click', () => {
-            console.log(this.getCheckedItems());
-            console.log(this.#headElement.querySelector("sirius-checkbox").children);
+            this.getCheckedItems();
             this._checkedItems=[];
         });
         
@@ -509,7 +527,7 @@ export class SiriusListBox extends SiriusElement {
      * @param {string} oldValue - Old value
      * @param {string} newValue - New value
      */
-    #attributeChangeHandler(name, oldValue, newValue) {
+    async #attributeChangeHandler(name, oldValue, newValue) {
         switch (name) {
             case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
                 this._setId(newValue);
@@ -536,10 +554,12 @@ export class SiriusListBox extends SiriusElement {
                 break;
 
             case SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR:
-                this.#setCheckboxColor(newValue);
+                this.addEventListener('itemsRendered', () => {
+                    this.#setCheckboxColor(newValue);
+                });
                 break;
             case SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS:
-                this.#setItems(JSON.parse(newValue));
+                await this.#setItems(newValue);
                 break;
 
             default:
@@ -559,7 +579,7 @@ export class SiriusListBox extends SiriusElement {
         if (!shouldContinue) return;
 
         // Call the attribute change handler
-        this.onBuilt=()=>this.#attributeChangeHandler(name, oldValue, formattedValue);
+        this.onBuilt = () => this.#attributeChangeHandler(name, oldValue, formattedValue);
     }
 }
 
