@@ -1,40 +1,38 @@
-.sirius-switch-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+:host {
+    display: inline-block;
+    --switch-width: 40px;
+    --switch-height: 20px;
+    --switch-bg-on: #3084F7; 
+    --switch-bg-off: #e5e5ea;
+    --switch-button-color: #ffffff; 
 }
 
-.sirius-switch-input {
-    width: 40px;
-    height: 20px;
-    appearance: none;
-    background: #ccc;
-    border-radius: 20px;
-    position: relative;
+.switch-container {
+    width: var(--switch-width);
+    height: var(--switch-height);
+    background-color: var(--switch-bg-off);
+    border-radius: calc(var(--switch-height) / 2);
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    box-sizing: border-box;
+    transition: background-color 0.3s ease;
     cursor: pointer;
 }
 
-.sirius-switch-input:checked {
-    background: #3084F7;
+.switch-container.checked {
+    background-color: var(--switch-bg-on);
 }
 
-.sirius-switch-input:before {
-    content: '';
-    position: absolute;
-    width: 18px;
-    height: 18px;
+.switch-button {
+    width: calc(var(--switch-height) - 4px);
+    height: calc(var(--switch-height) - 4px);
+    background-color: var(--switch-button-color);
     border-radius: 50%;
-    background: white;
-    transition: 0.2s;
-    top: 1px;
-    left: 1px;
+    transition: transform 0.3s ease;
+    transform: translateX(0);
 }
 
-.sirius-switch-input:checked:before {
-    left: 21px;
-}
-
-.sirius-switch-label {
-    font-size: 14px;
-    color: #333;
+.switch-container.checked .switch-button {
+    transform: translateX(calc(var(--switch-width) - var(--switch-height)));
 }

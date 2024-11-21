@@ -1,110 +1,99 @@
-import { SIRIUS_TYPES, SiriusElement } from "./SiriusElement.js";
+import { SiriusElement } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
-/** Sirius switch constants */
+// Constantes para el Switch
 export const SIRIUS_SWITCH = deepFreeze({
     NAME: "SiriusSwitch",
     TAG: "sirius-switch",
-    ATTRIBUTES: {
-        LABEL: { NAME: "label", DEFAULT: "Switch", TYPE: SIRIUS_TYPES.STRING },
-        CHECKED: { NAME: "isChecked", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN }
+    CSS_VARS: {
+        WIDTH: "--switch-width",
+        HEIGHT: "--switch-height",
+        BACKGROUND_ON: "--switch-bg-on",
+        BACKGROUND_OFF: "--switch-bg-off",
+        BUTTON_COLOR: "--switch-button-color",
     },
     CLASSES: {
-        CONTAINER: 'sirius-switch-container',
-        LABEL: 'sirius-switch-label',
-        INPUT: 'sirius-switch-input',
-        CHECKED: 'checked'
-    }
+        SWITCH_CONTAINER: "switch-container",
+        SWITCH_BUTTON: "switch-button",
+    },
 });
 
-class SiriusSwitch extends SiriusElement {
-    /**
-     * Create a SiriusSwitch element
-     * @param {object} props - Element properties (id, label, isChecked, etc.)
-     */
-    constructor(props) {
-        super(props, SIRIUS_SWITCH.NAME);
+export class SiriusSwitch extends SiriusElement {
+    #switchContainerElement = null;
+    #switchButtonElement = null;
 
-        // Load Sirius switch HTML attributes
-        this._loadAttributes({
-            htmlAttributes: SIRIUS_SWITCH.ATTRIBUTES,
-            properties: props
-        });
+    #isChecked = false; // Estado del switch
 
-        // Build the switch template
-        this._createSwitchTemplate();
+    constructor(properties) {
+        super(properties, SIRIUS_SWITCH.NAME);
     }
 
-    /** Create the switch template */
-    async _createSwitchTemplate() {
-        // Construct the HTML template using the constants
-        const switchHTML = `
-            <div id="${this._attributes.id}-container" class="${SIRIUS_SWITCH.CLASSES.CONTAINER}">
-                <label for="${this._attributes.id}-input" class="${SIRIUS_SWITCH.CLASSES.LABEL}">
-                    ${this._attributes[SIRIUS_SWITCH.ATTRIBUTES.LABEL.NAME]}
-                </label>
-                <input type="checkbox" id="${this._attributes.id}-input" class="${SIRIUS_SWITCH.CLASSES.INPUT}"
-                    ${this._attributes[SIRIUS_SWITCH.ATTRIBUTES.CHECKED.NAME] ? 'checked' : ''}>
-            </div>
-        `;
-
-        // Create the inner HTML template using the helper function from SiriusElement
-        await this._createTemplate(switchHTML);
-
-        // Set the container element as the switch's outer div
-        this.containerElement = this._templateContent.querySelector(`#${this._attributes.id}-container`);
-
-        // Append the template content to the shadow DOM
-        this.shadowRoot.appendChild(this._templateContent);
-
-        // Load the styles for this component
-        await this._loadElementStyles(SIRIUS_SWITCH.NAME);
-
-        // Dispatch the built event once the element is fully built
-        this.dispatchBuiltEvent();
+    static get observedAttributes() {
+        return [...SiriusElement.observedAttributes];
     }
 
-    /** Toggle the switch state programmatically */
-    toggleSwitch() {
-        const input = this.shadowRoot.querySelector(`#${this._attributes.id}-input`);
-        if (input) {
-            input.checked = !input.checked;
-            this._attributes[SIRIUS_SWITCH.ATTRIBUTES.CHECKED.NAME] = input.checked;
+    get isChecked() {
+        return this.#isChecked;
+    }
+
+    set isChecked(value) {
+        this.#isChecked = value;
+        this.#updateSwitchState();
+    }
+
+    #updateSwitchState() {
+        if (this.#isChecked) {
+            this.#switchContainerElement.classList.add("checked");
+        } else {
+            this.#switchContainerElement.classList.remove("checked");
         }
     }
 
-    /** Get the current state of the switch */
-    get isChecked() {
-        return this._attributes[SIRIUS_SWITCH.ATTRIBUTES.CHECKED.NAME];
+    #toggleSwitch() {
+        this.isChecked = !this.isChecked;
+        this.dispatchEvent(
+            new CustomEvent("switch-toggled", {
+                detail: { isChecked: this.isChecked },
+            })
+        );
     }
 
-    /** Add the SiriusSwitch element to the body */
-    addToBody() {
-        document.body.appendChild(this);
+    #getTemplate() {
+        const containerClasses = [SIRIUS_SWITCH.CLASSES.SWITCH_CONTAINER];
+        const buttonClasses = [SIRIUS_SWITCH.CLASSES.SWITCH_BUTTON];
+
+        return `
+            <div class="${containerClasses.join(" ")}">
+                <div class="${buttonClasses.join(" ")}"></div>
+            </div>
+        `;
     }
 
-    /** Show the switch */
-    show() {
-        this.containerElement.classList.remove('hidden');
-    }
+    async connectedCallback() {
+        if (!this.shadowRoot) {
+            this.attachShadow({ mode: 'open' });  // Crear shadow DOM si no está presente
+        }
 
-    /** Hide the switch */
-    hide() {
-        this.containerElement.classList.add('hidden');
-    }
+        // Crear la plantilla
+        const innerHTML = this.#getTemplate();
+        this.shadowRoot.innerHTML = innerHTML;
 
-    /** Center the switch on the screen */
-    centerScreen() {
-        this.containerElement.classList.add('center-screen');
-    }
+        // Obtener elementos del shadow DOM
+        this.#switchContainerElement = this.shadowRoot.querySelector(`.${SIRIUS_SWITCH.CLASSES.SWITCH_CONTAINER}`);
+        this.#switchButtonElement = this.#switchContainerElement.querySelector(`.${SIRIUS_SWITCH.CLASSES.SWITCH_BUTTON}`);
 
-    /** Remove centering from the screen */
-    removeCenterScreen() {
-        this.containerElement.classList.remove('center-screen');
+        // Agregar evento de clic
+        this.#switchContainerElement.addEventListener("click", () => this.#toggleSwitch());
+
+        // Agregar el estilo
+        await this._loadAndAdoptStyles();
+
+        // Estado inicial
+        this.#updateSwitchState();
+
+        // Despachar evento de construcción
+        this.dispatchBuiltEvent();
     }
 }
 
-// Register the custom element in the browser
 customElements.define(SIRIUS_SWITCH.TAG, SiriusSwitch);
-
-export default SiriusSwitch;

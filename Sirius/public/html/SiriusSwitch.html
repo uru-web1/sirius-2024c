@@ -3,40 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Sirius Switch</title>
+    <title>Sirius Switch Example</title>
     <script defer src="../js/Sirius.js" type="module"></script>
-    <script defer src="../js/SiriusSwitch.js" type="module"></script>
 </head>
 <body>
-<script type="module">
-    import sirius from '../js/Sirius.js';
-    import { SIRIUS_SWITCH, SiriusSwitch } from '../js/SiriusSwitch.js';
-    import { SIRIUS_ELEMENT } from "../js/SiriusElement.js";
+    <sirius-switch></sirius-switch>
+    <sirius-switch></sirius-switch>
 
-    // Get the attributes keys
-    const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
-    const activeKey = SIRIUS_SWITCH.ATTRIBUTES.ACTIVE.NAME;
-    const disabledKey = SIRIUS_SWITCH.ATTRIBUTES.DISABLED.NAME;
+    <script type="module">
+        import { SiriusSwitch } from "../js/SiriusSwitch.js";
 
-    sirius.onLoaded = async () => {
-        const siriusSwitch1 = new SiriusSwitch({
-            [idKey]: 'switch-1',
-            [activeKey]: false,
-            [disabledKey]: false
+        // Acceder al switch desde el DOM
+        const switchElement = document.querySelector("sirius-switch");
+
+        // Escuchar el evento personalizado
+        switchElement.addEventListener("switch-toggled", (event) => {
+            console.log("Switch toggled:", event.detail.isChecked);
         });
-
-        const siriusSwitch2 = new SiriusSwitch({
-            [idKey]: 'switch-2',
-            [activeKey]: true,
-            [disabledKey]: false
-        });
-
-        siriusSwitch1.addToBody();
-        siriusSwitch2.addToBody();
-    };
-</script>
-
-<sirius-switch id="switch-3"></sirius-switch>
-<sirius-switch id="switch-4"></sirius-switch>
+    </script>
 </body>
 </html>
