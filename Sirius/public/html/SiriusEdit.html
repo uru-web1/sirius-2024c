@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/SiriusEdit.css">
+    <script src="../js/Sirius.js" type="module"></script>
+    <script src="../js/SiriusEdit.js" type="module"></script>
+    <title>Document</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%; /* Ensure the body takes the full height of the viewport */
+        }
+        body {
+            font-style: italic;
+            display: flex;
+            background-color: #1C2841;
+            align-items: center;
+            justify-content: center;
+        }  
+    </style>
+</head>
+<body>
+
+    <script type="module">
+    import sirius from '../js/Sirius.js';
+    import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
+    import {SIRIUS_EDIT_ATTRIBUTES, SiriusEdit} from "../js/SiriusEdit.js"
+    // Get the attributes keys
+    const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+    const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+    
+    const widthKey = SIRIUS_EDIT_ATTRIBUTES.WIDTH;
+    const heightKey = SIRIUS_EDIT_ATTRIBUTES.HEIGHT;
+    const inputColorKey = SIRIUS_EDIT_ATTRIBUTES.INPUT_COLOR;
+    const inputFontSizeKey = SIRIUS_EDIT_ATTRIBUTES.INPUT_FONT_SIZE;
+    const inputFontColorKey = SIRIUS_EDIT_ATTRIBUTES.INPUT_FONT_COLOR;
+    const labelBackgroundKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_BACKGROUND;
+    const labelFontColorKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_FONT_COLOR;
+    const labelBorderColorKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_BORDER_COLOR;
+    const labelFontColorOnFocusKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_FONT_COLOR_ONFOCUS;
+    const labelBorderColorOnFocusKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_BORDER_COLOR_ONFOCUS;    
+
+    sirius.onLoaded = async () =>{
+        const SiriusEdit1 = new SiriusEdit({
+            [idKey]:"edit1",
+            [inputColorKey] : "black",
+        })
+    } 
+
+    </script>
+
+    
+</body>
+</html>
