@@ -1,22 +1,23 @@
 :host{
     display: inline-block;
-    --gap: 10px;
+    --gap: 5px;
     --padding: 10px;
-    --background-color: rgb(184, 184, 184);
+    --background-color: white;
 }
 
 .list-box-container {
     display: block;
     overflow-y: auto;
-    gap: var(--gap);
     padding: var(--padding);
     background-color: var(--background-color);
-    border-radius: 1em;
     margin: 40px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    max-width: 300px;
 }
 
+
 .head-container {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid rgb(48, 48, 48);
     padding: 5px;
 }
 
@@ -27,5 +28,7 @@
 }
 
 .items-container{
+    display:grid;
     padding: 5px;
+    gap: var(--gap);
 }

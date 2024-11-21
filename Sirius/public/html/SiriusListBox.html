@@ -10,26 +10,14 @@
 
 </head>
 <body>
+    <style>
+        body{
+            background-color: gray;
+        }
+    </style>
 
-    <!-- Con HTML
-    <sirius-list-box id="listbox-1"></sirius-list-box>
-
-    <script type="module">
-        import sirius from '../js/Sirius.js';
-        
-        sirius.onLoaded = async () => {
-            const listbox1 = document.querySelector('#listbox-1');
-            
-            listbox1.items = `[
-                { "id": "item-1", "label": "Item 1" },
-                { "id": "item-2", "label": "Item 2" },
-                { "id": "item-3", "label": "Item 3" }
-            ]`;
-            listbox1.background-color = 'lightblue';
-            listbox1.checkboxColor = 'blue';
-        };
-    </script> -->
-
+    <sirius-list-box id="listbox-1"  background-color = 'lightblue' 
+    checkbox-color='black' items='../data/item.json'></sirius-list-box>
 
     <!-- Con JS -->
     <script type="module">
@@ -49,29 +37,28 @@
 
             // Create a new ListBox
             const listBox1 = new SiriusListBox({
-                [idKey]: 'listbox-1',
-                [itemsKey]:`[
-                    { "id": "item_1", "label": "Item 1"},
-                    { "id": "item_2", "label": "Item 2"},
-                    { "id": "item_3", "label": "Item 3"}
-                ]
-                `,
-                [backgroundKey]: 'rgb(205,207,214)',
+                [idKey]: 'listbox-2',
+                // [headKey]: 'false',
+                [itemsKey]: '../data/item.json',
+                // [backgroundKey]: 'rgb(205,207,214)',
                 [checkboxColorKey]: 'black',
-                
+                // [styleKey]: 'margin: 400px'
             });
 
-            listBox1.removeItem('item_2');
-
-            listBox1.addItem({ "id": "item_2", "label": "Item 2" });
-
-
-
-
+            const listBox3 = new SiriusListBox({
+                [idKey]: 'listbox-3',
+                [itemsKey]: '../data/item.json',
+                [checkboxColorKey]: 'black',
+                [backgroundKey]: 'rgb(250, 201, 255)',
+            });
+            //listBox1.removeItem('item_2');
             
+            // listBox1.addItem({ "id": "item_5", "label": "Item 5" });
+
 
             // Add the ListBox to the body
             listBox1.addToBody();
+            listBox3.addToBody();
         };
     </script>
 </body>

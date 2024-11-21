@@ -767,7 +767,7 @@ export class SiriusCheckbox extends SiriusElement {
     /** Private method to remove the parent element */
     #removeParentElement() {
         this.onBuilt = () => {
-            this.#parentElement.#children = this.#children.filter(child => child !== this);
+            this.#parentElement.#children = this.#parentElement.#children.filter(child => child !== this);
             this.#parentElement = null;
         }
     }
@@ -840,10 +840,14 @@ export class SiriusCheckbox extends SiriusElement {
         this.onBuilt = () => {
             // Get the child element by ID
             const child = this.children.find(child => child.id === id);
+            console.log(this.children);
+            console.log(child)
             if (!child) return;
-
+            
+        
             // Remove the child element
             child.parentId = "";
+            console.log(this.children);
         }
     }
 
