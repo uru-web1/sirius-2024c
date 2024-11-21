@@ -1,17 +1,8 @@
 /** Sirius logger constants */
 export const SIRIUS_LOGGER = {
     NAME: 'SiriusLogger',
-    INNER_PADDING: {
-        CLASS: {
-            WIDTH: 20,
-            FILL_CHAR: ' ',
-        },
-        ELEMENT_ID: {
-            WIDTH: 20,
-            FILL_CHAR: ' ',
-        },
-    },
-    BORDER_PADDING: {
+    DEBUG: true,
+    PADDING: {
         WIDTH: 2,
         FILL_CHAR: ' ',
     },
@@ -60,34 +51,41 @@ export class SiriusLogger {
 
     /** Add padding
      * @param {string} message - Message to log
-     * @param {number} width - Padding width
-     * @param {string} fillChar - Padding character
+     * @param {number} maxLength - Maximum length
+     * @param {string} padding - Padding
      * @returns {string} - Padded message
      */
-    addPadding(message, {WIDTH: width, FILL_CHAR: fillChar}) {
-        const diff = width - String(message).length - 1;
-        let padding = '';
-        if (diff > 0) padding = fillChar.repeat(diff);
+    addPadding(message, maxLength= message.length, padding='') {
+        // Get the filled message
+        const filledMessage = message.concat(SIRIUS_LOGGER.PADDING.FILL_CHAR.repeat(maxLength - message.length));
 
-        return [message, padding].join('')
+        return [padding, filledMessage,padding].join('')
     }
 
     /** String formatting
      * @param {string} message - Message to log
      */
     format(message) {
+        // Get maximum length
+        const maxLength = Math.max(this.#name.length, this.#elementId?.length || 0, message.length);
+
+        // Get padding
+        const padding = SIRIUS_LOGGER.PADDING.FILL_CHAR.repeat(SIRIUS_LOGGER.PADDING.WIDTH);
+
         // Get padded class name
-        const paddedClassName = this.addPadding(this.#name, SIRIUS_LOGGER.INNER_PADDING.CLASS);
+        const paddedClassName = this.addPadding(this.#name,maxLength, padding);
 
-        // Get padded element ID if exists
-        let paddedElementId = ''
-        if (this.#elementId)
-            paddedElementId = this.addPadding(this.#elementId, SIRIUS_LOGGER.INNER_PADDING.ELEMENT_ID);
+        // Get padded message
+        const paddedMessage = this.addPadding(message,maxLength, padding);
 
-        // Get border padding
-        const borderPadding = SIRIUS_LOGGER.BORDER_PADDING.FILL_CHAR.repeat(SIRIUS_LOGGER.BORDER_PADDING.WIDTH);
+        // Check if element ID is available
+        if (!this.#elementId)
+            return ['%c', paddedClassName, paddedMessage].join('\n')
 
-        return ['%c', borderPadding, paddedClassName, paddedElementId, message, borderPadding].join('')
+        // Get padded element ID
+        const paddedElementId = this.addPadding(this.#elementId,maxLength, padding);
+
+        return ['%c', paddedClassName, paddedElementId, paddedMessage].join('\n')
     }
 
     /** Get color CSS
@@ -103,6 +101,8 @@ export class SiriusLogger {
      * @param {string} message - Message to log
      */
     log(message) {
+        if (!SIRIUS_LOGGER.DEBUG) return;
+
         // Get the log colors
         const cssStyle = this.#getColorCSS({
             bgColor: this.#logBgColor,
@@ -115,6 +115,8 @@ export class SiriusLogger {
      * @param {string} message - Message to log
      */
     error(message) {
+        if (!SIRIUS_LOGGER.DEBUG) return;
+
         // Get the error colors
         const cssStyle = this.#getColorCSS({
             bgColor: this.#errorBgColor,

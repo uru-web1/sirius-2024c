@@ -5,9 +5,8 @@
     --background-color: rgb(184, 184, 184);
 }
 
-.list-box-container {
-    display: block;
-    overflow-y: auto;
+.exchange-list-container {
+    display: flex;
     gap: var(--gap);
     padding: var(--padding);
     background-color: var(--background-color);
@@ -15,17 +14,9 @@
     margin: 40px;
 }
 
-.head-container {
-    border-bottom: 1px solid black;
-    padding: 5px;
-}
-
-.item-container {
-    display: flex;
+.buttom-container {
+    display: grid;
     align-items: center;
     gap: 10px
 }
 
-.items-container{
-    padding: 5px;
-}

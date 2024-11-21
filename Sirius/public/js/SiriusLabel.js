@@ -46,6 +46,9 @@ export class SiriusLabel extends SiriusElement {
      */
     constructor(properties) {
         super(properties, SIRIUS_LABEL.NAME);
+
+        // Build the SiriusLabel
+        this.#build().then();
     }
 
     /** Define observed attributes
@@ -53,6 +56,44 @@ export class SiriusLabel extends SiriusElement {
      * */
     static get observedAttributes() {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_LABEL_ATTRIBUTES)];
+    }
+
+    /** Get the template for the Sirius label
+     * @returns {string} - Template
+     * */
+    #getTemplate() {
+        return `<div class="${SIRIUS_LABEL.CLASSES.LABEL_CONTAINER}">
+                    <div class ="${SIRIUS_LABEL.CLASSES.CAPTION_CONTAINER}">
+                        ${this.caption}
+                    </div>
+                </div>`;
+    }
+
+    /** Build the SiriusLabel */
+    async #build() {
+        // Load Sirius Label attributes
+        this._loadAttributes({
+            instanceProperties: this._properties,
+            attributes: SIRIUS_LABEL_ATTRIBUTES,
+            attributesDefault: SIRIUS_LABEL_ATTRIBUTES_DEFAULT
+        });
+
+        // Create the CSS stylesheet and add it to the shadow DOM
+        await this._loadAndAdoptStyles()
+
+        // Get HTML inner content
+        const innerHTML = this.#getTemplate();
+
+        // Create the HTML template
+        await this._createTemplate(innerHTML);
+
+        // Add label to the shadow DOM
+        this.#labelContainerElement = this._containerElement = this._templateContent.firstChild;
+        this.#captionContainerElement = this.labelContainerElement.firstElementChild;
+        this.shadowRoot.appendChild(this.containerElement);
+
+        // Dispatch the built event
+        this.dispatchBuiltEvent();
     }
 
     /** Get the label container element
@@ -239,62 +280,47 @@ export class SiriusLabel extends SiriusElement {
             this.onBuilt = () => this._setEvents(events, this.captionContainerElement);
     }
 
-    /** Get the template for the Sirius label
-     * @returns {string} - Template
-     * */
-    #getTemplate() {
-        return `<div class="${SIRIUS_LABEL.CLASSES.LABEL_CONTAINER}">
-                    <div class ="${SIRIUS_LABEL.CLASSES.CAPTION_CONTAINER}">
-                        ${this.caption}
-                    </div>
-                </div>`;
-    }
-
-    /** Attribute change callback
+    /** Private method to handle attribute changes
      * @param {string} name - Attribute name
      * @param {string} oldValue - Old value
      * @param {string} newValue - New value
      */
-    attributeChangedCallback(name, oldValue, newValue) {
-        // Call the pre-attribute changed callback
-        const {formattedValue, shouldContinue} = this._preAttributeChangedCallback(name, oldValue, newValue);
-        if (!shouldContinue) return;
-
+    #attributeChangeHandler(name, oldValue, newValue) {
         switch (name) {
             case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
-                this._setId(formattedValue);
+                this._setId(newValue);
                 break;
 
             case SIRIUS_ELEMENT_ATTRIBUTES.STYLE:
-                this.#setStyle(formattedValue);
+                this.#setStyle(newValue);
                 break;
 
             case SIRIUS_LABEL_ATTRIBUTES.CAPTION:
-                this.#setCaption(formattedValue);
+                this.#setCaption(newValue);
                 break;
 
             case SIRIUS_LABEL_ATTRIBUTES.CAPTION_TEXT_ALIGN:
-                this.#setCaptionTextAlign(formattedValue);
+                this.#setCaptionTextAlign(newValue);
                 break;
 
             case SIRIUS_LABEL_ATTRIBUTES.CAPTION_BACKGROUND_COLOR:
-                this.#setCaptionBackgroundColor(formattedValue);
+                this.#setCaptionBackgroundColor(newValue);
                 break;
 
             case SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR:
-                this.#setCaptionColor(formattedValue);
+                this.#setCaptionColor(newValue);
                 break;
 
             case SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_FAMILY:
-                this.#setCaptionFontFamily(formattedValue);
+                this.#setCaptionFontFamily(newValue);
                 break;
 
             case SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_SIZE:
-                this.#setCaptionFontSize(formattedValue);
+                this.#setCaptionFontSize(newValue);
                 break;
 
             case SIRIUS_LABEL_ATTRIBUTES.CAPTION_PADDING:
-                this.#setCaptionPadding(formattedValue);
+                this.#setCaptionPadding(newValue);
                 break;
 
             default:
@@ -303,35 +329,18 @@ export class SiriusLabel extends SiriusElement {
         }
     }
 
-    /** Lifecycle method called when the component is connected to the DOM
+    /** Attribute change callback
+     * @param {string} name - Attribute name
+     * @param {string} oldValue - Old value
+     * @param {string} newValue - New value
      */
-    async connectedCallback() {
-        // Call the parent connected callback
-        await super.connectedCallback()
+    attributeChangedCallback(name, oldValue, newValue) {
+        // Call the attribute change pre-handler
+        const {formattedValue, shouldContinue} = this._attributeChangePreHandler(name, oldValue, newValue);
+        if (!shouldContinue) return;
 
-        // Load Sirius Label attributes
-        this._loadAttributes({
-            instanceProperties: this._properties,
-            attributes: SIRIUS_LABEL_ATTRIBUTES,
-            attributesDefault: SIRIUS_LABEL_ATTRIBUTES_DEFAULT
-        });
-
-        // Create the CSS stylesheet and add it to the shadow DOM
-        await this._loadAndAdoptStyles()
-
-        // Get HTML inner content
-        const innerHTML = this.#getTemplate();
-
-        // Create the HTML template
-        await this._createTemplate(innerHTML);
-
-        // Add label to the shadow DOM
-        this.#labelContainerElement = this._containerElement = this._templateContent.firstChild;
-        this.#captionContainerElement = this.labelContainerElement.firstElementChild;
-        this.shadowRoot.appendChild(this.containerElement);
-
-        // Dispatch the built event
-        this.dispatchBuiltEvent();
+        // Call the on attribute change handler
+        this.onBuilt = () => this.#attributeChangeHandler(name, oldValue, formattedValue);
     }
 }
 

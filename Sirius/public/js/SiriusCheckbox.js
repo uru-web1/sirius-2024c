@@ -69,8 +69,13 @@ export class SiriusCheckbox extends SiriusElement {
     #children = []
     #checkboxContainerElement = null;
     #labelContainerElement = null;
+    #labelSlotElement=null
     #iconContainerElement = null;
     #iconElement = null;
+    #previousStatus = null
+    #changedChildrenStatus = 0
+    #changingStatusByParent = false
+    #changingStatusByChildren = false
 
     /**
      * Create a Sirius checkbox element
@@ -78,11 +83,86 @@ export class SiriusCheckbox extends SiriusElement {
      */
     constructor(properties) {
         super(properties, SIRIUS_CHECKBOX.NAME);
+      
+        // Build the SiriusCheckbox
+        this.#build().then();
     }
 
     /** Define observed attributes */
     static get observedAttributes() {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_CHECKBOX_ATTRIBUTES)];
+    }
+
+    /** Get the template for the Sirius checkbox
+     * @returns {string} - Template
+     */
+    #getTemplate() {
+        // Get the checkbox classes
+        const checkboxContainerClasses = [SIRIUS_CHECKBOX.CLASSES.CHECKBOX_CONTAINER];
+        const iconContainerClasses = [SIRIUS_CHECKBOX.CLASSES.ICON_CONTAINER];
+        const labelContainerClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL_CONTAINER]
+        const labelClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL]
+
+        return `<div class="${checkboxContainerClasses.join(' ')}">
+                    <div class="${iconContainerClasses.join(' ')}">
+                    </div>
+                    <div class="${labelContainerClasses.join(' ')}">
+                        <slot name="${SIRIUS_CHECKBOX.SLOTS.LABEL}" class="${labelClasses.join(' ')}"></slot>
+                    </div>
+                </div>`;
+    }
+
+    /** Build the SiriusCheckbox */
+    async #build() {
+        // Load Sirius checkbox HTML attributes
+        this._loadAttributes({
+            instanceProperties: this._properties,
+            attributes: SIRIUS_CHECKBOX_ATTRIBUTES,
+            attributesDefault: SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT
+        });
+
+        // Create the CSS style sheets and add them to the shadow DOM
+        await this._loadAndAdoptStyles();
+
+        // Create derived IDs
+        const iconId = this._getDerivedId("icon")
+
+        // Get the required keys
+        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
+        const hideKey = SIRIUS_ELEMENT_ATTRIBUTES.HIDE
+        const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON
+        const statusKey = SIRIUS_CHECKBOX_ATTRIBUTES.STATUS
+
+        // Create SiriusIcon element
+        this.#iconElement = new SiriusIcon({
+            [idKey]: iconId,
+            [iconKey]: "check-mark",
+            [hideKey]: SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT[statusKey] === "unchecked" ? "true" : "false"
+        })
+
+        // Get HTML inner content
+        const innerHTML = this.#getTemplate();
+
+        // Create the HTML template
+        await this._createTemplate(innerHTML);
+
+        // Add checkbox to the shadow DOM
+        this.#checkboxContainerElement = this._containerElement = this._templateContent.firstChild;
+        this.#iconContainerElement = this.#checkboxContainerElement.firstElementChild;
+        this.#labelContainerElement = this.#checkboxContainerElement.lastElementChild;
+        this.#labelSlotElement = this.#labelContainerElement.firstElementChild
+        this.shadowRoot.appendChild(this.containerElement);
+
+        // Add icon and label to the checkbox container
+        this.#iconContainerElement.appendChild(this.iconElement);
+
+        // Add event listeners
+        this.iconElement.events = {
+            "click": () => this.toggleStatus()
+        }
+
+        // Dispatch the built event
+        this.dispatchBuiltEvent();
     }
 
     /** Get the checkbox container element
@@ -97,6 +177,13 @@ export class SiriusCheckbox extends SiriusElement {
      */
     get labelContainerElement() {
         return this.#labelContainerElement;
+    }
+
+    /** Get the label slot element
+     * @returns {HTMLSlotElement|null} - Label container element
+     */
+    get labelSlotElement() {
+        return this.#labelSlotElement;
     }
 
     /** Get the icon container element
@@ -138,6 +225,9 @@ export class SiriusCheckbox extends SiriusElement {
      * @param {string} value - Status attribute
      */
     set status(value) {
+        // Store the previous status
+        this.#previousStatus = this.status;
+
         this.setAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.STATUS, value);
     }
 
@@ -152,8 +242,19 @@ export class SiriusCheckbox extends SiriusElement {
     #setChildrenStatus(status) {
         if (!this.children || !status) return;
 
+        // Set the changing children status flag
+        this.#changedChildrenStatus = this.children.reduce((acc, child) => {
+            if (child.status === status) return acc+1;
+            return acc;
+        },0);
+
         // Set the status attribute for the children elements
-        this.children.forEach(child => child.status = status === "checked" ? "checked" : "unchecked");
+        this.children.forEach(child => {
+            if (child.status === status) return;
+
+            child.#changingStatusByParent = true;
+            child.status = status === "checked" ? "checked" : "unchecked"
+        });
     }
 
     /** Check the children elements status attribute value */
@@ -162,16 +263,29 @@ export class SiriusCheckbox extends SiriusElement {
 
         // Check the children elements status attribute
         const numberChildren = this.children.length;
-        const childrenStatus = this.children.map(child => child.status)
-        let numberChildrenChecked = childrenStatus.reduce((acc, value) => {
-            if (value === "checked") return acc + 1;
-            return acc
-        }, 0)
+        let numberChildrenChecked=0
+        let numberChildrenIndeterminate=0
+
+        this.children.map(child => child.status).forEach(status => {
+            if (status === "checked") numberChildrenChecked++;
+            else if (status === "indeterminate") numberChildrenIndeterminate++;
+        })
 
         // Set the checked attribute value
-        if (numberChildrenChecked === 0) this.status = "unchecked";
-        else if (numberChildrenChecked === numberChildren) this.status = "checked";
-        else this.status = "indeterminate";
+        let status
+        if (numberChildrenChecked === 0&&numberChildrenIndeterminate===0) status = "unchecked";
+        else if (numberChildrenChecked === numberChildren) status = "checked";
+        else status = "indeterminate";
+
+        // Check if the status has changed
+        if (status === this.status) {
+            if (this.#changingStatusByChildren)
+                this.#changingStatusByChildren = false;
+            return;
+        }
+
+        // Set the status attribute
+        this.status = status;
     }
 
     /** Get gap attribute
@@ -413,12 +527,35 @@ export class SiriusCheckbox extends SiriusElement {
         return this.getAttribute(SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID);
     }
 
-
     /** Private method to set the status attribute
      * @param {string} status - Status attribute value
      */
     #setStatus(status) {
         if (!status) return
+
+        // Store current changing status by parent and children flags
+        const changingStatusByParent = this.#changingStatusByParent;
+        const changingStatusByChildren = this.#changingStatusByChildren;
+
+        // Check if the status is being changed by the children elements
+        if (changingStatusByChildren)
+            this.#changingStatusByChildren = false;
+
+        // Check if the status is being changed by the parent element
+        if (changingStatusByParent) {
+            this.#changingStatusByParent = false;
+
+            // Check if all children status have been changed
+            if (++this.parentElement.#changedChildrenStatus === this.children.length)
+                this.parentElement.#changedChildrenStatus = 0;
+        }
+
+        // Check if is the same status
+        if (status === this.#previousStatus) return;
+
+        // Update the children elements
+        if (!changingStatusByChildren&&status !== "indeterminate" && this.children)
+            this.#setChildrenStatus(status);
 
         // Update the icon element
         if (status === "unchecked")
@@ -441,12 +578,11 @@ export class SiriusCheckbox extends SiriusElement {
             return;
         }
 
-        // Update the children elements
-        if (status !== "indeterminate" && this.children)
-            this.#setChildrenStatus(status);
-
         // Trigger parent element to check children status
-        if (this.parentElement) this.parentElement.#checkChildrenStatus();
+        if (this.parentElement && !changingStatusByParent) {
+            this.parentElement.#changingStatusByChildren = true;
+            this.parentElement.#checkChildrenStatus();
+        }
     }
 
     /** Private method to set the gap attribute
@@ -587,6 +723,10 @@ export class SiriusCheckbox extends SiriusElement {
         }
 
         this.onBuilt = () => {
+            // Check if the parent element is the same as the current element
+            if (this.id === parentId)
+                this.logger.error("Parent element cannot be the same as the current element")
+
             const parent = sirius.getInstance(parentId);
 
             // Check if the parent element exists
@@ -618,14 +758,18 @@ export class SiriusCheckbox extends SiriusElement {
      * @param {SiriusCheckbox} parent - Parent element
      * */
     #addParentElement(parent) {
-        this.#parentElement = parent;
-        parent.#children.push(this);
+        this.onBuilt = () => {
+            this.#parentElement = parent;
+            parent.#children.push(this);
+        }
     }
 
     /** Private method to remove the parent element */
     #removeParentElement() {
-        this.#parentElement.#children = this.#children.filter(child => child !== this);
-        this.#parentElement = null;
+        this.onBuilt = () => {
+            this.#parentElement.#children = this.#children.filter(child => child !== this);
+            this.#parentElement = null;
+        }
     }
 
     /** Private method to set the checkbox container style
@@ -657,123 +801,137 @@ export class SiriusCheckbox extends SiriusElement {
         if (label)
             this.onBuilt = () => {
                 label.slot = SIRIUS_CHECKBOX.SLOTS.LABEL
-                this.labelContainerElement.appendChild(label)
+                this.labelSlotElement.appendChild(label)
             }
     }
 
-    /** Clear the label slot */
-    clearLabel() {
-        this.onBuilt = () => this.#labelContainerElement.innerHTML = "";
+    /** Clear the label slot element */
+    clearLabelSlotElement() {
+        this.onBuilt = () => this.labelSlotElement.innerHTML = "";
     }
 
-    /** Get the template for the Sirius checkbox
-     * @returns {string} - Template
+    /** Add children elements
+     * @param {SiriusCheckbox[]} children - Children elements
      */
-    #getTemplate() {
-        // Get the checkbox classes
-        const checkboxContainerClasses = [SIRIUS_CHECKBOX.CLASSES.CHECKBOX_CONTAINER];
-        const iconContainerClasses = [SIRIUS_CHECKBOX.CLASSES.ICON_CONTAINER];
-        const labelContainerClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL_CONTAINER]
-        const labelClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL]
+    addChildrenElement(children) {
+        if (!children) return;
 
-        return `<div class="${checkboxContainerClasses.join(' ')}">
-                    <div class="${iconContainerClasses.join(' ')}">
-                    </div>
-                    <div class="${labelContainerClasses.join(' ')}">
-                        <slot name="${SIRIUS_CHECKBOX.SLOTS.LABEL}" class="${labelClasses.join(' ')}"></slot>
-                    </div>
-                </div>`;
+        // Add the children elements
+        this.onBuilt = () => children.forEach(child => child.parentId = this.id)
     }
 
-    /** Attribute change callback
+    /** Remove children elements
+     * @param {SiriusCheckbox[]} children - Children elements
+     */
+    removeChildrenElement(children) {
+        if (!children) return;
+
+        // Remove the children elements
+        this.onBuilt = () => children.forEach(child => child.parentId = "")
+    }
+
+    /** Remove child element by ID
+     * @param {string} id - Child ID
+     */
+    removeChildElementById(id) {
+        if (!id) return;
+
+        // Remove the child element
+        this.onBuilt = () => {
+            // Get the child element by ID
+            const child = this.children.find(child => child.id === id);
+            if (!child) return;
+
+            // Remove the child element
+            child.parentId = "";
+        }
+    }
+
+    /** Private method to handle attribute changes
      * @param {string} name - Attribute name
-     * @param {string} oldValue - Old attribute value
-     * @param {string} newValue - New attribute value
+     * @param {string} oldValue - Old value
+     * @param {string} newValue - New value
      */
-    attributeChangedCallback(name, oldValue, newValue) {
-        // Call the pre-attribute changed callback
-        const {formattedValue, shouldContinue} = this._preAttributeChangedCallback(name, oldValue, newValue);
-        if (!shouldContinue) return;
-
+    #attributeChangeHandler(name, oldValue, newValue) {
         switch (name) {
             case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
-                this._setId(formattedValue);
+                this._setId(newValue);
                 break;
 
             case SIRIUS_ELEMENT_ATTRIBUTES.STYLE:
-                this.#setStyle(formattedValue);
+                this.#setStyle(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.STATUS:
-                this.#setStatus(formattedValue);
+                this.#setStatus(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.GAP:
-                this.#setGap(formattedValue);
+                this.#setGap(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.PADDING:
-                this.#setPadding(formattedValue);
+                this.#setPadding(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.BACKGROUND_COLOR:
-                this.#setBackgroundColor(formattedValue);
+                this.#setBackgroundColor(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.ICON_WIDTH:
-                this.#setIconWidth(formattedValue);
+                this.#setIconWidth(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.ICON_HEIGHT:
-                this.#setIconHeight(formattedValue);
+                this.#setIconHeight(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.ICON_FILL:
-                this.#setIconFill(formattedValue);
+                this.#setIconFill(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.ICON_ANIMATION_DURATION:
-                this.#setIconAnimationDuration(formattedValue);
+                this.#setIconAnimationDuration(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.ICON_CHECKED_ANIMATION:
-                this.#setIconCheckedAnimation(formattedValue);
+                this.#setIconCheckedAnimation(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.ICON_UNCHECKED_ANIMATION:
-                this.#setIconUncheckedAnimation(formattedValue);
+                this.#setIconUncheckedAnimation(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.ICON_PADDING:
-                this.#setIconPadding(formattedValue);
+                this.#setIconPadding(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.CHECKBOX_ORDER:
-                this.#setCheckboxOrder(formattedValue);
+                this.#setCheckboxOrder(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.CHECKBOX_BACKGROUND_COLOR:
-                this.#setCheckboxBackgroundColor(formattedValue);
+                this.#setCheckboxBackgroundColor(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.CHECKBOX_BORDER_COLOR:
-                this.#setCheckboxBorderColor(formattedValue);
+                this.#setCheckboxBorderColor(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.CHECKBOX_BORDER_LINE_STYLE:
-                this.#setCheckboxBorderLineStyle(formattedValue);
+                this.#setCheckboxBorderLineStyle(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.CHECKBOX_BORDER_RADIUS:
-                this.#setCheckboxBorderRadius(formattedValue);
+                this.#setCheckboxBorderRadius(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.CHECKBOX_BORDER_WIDTH:
-                this.#setCheckboxBorderWidth(formattedValue);
+                this.#setCheckboxBorderWidth(newValue);
                 break;
 
             case SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID:
-                this.#setParentId(formattedValue);
+                this.#setParentId(newValue);
                 break;
 
             default:
@@ -782,60 +940,18 @@ export class SiriusCheckbox extends SiriusElement {
         }
     }
 
-    /** Lifecycle method called when the component is connected to the DOM
+    /** Attribute change callback
+     * @param {string} name - Attribute name
+     * @param {string} oldValue - Old attribute value
+     * @param {string} newValue - New attribute value
      */
-    async connectedCallback() {
-        // Call the parent connectedCallback
-        await super.connectedCallback();
+    attributeChangedCallback(name, oldValue, newValue) {
+        // Call the attribute change pre-handler
+        const {formattedValue, shouldContinue} = this._attributeChangePreHandler(name, oldValue, newValue);
+        if (!shouldContinue) return;
 
-        // Load Sirius checkbox HTML attributes
-        this._loadAttributes({
-            instanceProperties: this._properties,
-            attributes: SIRIUS_CHECKBOX_ATTRIBUTES,
-            attributesDefault: SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT
-        });
-
-        // Create the CSS style sheets and add them to the shadow DOM
-        await this._loadAndAdoptStyles();
-
-        // Create derived IDs
-        const iconId = this._getDerivedId("icon")
-
-        // Get the required keys
-        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
-        const hideKey = SIRIUS_ELEMENT_ATTRIBUTES.HIDE
-        const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON
-        const statusKey = SIRIUS_CHECKBOX_ATTRIBUTES.STATUS
-
-        // Create SiriusIcon element
-        this.#iconElement = new SiriusIcon({
-            [idKey]: iconId,
-            [iconKey]: "check-mark",
-            [hideKey]: SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT[statusKey] === "unchecked" ? "true" : "false"
-        })
-
-        // Get HTML inner content
-        const innerHTML = this.#getTemplate();
-
-        // Create the HTML template
-        await this._createTemplate(innerHTML);
-
-        // Add checkbox to the shadow DOM
-        this.#checkboxContainerElement = this._containerElement = this._templateContent.firstChild;
-        this.#iconContainerElement = this.#checkboxContainerElement.firstElementChild;
-        this.#labelContainerElement = this.#checkboxContainerElement.lastElementChild;
-        this.shadowRoot.appendChild(this.containerElement);
-
-        // Add icon and label to the checkbox container
-        this.#iconContainerElement.appendChild(this.iconElement);
-
-        // Add event listeners
-        this.iconElement.events = {
-            "click": () => this.toggleStatus()
-        }
-
-        // Dispatch the built event
-        this.dispatchBuiltEvent();
+        // Call the attribute change handler
+        this.onBuilt = () => this.#attributeChangeHandler(name, oldValue, formattedValue);
     }
 }
 

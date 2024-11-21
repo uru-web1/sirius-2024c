@@ -163,6 +163,9 @@ export class SiriusSvg extends SiriusElement {
      * */
     constructor(properties) {
         super(properties, SIRIUS_SVG.NAME);
+
+        // Build the SiriusSvg
+        this.#build().then()
     }
 
     /** Define the observed attributes
@@ -170,6 +173,50 @@ export class SiriusSvg extends SiriusElement {
      * */
     static get observedAttributes() {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_SVG_ATTRIBUTES)];
+    }
+
+    /** Get the template for the Sirius SVG
+     * @returns {string} - Template
+     */
+    #getTemplate() {
+        // Get the SVG container element classes
+        const svgContainerClasses = [SIRIUS_SVG.CLASSES.SVG_CONTAINER];
+
+        // Get the icon
+        const icon = this.icon || SIRIUS_SVG_ATTRIBUTES_DEFAULT[SIRIUS_SVG_ATTRIBUTES.ICON];
+
+        return `<div class="${svgContainerClasses.join(' ')}">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                        ${this.#getSvgInnerHtml(icon)}
+                    </svg>
+                </div>`;
+    }
+
+    /** Build the SiriusSvg */
+    async #build() {
+        // Load Sirius Label attributes
+        this._loadAttributes({
+            instanceProperties: this._properties,
+            attributes: SIRIUS_SVG_ATTRIBUTES,
+            attributesDefault: SIRIUS_SVG_ATTRIBUTES_DEFAULT
+        });
+
+        // Create the CSS stylesheet and add it to the shadow DOM
+        await this._loadAndAdoptStyles()
+
+        // Get HTML inner content
+        const innerHTML = this.#getTemplate();
+
+        // Create the HTML template
+        await this._createTemplate(innerHTML);
+
+        // Add SVG to the shadow DOM
+        this.#svgContainerElement = this._containerElement = this._templateContent.firstChild;
+        this.#svgElement = this.svgContainerElement.firstElementChild;
+        this.shadowRoot.appendChild(this.containerElement);
+
+        // Dispatch the built event
+        this.dispatchBuiltEvent();
     }
 
     /** Get the SVG container element
@@ -447,21 +494,44 @@ export class SiriusSvg extends SiriusElement {
         return SIRIUS_SVG_ICONS_INNER_HTML[icon] || SIRIUS_SVG_ICONS_INNER_HTML[SIRIUS_SVG_ATTRIBUTES_DEFAULT[SIRIUS_SVG_ATTRIBUTES.ICON]]
     }
 
-    /** Get the template for the Sirius SVG
-     * @returns {string} - Template
+    /** Private method to handle attribute changes
+     * @param {string} name - Attribute name
+     * @param {string} oldValue - Old value
+     * @param {string} newValue - New value
      */
-    #getTemplate() {
-        // Get the SVG container element classes
-        const svgContainerClasses = [SIRIUS_SVG.CLASSES.SVG_CONTAINER];
-
-        // Get the icon
-        const icon = this.icon || SIRIUS_SVG_ATTRIBUTES_DEFAULT[SIRIUS_SVG_ATTRIBUTES.ICON];
-
-        return `<div class="${svgContainerClasses.join(' ')}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
-                        ${this.#getSvgInnerHtml(icon)}
-                    </svg>
-                </div>`;
+    #attributeChangeHandler(name, oldValue, newValue) {
+        switch (name) {
+            case SIRIUS_SVG_ATTRIBUTES.ICON:
+                this.#setIcon(newValue);
+                break;
+            case SIRIUS_SVG_ATTRIBUTES.WIDTH:
+                this.#setWidth(newValue);
+                break;
+            case SIRIUS_SVG_ATTRIBUTES.HEIGHT:
+                this.#setHeight(newValue);
+                break;
+            case SIRIUS_SVG_ATTRIBUTES.FILL:
+                this.#setFill(newValue);
+                break;
+            case SIRIUS_SVG_ATTRIBUTES.ROTATION:
+                this.#setRotation(newValue);
+                break;
+            case SIRIUS_SVG_ATTRIBUTES.TRANSITION_DURATION:
+                this.#setTransitionDuration(newValue);
+                break;
+            case SIRIUS_SVG_ATTRIBUTES.ANIMATION_DURATION:
+                this.#setAnimationDuration(newValue);
+                break;
+            case SIRIUS_SVG_ATTRIBUTES.SHOW_ANIMATION:
+                this.#setShowAnimation(newValue);
+                break;
+            case SIRIUS_SVG_ATTRIBUTES.HIDING_ANIMATION:
+                this.#setHidingAnimation(newValue);
+                break;
+            case SIRIUS_ELEMENT_ATTRIBUTES.HIDE:
+                this.#setHide(newValue);
+                break;
+        }
     }
 
     /** Attribute changed callback
@@ -470,89 +540,12 @@ export class SiriusSvg extends SiriusElement {
      * @param {string} newValue - New attribute value
      */
     attributeChangedCallback(name, oldValue, newValue) {
-        // Call the pre-attribute changed callback
-        const {formattedValue, shouldContinue} = this._preAttributeChangedCallback(name, oldValue, newValue);
+        // Call the attribute change pre-handler
+        const {formattedValue, shouldContinue} = this._attributeChangePreHandler(name, oldValue, newValue);
         if (!shouldContinue) return;
 
-        switch (name) {
-            case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
-                this._setId(formattedValue);
-                break;
-
-            case SIRIUS_ELEMENT_ATTRIBUTES.HIDE:
-                this.#setHide(formattedValue);
-                break;
-
-            case SIRIUS_SVG_ATTRIBUTES.ICON:
-                this.#setIcon(formattedValue);
-                break;
-
-            case SIRIUS_SVG_ATTRIBUTES.WIDTH:
-                this.#setWidth(formattedValue);
-                break;
-
-            case SIRIUS_SVG_ATTRIBUTES.HEIGHT:
-                this.#setHeight(formattedValue);
-                break;
-
-            case SIRIUS_SVG_ATTRIBUTES.FILL:
-                this.#setFill(formattedValue);
-                break;
-
-            case SIRIUS_SVG_ATTRIBUTES.ROTATION:
-                this.#setRotation(formattedValue);
-                break;
-
-            case SIRIUS_SVG_ATTRIBUTES.TRANSITION_DURATION:
-                this.#setTransitionDuration(formattedValue);
-                break;
-
-            case SIRIUS_SVG_ATTRIBUTES.ANIMATION_DURATION:
-                this.#setAnimationDuration(formattedValue);
-                break;
-
-            case SIRIUS_SVG_ATTRIBUTES.SHOW_ANIMATION:
-                this.#setShowAnimation(formattedValue);
-                break;
-
-            case SIRIUS_SVG_ATTRIBUTES.HIDING_ANIMATION:
-                this.#setHidingAnimation(formattedValue);
-                break;
-
-            default:
-                this._onInjectedLogger = () => this.logger.error(`Unregistered attribute: ${name}`);
-                break;
-        }
-    }
-
-    /** Lifecycle method called when the component is connected to the DOM */
-    async connectedCallback() {
-        // Call the parent connected callback
-        await super.connectedCallback()
-
-        // Load Sirius Label attributes
-        this._loadAttributes({
-            instanceProperties: this._properties,
-            attributes: SIRIUS_SVG_ATTRIBUTES,
-            attributesDefault: SIRIUS_SVG_ATTRIBUTES_DEFAULT
-        });
-
-        // Create the CSS stylesheet and add it to the shadow DOM
-        await this._loadAndAdoptStyles()
-
-        // Get HTML inner content
-        const innerHTML = this.#getTemplate();
-
-        // Create the HTML template
-        await this._createTemplate(innerHTML);
-
-        // Add SVG to the shadow DOM
-        this.#svgContainerElement = this._containerElement = this._templateContent.firstChild;
-        this.#svgElement = this.svgContainerElement.firstElementChild;
-        this.shadowRoot.appendChild(this.containerElement);
-
-        // Dispatch the built event
-        this.dispatchBuiltEvent();
+        // Call the attribute change handler
+        this.onBuilt = () => this.#attributeChangeHandler(name, oldValue, formattedValue);
     }
 }
 

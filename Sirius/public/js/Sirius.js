@@ -117,7 +117,7 @@ class Sirius {
 
     /** Get Sirius element by ID
      * @param id - Element ID
-     * @returns {SiriusCheckbox|SiriusIcon | SiriusLabel | SiriusListbox | SiriusSvg | SiriusTreeView | null} - Element
+     * @returns {SiriusCheckbox|SiriusIcon | SiriusLabel | SiriusListBox | SiriusSvg | SiriusTreeView | null} - Element
      * */
     getInstance(id) {
         return this.#instancesId.has(id) ? this.#instancesId.get(id) : null;
@@ -234,7 +234,6 @@ class Sirius {
             // Load the class and create an instance
             const importedClass = await this.getClass(jsFilename, jsClass);
             const instance = new importedClass(props);
-
             this.#instancesId.set(props.id, instance);
 
             return instance;
