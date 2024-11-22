@@ -1,5 +1,6 @@
 :host{
     display: inline-block;
+
     --gap: 5px;
     --padding: 10px;
     --background-color: white;
@@ -15,14 +16,20 @@
     max-width: 300px;
 }
 
-
 .head-container {
     border-bottom: 1px solid rgb(48, 48, 48);
     padding: 5px;
 }
 
+
 .items-container{
     display:grid;
     padding: 5px;
     gap: var(--gap);
+}
+
+.item-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }

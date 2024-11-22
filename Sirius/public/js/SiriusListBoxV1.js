@@ -6,7 +6,7 @@ import deepFreeze from "./utils/deep-freeze.js";
 
 /** SiriusListBox class */
 export const SIRIUS_LIST_BOX = deepFreeze({
-    NAME: "SiriusListBox",
+    NAME: "SiriusListBoxV1",
     TAG: "sirius-list-box",
     CSS_VARS: {
         GAP: "--gap",
@@ -39,20 +39,19 @@ export const SIRIUS_LIST_BOX_ATTRIBUTES_DEFAULT = deepFreeze({
 
 /** Sirius class that represents a ListBox component */
 export default class SiriusListBoxV1 extends SiriusElement {
-
-    // container elements
+    // Container elements
     #listBoxContainerElement = null;
     #headContainerElement = null;
     #itemsListContainerElement = null;
     #itemContainerElement = null;
 
-    // elements
+    // Main elements
     #checkboxElement = null;
     #labelElement = null;
     #headElement = null;
     #head = null;
     
-    // lists
+    // List elements
     #itemsList = [];
     #itemContainerList = [];
     _checkedItems = [];

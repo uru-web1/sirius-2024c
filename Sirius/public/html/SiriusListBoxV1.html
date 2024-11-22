@@ -22,7 +22,7 @@
     <!-- With JS -->
     <script type="module">
         import sirius from '../js/Sirius.js';
-        import SiriusListBoxV1, {SIRIUS_LIST_BOX_ATTRIBUTES} from '../js/SiriusListBoxV1.js';
+        import SiriusListBox, {SIRIUS_LIST_BOX_ATTRIBUTES} from '../js/SiriusListBoxV1.js';
         import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
                 SIRIUS_ELEMENT_ATTRIBUTES
         } from "../js/SiriusElement.js";
@@ -36,18 +36,18 @@
             const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
 
             // Create a new ListBox
-            const listBox1 = new SiriusListBoxV1({
+            const listBox1 = new SiriusListBox({
                 [idKey]: 'listbox-2',
                 // [headKey]: 'false',
-                [itemsKey]: '../data/item.json',
+                [itemsKey]: '../data/SiriusListBoxV1.json',
                 // [backgroundKey]: 'rgb(205,207,214)',
                 [checkboxColorKey]: 'black',
                 // [styleKey]: 'margin: 400px'
             });
 
-            const listBox3 = new SiriusListBoxV1({
+            const listBox3 = new SiriusListBox({
                 [idKey]: 'listbox-3',
-                [itemsKey]: '../data/item.json',
+                [itemsKey]: '../data/SiriusListBoxV1.json',
                 [checkboxColorKey]: 'black',
                 [backgroundKey]: 'rgb(250, 201, 255)',
             });
