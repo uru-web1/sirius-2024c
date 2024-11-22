@@ -1,14 +1,13 @@
-import SiriusElement, {
+import {
     SIRIUS_ELEMENT_ATTRIBUTES,
     SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES
 } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES} from "./SiriusIcon.js";
-import sirius from "./Sirius.js";
 import SiriusControlElement, {
-    SIRIUS_CONTROL_ELEMENT,
-    SIRIUS_CONTROL_ELEMENT_ATTRIBUTES, SIRIUS_CONTROL_ELEMENT_ATTRIBUTES_DEFAULT
+    SIRIUS_CONTROL_ELEMENT_ATTRIBUTES, SIRIUS_CONTROL_ELEMENT_ATTRIBUTES_DEFAULT, SIRIUS_CONTROL_ELEMENT_STATUS
 } from "./SiriusControlElement.js";
+import {SIRIUS_SVG_ICONS} from "./SiriusSvg.js";
 
 /** SiriusCheckbox constants */
 export const SIRIUS_CHECKBOX = deepFreeze({
@@ -126,11 +125,18 @@ export default class SiriusCheckbox extends SiriusControlElement {
         const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON
         const statusKey = SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.STATUS
 
+        // Check if the checkbox is hidden
+        let hide
+        if (SIRIUS_CONTROL_ELEMENT_ATTRIBUTES_DEFAULT[statusKey] === SIRIUS_CONTROL_ELEMENT_STATUS.UNCHECKED)
+            hide = "true"
+        else
+            hide = "false"
+
         // Create SiriusIcon element
         this.#iconElement = new SiriusIcon({
             [idKey]: iconId,
-            [iconKey]: "check-mark",
-            [hideKey]: SIRIUS_CONTROL_ELEMENT_ATTRIBUTES_DEFAULT[statusKey] === "unchecked" ? "true" : "false"
+            [iconKey]: SIRIUS_SVG_ICONS.CHECK_MARK,
+            [hideKey]: hide,
         })
 
         // Get HTML inner content
@@ -422,7 +428,7 @@ export default class SiriusCheckbox extends SiriusControlElement {
     _statusCheckedHandler() {
         this.onBuilt = () => {
             this.iconElement.hide = "false";
-            this.iconElement.icon = "check-mark";
+            this.iconElement.icon = SIRIUS_SVG_ICONS.CHECK_MARK;
         }
     }
 
@@ -435,7 +441,7 @@ export default class SiriusCheckbox extends SiriusControlElement {
     _statusIndeterminateHandler() {
         this.onBuilt = () => {
                 this.iconElement.hide = "false";
-                this.iconElement.icon = "indeterminate";
+                this.iconElement.icon = SIRIUS_SVG_ICONS.INDETERMINATE;
             }
     }
 
