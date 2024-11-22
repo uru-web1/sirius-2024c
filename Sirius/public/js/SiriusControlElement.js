@@ -20,15 +20,18 @@ export const SIRIUS_CONTROL_ELEMENT_STATUS = deepFreeze({
     INDETERMINATE: "indeterminate"
 })
 
-/** Sirius checkbox default values */
+/** SiriusControlElement default values */
 export const SIRIUS_CONTROL_ELEMENT_ATTRIBUTES_DEFAULT = deepFreeze({
     [SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.STATUS]: SIRIUS_CONTROL_ELEMENT_STATUS.UNCHECKED,
 })
 
 /** Sirius class that represents a control element component */
 export default class SiriusControlElement extends SiriusElement {
+    // Main elements
     _parent = null;
     _children = []
+
+    // Status
     _previousStatus = null;
     _changedChildrenStatus = 0
     _changingStatusByParent = false
@@ -255,6 +258,20 @@ export default class SiriusControlElement extends SiriusElement {
     removeAllChildren() {
         // Remove all children elements
         this.onBuilt = () => this.children.forEach(child => child.parentId = "")
+    }
+
+    /** Check if the element is checked
+     * @returns {boolean} - Checked status
+     */
+    get isChecked() {
+        return this.status === SIRIUS_CONTROL_ELEMENT_STATUS.CHECKED;
+    }
+
+    /** Get the checked children elements
+     * @returns {SiriusControlElement[]} - Checked children elements
+     */
+    get checkedChildrenElements(){
+        return this.children.filter(child => child.isChecked);
     }
 
     /** Protected method to the parent ID

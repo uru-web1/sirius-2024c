@@ -37,6 +37,7 @@ export const SIRIUS_LABEL_ATTRIBUTES_DEFAULT = deepFreeze({
 
 /** Sirius class that represents a label component */
 export default class SiriusLabel extends SiriusElement {
+    // Container elements
     #labelContainerElement = null
     #captionContainerElement = null
 

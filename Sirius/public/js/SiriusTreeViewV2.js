@@ -1,10 +1,8 @@
 import deepFreeze from "./utils/deep-freeze.js";
-import SiriusElement, {SIRIUS_ELEMENT, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
-import SiriusControlElement, {
-    SIRIUS_CONTROL_ELEMENT,
-    SIRIUS_CONTROL_ELEMENT_ATTRIBUTES, SIRIUS_CONTROL_ELEMENT_STATUS
-} from "./SiriusControlElement.js";
+import {SIRIUS_ELEMENT, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
+import {SIRIUS_CONTROL_ELEMENT_ATTRIBUTES} from "./SiriusControlElement.js";
 import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES, SIRIUS_ICON_ATTRIBUTES_DEFAULT} from "./SiriusIcon.js";
+import SiriusLinkedControlElement from "./SiriusLinkedControlElement.js";
 
 /** SiriusTreeView constants */
 export const SIRIUS_TREE_VIEW = deepFreeze({
@@ -59,18 +57,15 @@ export const SIRIUS_TREE_VIEW_ATTRIBUTES_DEFAULT = deepFreeze({
 })
 
 /** Sirius class that represents a Tree View component */
-export default class SiriusTreeView extends SiriusControlElement {
+export default class SiriusTreeView extends SiriusLinkedControlElement {
+    // Container elements
     #treeViewContainerElement = null
     #parentContainerElement = null
     #iconContainerElement = null
-    #iconElement = null
-    #parentSlotElement = null
     #childrenContainerElement = null
-    #childrenSlotElement = null
-    #childrenParentElement=null
-    #childrenElements =[]
-    #parentObserver=null
-    #childrenObserver=null
+
+    // Main elements
+    #iconElement = null
 
     /**
      * Create a Sirius icon element
@@ -85,7 +80,7 @@ export default class SiriusTreeView extends SiriusControlElement {
 
     /** Define observed attributes */
     static get observedAttributes() {
-        return [...SiriusControlElement.observedAttributes, ...Object.values(SIRIUS_TREE_VIEW_ATTRIBUTES)];
+        return [...SiriusLinkedControlElement.observedAttributes, ...Object.values(SIRIUS_TREE_VIEW_ATTRIBUTES)];
     }
 
     /** Get the template for the SiriusTreeView
@@ -147,9 +142,9 @@ export default class SiriusTreeView extends SiriusControlElement {
         this.#treeViewContainerElement = this._containerElement = this._templateContent.firstChild;
         this.#parentContainerElement = this.treeViewContainerElement.firstElementChild;
         this.#iconContainerElement = this.parentContainerElement.firstElementChild;
-        this.#parentSlotElement = this.parentContainerElement.lastElementChild;
+        this._linkedParentSlotElement = this.parentContainerElement.lastElementChild;
         this.#childrenContainerElement = this.treeViewContainerElement.lastElementChild;
-        this.#childrenSlotElement = this.childrenContainerElement.firstElementChild;
+        this._linkedChildrenSlotElement = this.childrenContainerElement.firstElementChild;
         this.shadowRoot.appendChild(this.containerElement);
 
         // Add icon to the icon container
@@ -160,51 +155,11 @@ export default class SiriusTreeView extends SiriusControlElement {
             "click": () => this.toggleMode()
         }
 
-        // Set up MutationObserver to detect parent slot changes
-        this.#parentObserver = new MutationObserver((mutationsList) => {
-            for (const mutation of mutationsList)
-                if (mutation.type === 'childList') {
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE && node.slot)
-                            this.addChildrenParentElement(node)
-                    });
-                    mutation.removedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE && node.slot)
-                            this.removeChildrenParentElement()
-                    })
-                }
-        });
+        // Set up the linked parent observer
+        this._setLinkedParentObserver();
 
-        // Set up MutationObserver to detect parent slot changes
-        this.#childrenObserver = new MutationObserver((mutationsList) => {
-            for (const mutation of mutationsList)
-                if (mutation.type === 'childList') {
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE && node.slot)
-                            this.addChildElement(node)
-                    });
-                    mutation.removedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE && node.slot)
-                            this.removeChildElementById(node.id)
-                    })
-                }
-        });
-
-        // Start observing the parent slot element
-        this.#parentObserver.observe(this.parentSlotElement, { childList: true });
-
-        // Start observing the children slot element
-        this.#childrenObserver.observe(this.childrenSlotElement, { childList: true });
-
-        // Manually call parent slot observer to add existing children
-        this.parentSlotElement.assignedElements().forEach(node => {
-            this.#addChildrenParentElement(node,false);
-        });
-
-        // Manually call children slot observer to add existing children
-        this.childrenSlotElement.assignedElements().forEach(node => {
-            this.#addChildElement(node, false);
-        })
+        // Set up the linked children observer
+        this._setLinkedChildrenObserver();
 
         // Dispatch the built event
         this.dispatchBuiltEvent();
@@ -238,13 +193,6 @@ export default class SiriusTreeView extends SiriusControlElement {
         return this.#iconElement;
     }
 
-    /** Get the parent slot element
-     * @returns {HTMLSlotElement} - Parent slot element
-     */
-    get parentSlotElement(){
-        return this.#parentSlotElement
-    }
-
     /** Get the children container element
      * @returns {HTMLDivElement} - Children container element
      */
@@ -252,25 +200,32 @@ export default class SiriusTreeView extends SiriusControlElement {
         return this.#childrenContainerElement
     }
 
+    /** Get the parent slot element
+     * @returns {HTMLSlotElement} - Parent slot element
+     */
+    get parentSlotElement(){
+        return this._linkedParentSlotElement
+    }
+
     /** Get the children slot element
      * @returns {HTMLSlotElement} - Children slot element
      */
     get childrenSlotElement(){
-        return this.#childrenSlotElement
+        return this._linkedChildrenSlotElement
     }
 
-    /** Get the children parent element
-     * @returns {SiriusControlElement} - Children parent element
+    /** Get the parent element
+     * @returns {SiriusControlElement|null} - Parent element
      */
-    get childrenParentElement() {
-        return this.#childrenParentElement;
+    get parentElement() {
+        return this._linkedParent;
     }
 
     /** Get the children elements
-     * @returns {Element[]} - Children elements
+     * @returns {SiriusControlElement[]} - Children elements
      */
     get childrenElements() {
-        return this.#childrenElements
+        return this._linkedChildren;
     }
 
     /** Get the mode attribute
@@ -425,159 +380,6 @@ export default class SiriusTreeView extends SiriusControlElement {
      */
     set childrenMarginLeft(value) {
         this.setAttribute(SIRIUS_TREE_VIEW_ATTRIBUTES.CHILDREN_MARGIN_LEFT, value);
-    }
-
-    /** Add children parent element
-     * @param {SiriusControlElement} childrenParent - Children parent element
-     * @param {boolean} append - Append to the parent element
-     */
-    #addChildrenParentElement(childrenParent, append) {
-        if (!childrenParent) return
-
-        this.onBuilt = () => {
-            // Remove the current parent element
-            this.removeChildrenParentElement()
-
-            // Add the new parent
-            if (append)
-                this.parentSlotElement.appendChild(childrenParent);
-
-            // Set the children parent status
-            childrenParent.status = this.status
-
-            // Set the parent ID for the children
-            this.childrenElements.forEach(child => child.parentId = childrenParent.id);
-
-            // Set the children parent element and the parent ID
-            this.#childrenParentElement = childrenParent
-            childrenParent.parentId = this.id
-        }
-    }
-
-    /** Add children parent element node
-     * @param {HTMLElement|SiriusControlElement} element - Children parent element node/instance
-     * @param {boolean} append - Append to the parent element
-     */
-    addChildrenParentElement(element, append = true) {
-        // Check if the parent element is a valid SiriusControlElement
-        if (element!==null&&element instanceof SIRIUS_CONTROL_ELEMENT)
-            this.logger.error("The parent element must be a SiriusControlElement");
-
-        this.#addChildrenParentElement(element, append);
-    }
-
-    /** Remove children parent element */
-    removeChildrenParentElement() {
-        this.onBuilt = () => {
-            if (!this.childrenParentElement) return
-
-            // Remove the current parent
-            this.parentSlotElement.removeChild(this.childrenParentElement);
-
-            // Remove the child-parent relationship
-            this.childrenParentElement.parentId = "";
-
-            // Remove the existing parent element from the children elements
-            this.childrenElements.forEach(child => child.parentId = "");
-
-            // Clear the children parent
-            this.#childrenParentElement = null;
-        }
-    }
-
-    /** Add child element
-     * @param {SiriusControlElement|SiriusTreeView|HTMLElement} child - Child element
-     * @param {boolean} append - Append to the children container
-     */
-    #addChildElement(child, append= true) {
-        if(!child) return
-
-        this.onBuilt=()=> {
-             // Check if the child is already in the children elements list
-            if (this.childrenElements.find(c => c.id === child.id))
-                return
-
-            // Add the children to the children container
-            if (append)
-                this.childrenContainerElement.appendChild(child);
-
-            // Add to the children elements list
-            this.childrenElements.push(child);
-
-            // Set the parent ID
-            if (this.childrenParentElement)
-                child.parentId = this.childrenParentElement.id;
-        }
-    }
-
-    /** Add child element node
-     * @param {HTMLElement|SiriusControlElement|SiriusTreeView} element - Child element node/instance
-     */
-    addChildElement(element) {
-        // Check if the child element is a valid SiriusControlElement
-        if (element instanceof SIRIUS_CONTROL_ELEMENT)
-            this.logger.error("The child element must be a SiriusControlElement");
-
-        this.#addChildElement(element);
-    }
-
-    /** Remove child element by ID
-     * @param {string} id - Child element ID
-     */
-    removeChildElementById(id) {
-        this.onBuilt = () => {
-            // Get the child element by ID
-            const child = this.children.find(child => child.id === id);
-            if (!child) return;
-
-            // Remove the children from the children slot element
-            this.childrenSlotElement.removeChild(child);
-
-            // Remove the child element from the children elements list
-            this.#childrenElements = this.#childrenElements.filter(child => child.id !== id);
-
-            // Remove the parent ID
-            child.parentId = "";
-        }
-    }
-
-    /** Remove children elements */
-    removeAllChildrenElements() {
-        this.onBuilt = () => {
-            if (!this.children) return
-
-            this.children.forEach(child =>{
-                // Remove the children from the children slot element
-                this.childrenSlotElement.removeChild(child);
-
-                // Remove the parent ID
-                this.childrenElements.forEach(child => child.parentId = "")
-            })
-        }
-    }
-
-    /** Protected method to handle the status attribute change to checked */
-    _statusCheckedHandler() {
-        this.onBuilt = () => {
-            if (this.childrenParentElement)
-                this.childrenParentElement.status = SIRIUS_CONTROL_ELEMENT_STATUS.CHECKED;
-        }
-    }
-
-     /** Protected method to handle the status attribute change to unchecked */
-    _statusUncheckedHandler() {
-        this.onBuilt = () => {
-            if (this.childrenParentElement)
-                this.childrenParentElement.status = SIRIUS_CONTROL_ELEMENT_STATUS.UNCHECKED;
-        }
-     }
-
-     /** Protected method to handle the status attribute change to indeterminate */
-    _statusIndeterminateHandler() {
-        this.onBuilt = () => {
-            if (this.childrenParentElement)
-                this.childrenParentElement.status = SIRIUS_CONTROL_ELEMENT_STATUS.INDETERMINATE;
-        }
     }
 
     /** Set parent control element ID

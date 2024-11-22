@@ -43,7 +43,10 @@ export const SIRIUS_ICON_ATTRIBUTES_DEFAULT = deepFreeze({
 
 /** Sirius class that represents an icon component */
 export default class SiriusIcon extends SiriusElement {
+    // Container elements
     #iconContainerElement = null
+
+    // Main elements
     #svgElement = null
 
     /**

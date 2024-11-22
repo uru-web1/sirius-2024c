@@ -63,10 +63,15 @@ export const SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT = deepFreeze({
 
 /** Sirius class that represents a checkbox component */
 export default class SiriusCheckbox extends SiriusControlElement {
+    // Container elements
     #checkboxContainerElement = null;
     #labelContainerElement = null;
-    #labelSlotElement=null
     #iconContainerElement = null;
+
+    // Slot elements
+    #labelSlotElement=null
+
+    // Main elements
     #iconElement = null;
 
     /**

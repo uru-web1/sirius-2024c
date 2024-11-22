@@ -151,10 +151,15 @@ export const SIRIUS_SVG_ROTATION_DEGREES = deepFreeze({
 
 /** Sirius class that represents the SVG icon */
 export default class SiriusSvg extends SiriusElement {
+    // Container elements
+    #svgContainerElement = null
+
+    // Main elements
+    #svgElement = null
+
+    // Icon properties
     #icon = null
     #rotation = null
-    #svgContainerElement = null
-    #svgElement = null
 
     /** Create a SiriusSvg element
      * @param {object} properties - Element properties

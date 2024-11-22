@@ -54,7 +54,9 @@ export const SIRIUS_EDIT_ATTRIBUTES_DEFAULT = deepFreeze({
 })
 
 export class SiriusEdit extends SiriusElement {
+    // Container elements
     #editContainerElement = null;
+
     constructor(properties) {
         super(properties,SIRIUS_EDIT.NAME);
         this.#build().then;

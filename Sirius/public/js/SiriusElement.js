@@ -62,18 +62,32 @@ export const SIRIUS_ELEMENT_PROPERTIES_DETAILS = deepFreeze({
 
 /** Sirius class that represents an element component */
 export default class SiriusElement extends HTMLElement {
-    _properties = {}
+    // Container elements
+    _containerElement = null
+
+    // Shadow DOM
+    _template = null
     _styleSheets = {}
     _elementStyleSheetRules = new Map()
+
+    // Attributes
     _applyingAttribute = new Map();
+
+    // Hidden state
     _hidden = false;
     _hiding = false;
-    _containerElement = null
+
+    // Element properties
+    _properties = {}
     #elementId = ''
     #elementName = ''
-    #logger = null
+
+    // Built
     #isBuilt = false
     #onBuilt = []
+
+    // Logger
+    #logger = null
     #isLoggerInjected = false
     #onInjectedLogger = []
 
