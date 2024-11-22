@@ -216,6 +216,8 @@ export default class SiriusSvg extends SiriusElement {
         // Add SVG to the shadow DOM
         this.#svgContainerElement = this._containerElement = this._templateContent.firstChild;
         this.#svgElement = this.svgContainerElement.firstElementChild;
+
+        // Add the
         this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event

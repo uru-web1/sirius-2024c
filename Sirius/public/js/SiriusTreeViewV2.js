@@ -1,8 +1,9 @@
 import deepFreeze from "./utils/deep-freeze.js";
-import {SIRIUS_ELEMENT, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
+import {SIRIUS_ELEMENT, SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
 import SiriusControlElement, {SIRIUS_CONTROL_ELEMENT_ATTRIBUTES} from "./SiriusControlElement.js";
 import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES, SIRIUS_ICON_ATTRIBUTES_DEFAULT} from "./SiriusIcon.js";
 import SiriusLinkedControlElement from "./SiriusLinkedControlElement.js";
+import {SIRIUS_SVG_ICONS} from "./SiriusSvg.js";
 
 /** SiriusTreeView constants */
 export const SIRIUS_TREE_VIEW = deepFreeze({
@@ -129,7 +130,7 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
         // Create SiriusIcon element
         this.#iconElement = new SiriusIcon({
             [idKey]: iconId,
-            [iconKey]: "arrow",
+            [iconKey]: SIRIUS_SVG_ICONS.ARROW,
         })
 
         // Get HTML inner content
@@ -402,11 +403,22 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
             elements.forEach(element=>this.childrenSlotElement.appendChild(element));
     }
 
-    /** Remove children element node
+    /** Remove children elements node
      * @param {HTMLElement|SiriusControlElement} elements - Children elements node/instance
      * */
-    removeChild(...elements) {
+    removeChildren(...elements) {
         this.onBuilt = () => elements.forEach(element => element.remove())
+    }
+
+    /** Private method to set the SiriusTreeView container element style attribute
+     * @param {string} style - Style attribute value
+     */
+    #setStyle(style) {
+        if (!style)
+            return
+
+        // Add the style attribute to the element when built
+        this._setStyle = () => this._setStyleAttributes(style, this.treeViewContainerElement);
     }
 
     /** Set parent control element ID
@@ -534,6 +546,10 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
         switch (name) {
             case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
                 this._setId(newValue)
+                break;
+
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLE:
+                this.#setStyle(newValue);
                 break;
 
                 case SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.STATUS:

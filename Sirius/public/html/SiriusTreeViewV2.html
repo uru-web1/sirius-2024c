@@ -102,6 +102,7 @@
             [idKey]: 'checkbox-child3__label',
             [captionKey]: 'Child 3',
         });
+        siriusTreeView.addToBody()
 
         // Link parent
         siriusTreeView.addParent(siriusCheckboxMaster)
@@ -109,9 +110,8 @@
         // Link children
         siriusTreeView.addChildren(siriusCheckboxChild1, siriusCheckboxChild2, siriusCheckboxChild3)
 
-        siriusTreeView.addToBody()
-
-        siriusTreeView.removeChild(siriusCheckboxChild1)
+        // Remove child element
+        siriusTreeView.removeChildren(siriusCheckboxChild1)
     }
 </script>
 </body>
