@@ -1,0 +1,33 @@
+:host {
+    --menu-width: 300px;
+    --menu-background: #f9f9f9;
+    --option-color: #333;
+    --option-hover-color: #555;
+    --animation-duration: 0.3s;
+    display: block;
+}
+
+.menu-container {
+    width: var(--menu-width);
+    background: var(--menu-background);
+    overflow: hidden;
+    transition: transform var(--animation-duration);
+}
+
+.menu-option, .menu-fixed-option {
+    padding: 10px;
+    cursor: pointer;
+    color: var(--option-color);
+}
+
+.menu-option:hover, .menu-fixed-option:hover {
+    color: var(--option-hover-color);
+}
+
+.slide-in {
+    transform: translateX(0);
+}
+
+.slide-out {
+    transform: translateX(-100%);
+}

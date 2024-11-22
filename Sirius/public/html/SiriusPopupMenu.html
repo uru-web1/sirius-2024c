@@ -3,56 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sirius PopupMenu</title>
-    <!-- Importar los scripts necesarios -->
-    <script defer src="../js/Sirius.js" type="module"></script>
-    <script defer src="../js/SiriusPopupMenu.js" type="module"></script>
+    <title>Popup Menu Test</title>
+    <script type="module" src="../js/SiriusPopupMenu.js"></script>
 </head>
 <body>
-<script type="module">
-    import sirius from '../js/Sirius.js';
-    import { SIRIUS_POPUPMENU, SiriusPopupMenu } from '../js/SiriusPopupMenu.js';
-    import { SIRIUS_ELEMENT } from "../js/SiriusElement.js";
-
-    // Definir atributos para el PopupMenu
-    const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
-    const menuOptionsKey = SIRIUS_POPUPMENU.ATTRIBUTES.MENU_OPTIONS.NAME;
-
-    sirius.onLoaded = async () => {
-        // Crear una instancia dinámica de SiriusPopupMenu
-        const siriusPopupMenu = new SiriusPopupMenu({
-            [idKey]: 'popupmenu-1',
-            [menuOptionsKey]: JSON.stringify([
-                { label: "Home", action: "home" },
-                { label: "Profile", action: "profile" },
-                { label: "Settings", submenu: [
-                    { label: "Account", action: "account" },
-                    { label: "Notifications", action: "notifications" },
-                    { label: "Privacy", action: "privacy" }
-                ]},
-                { label: "Logout", action: "logout" }
-            ])
-        });
-
-        // Añadir el PopupMenu al body
-        siriusPopupMenu.addToBody();
-
-        // Escuchar el evento de acción en el PopupMenu
-        siriusPopupMenu.addEventListener("menu-action", (event) => {
-            console.log("Acción seleccionada:", event.detail.action);
-        });
-    };
-</script>
-
-<!-- Instancia directa del PopupMenu en el HTML -->
-<sirius-popupmenu id="popupmenu-2" menuOptions='[
-    {"label": "Dashboard", "action": "dashboard"},
-    {"label": "Settings", "submenu": [
-        {"label": "Preferences", "action": "preferences"},
-        {"label": "Appearance", "action": "appearance"}
-    ]},
-    {"label": "Help", "action": "help"}
-]'></sirius-popupmenu>
-
+    <sirius-popup-menu></sirius-popup-menu>
 </body>
 </html>
