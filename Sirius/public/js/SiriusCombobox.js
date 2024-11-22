@@ -1,7 +1,7 @@
 import { SiriusElement } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
+import { SiriusIcon } from "./SiriusIcon.js"; // Importación del SiriusIcon
 
-// Constantes para el Combobox
 export const SIRIUS_COMBOBOX = deepFreeze({
     NAME: "SiriusCombobox",
     TAG: "sirius-combobox",
@@ -15,6 +15,7 @@ export const SIRIUS_COMBOBOX = deepFreeze({
     CLASSES: {
         CONTAINER: "combobox-container",
         PLACEHOLDER: "combobox-placeholder",
+        ICON: "combobox-icon",
         OPTIONS: "combobox-options",
         OPTION: "combobox-option",
         HIDDEN: "hidden",
@@ -24,6 +25,7 @@ export const SIRIUS_COMBOBOX = deepFreeze({
 export class SiriusCombobox extends SiriusElement {
     #placeholderElement = null;
     #optionsContainer = null;
+    #iconElement = null;
 
     constructor(properties) {
         super(properties, SIRIUS_COMBOBOX.NAME);
@@ -49,7 +51,8 @@ export class SiriusCombobox extends SiriusElement {
         return `
             <div class="${SIRIUS_COMBOBOX.CLASSES.CONTAINER}">
                 <div class="${SIRIUS_COMBOBOX.CLASSES.PLACEHOLDER}">
-                    ${this.getAttribute("placeholder") || "Select an option"}
+                    <span>${this.getAttribute("placeholder") || "Select an option"}</span>
+                    <sirius-icon class="${SIRIUS_COMBOBOX.CLASSES.ICON}" icon="arrow" fill="black" height="20px" width="24px" id="icon-1"></sirius-icon>
                 </div>
                 <div class="${SIRIUS_COMBOBOX.CLASSES.OPTIONS} ${SIRIUS_COMBOBOX.CLASSES.HIDDEN}"></div>
             </div>
@@ -67,9 +70,10 @@ export class SiriusCombobox extends SiriusElement {
         // Inicializar elementos
         this._containerElement = this.shadowRoot.querySelector(`.${SIRIUS_COMBOBOX.CLASSES.CONTAINER}`);
         this.#placeholderElement = this._containerElement?.querySelector(`.${SIRIUS_COMBOBOX.CLASSES.PLACEHOLDER}`);
+        this.#iconElement = this._containerElement?.querySelector(`.${SIRIUS_COMBOBOX.CLASSES.ICON}`);
         this.#optionsContainer = this._containerElement?.querySelector(`.${SIRIUS_COMBOBOX.CLASSES.OPTIONS}`);
 
-        if (!this._containerElement || !this.#placeholderElement || !this.#optionsContainer) {
+        if (!this._containerElement || !this.#placeholderElement || !this.#optionsContainer || !this.#iconElement) {
             console.error("Error: No se pudieron inicializar los elementos requeridos en SiriusCombobox.");
             return;
         }
@@ -99,14 +103,17 @@ export class SiriusCombobox extends SiriusElement {
         const isHidden = this.#optionsContainer.classList.contains(SIRIUS_COMBOBOX.CLASSES.HIDDEN);
         if (isHidden) {
             this.#optionsContainer.classList.remove(SIRIUS_COMBOBOX.CLASSES.HIDDEN);
+            this.#iconElement.setAttribute("rotation", "180"); // Rotar ícono
         } else {
             this.#optionsContainer.classList.add(SIRIUS_COMBOBOX.CLASSES.HIDDEN);
+            this.#iconElement.setAttribute("rotation", "0"); // Resetear rotación
         }
     }
 
     #selectOption(value) {
-        this.#placeholderElement.textContent = value;
+        this.#placeholderElement.querySelector("span").textContent = value;
         this.#optionsContainer.classList.add(SIRIUS_COMBOBOX.CLASSES.HIDDEN);
+        this.#iconElement.setAttribute("rotation", "0"); // Resetear rotación
         this.dispatchEvent(new CustomEvent("option-selected", { detail: { value } }));
     }
 }

@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Combobox Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combobox with SiriusIcon</title>
     <link rel="stylesheet" href="../css/SiriusCombobox.css">
     <script defer src="../js/SiriusCombobox.js" type="module"></script>
+    <script defer src="../js/SiriusIcon.js" type="module"></script>
 </head>
 <body>
     <sirius-combobox id="combobox1" placeholder="Select an option"></sirius-combobox>
-    
+
     <script type="module">
         const combobox = document.querySelector("#combobox1");
         combobox.options = ["Option 1", "Option 2", "Option 3", "Option 4"];
