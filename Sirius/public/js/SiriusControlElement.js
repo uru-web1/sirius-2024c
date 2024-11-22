@@ -180,7 +180,7 @@ export default class SiriusControlElement extends SiriusElement {
     }
 
     /** Protected method to add the parent element
-     * @param {SiriusCheckbox} parent - Parent element
+     * @param {SiriusControlElement} parent - Parent element
      * */
     _addParent(parent) {
         this.onBuilt = () => {
@@ -191,16 +191,20 @@ export default class SiriusControlElement extends SiriusElement {
 
     /** Protected method to remove the parent element */
     _removeParent() {
-        this.onBuilt = () => {
-            this._parent._children = this._parent._children.filter(child => child !== this);
-            this._parent = null;
+        // Check if the parent element is set
+        if (!this._parent){
+            this.logger.error('Parent element must be set')
+            return
         }
+
+        this._parent._children = this._parent._children.filter(child => child !== this);
+        this._parent = null;
     }
 
     /** Add child element
      * @param {SiriusControlElement} child - Child element
      */
-    addChild(child) {
+    _addChild(child) {
         if (!child) return;
 
         // Add the child element
@@ -210,7 +214,7 @@ export default class SiriusControlElement extends SiriusElement {
     /** Add children elements
      * @param {SiriusControlElement[]} children - Children elements
      */
-    addChildren(children) {
+    _addChildren(children) {
         if (!children) return;
 
         // Add the children elements
@@ -220,44 +224,39 @@ export default class SiriusControlElement extends SiriusElement {
     /** Remove child element
      * @param {SiriusControlElement} child - Child element
      */
-    removeChild(child) {
+    _removeChild(child) {
         if (!child) return;
 
         // Remove the child element
-        this.onBuilt = () => child.parentId = ""
+        child.parentId = ""
     }
 
     /** Remove child element by ID
      * @param {string} id - Child ID
      */
-    removeChildById(id) {
+    _removeChildById(id) {
         if (!id) return;
 
-        // Remove the child element
-        this.onBuilt = () => {
-            // Get the child element by ID
-            const child = this.children.find(child => child.id === id);
-            if (!child) return;
+        // Get the child element by ID
+        const child = this.children.find(child => child.id === id);
+        if (!child) return;
 
-            // Remove the child element
-            this.removeChild(child);
-        }
+        // Remove the child element
+        this._removeChild(child);
     }
 
     /** Remove children elements
      * @param {SiriusControlElement[]} children - Children elements
      */
-    removeChildren(children) {
+    _removeChildren(children) {
         if (!children) return;
 
-        // Remove the children elements
-        this.onBuilt = () => children.forEach(child => child.parentId = "")
+        children.forEach(child => child.parentId = "")
     }
 
     /** Remove all children elements */
-    removeAllChildren() {
-        // Remove all children elements
-        this.onBuilt = () => this.children.forEach(child => child.parentId = "")
+    _removeAllChildren() {
+        this.children.forEach(child => child.parentId = "")
     }
 
     /** Check if the element is checked

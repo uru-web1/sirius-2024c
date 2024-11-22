@@ -49,5 +49,70 @@
         <sirius-label slot="label" id="checkbox-10__label" caption="Child 3"></sirius-label>
     </sirius-checkbox>
 </sirius-tree-view>
+
+<script type="module">
+    import SiriusTreeView from "../js/SiriusTreeViewV2.js";
+    import sirius from "../js/Sirius.js"
+    import SiriusCheckbox from "../js/SiriusCheckbox.js";
+    import SiriusLabel, {SIRIUS_LABEL_ATTRIBUTES} from "../js/SiriusLabel.js";
+    import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "../js/SiriusElement.js";
+
+    sirius.onLoaded=()=> {
+        // Get the attributes keys
+        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+        const captionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION
+
+        // Create SiriusTreeView
+        const siriusTreeView = new SiriusTreeView({
+            [idKey]: 'tree-view',
+        })
+
+        // Create parent SiriusCheckbox
+        const siriusCheckboxMaster = new SiriusCheckbox({
+            [idKey]: 'checkbox-master'
+        });
+        siriusCheckboxMaster.label= new SiriusLabel({
+            [idKey]: 'checkbox-master__label',
+            [captionKey]: 'Master',
+        });
+
+        // Create child 1 SiriusCheckbox
+        const siriusCheckboxChild1 = new SiriusCheckbox({
+            [idKey]: 'checkbox-child1'
+        });
+        siriusCheckboxChild1.label= new SiriusLabel({
+            [idKey]: 'checkbox-child1__label',
+            [captionKey]: 'Child 1',
+        });
+
+        // Create child 2 SiriusCheckbox
+        const siriusCheckboxChild2 = new SiriusCheckbox({
+            [idKey]: 'checkbox-child2'
+        });
+        siriusCheckboxChild2.label= new SiriusLabel({
+            [idKey]: 'checkbox-child2__label',
+            [captionKey]: 'Child 2',
+        });
+
+        // Create child 3 SiriusCheckbox
+        const siriusCheckboxChild3 = new SiriusCheckbox({
+            [idKey]: 'checkbox-child3'
+        });
+        siriusCheckboxChild3.label= new SiriusLabel({
+            [idKey]: 'checkbox-child3__label',
+            [captionKey]: 'Child 3',
+        });
+
+        // Link parent
+        siriusTreeView.addParent(siriusCheckboxMaster)
+
+        // Link children
+        siriusTreeView.addChildren(siriusCheckboxChild1, siriusCheckboxChild2, siriusCheckboxChild3)
+
+        siriusTreeView.addToBody()
+
+        siriusTreeView.removeChild(siriusCheckboxChild1)
+    }
+</script>
 </body>
 </html>

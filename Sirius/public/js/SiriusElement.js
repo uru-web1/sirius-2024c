@@ -362,7 +362,7 @@ export default class SiriusElement extends HTMLElement {
             sirius.setInstance(id, this);
             this.#elementId = id
         } catch (error) {
-            this._onInjectedLogger = () => this.logger.error(error);
+            this._onInjectedLogger = () => this.logger.error(error.message);
         }
     }
 

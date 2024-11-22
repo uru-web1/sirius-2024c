@@ -96,12 +96,16 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
             for (const mutation of mutationsList)
                 if (mutation.type === 'childList') {
                     mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE && node.slot)
-                            this.addLinkedParent(node)
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            // Add the parent slot
+                            node.slot = this._linkedParentSlotElement.name;
+
+                            this._addLinkedParent(node)
+                        }
                     });
                     mutation.removedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE && node.slot)
-                            this.removeLinkedParent()
+                        if (node.nodeType === Node.ELEMENT_NODE)
+                            this._removeLinkedParent()
                     })
                 }
         });
@@ -111,9 +115,8 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
 
         // Manually call linked parent slot observer to add existing parent
         this.linkedParentSlotElement.assignedElements().forEach(node => {
-            this.#addLinkedParent(node,false);
+            this.#addLinkedParent(node);
         });
-
     }
 
     /** Set the linked children observer */
@@ -128,12 +131,16 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
             for (const mutation of mutationsList)
                 if (mutation.type === 'childList') {
                     mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE && node.slot)
-                            this.addLinkedChild(node)
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            // Add the children slot
+                            node.slot=this._linkedChildrenSlotElement.name;
+
+                            this._addLinkedChild(node)
+                        }
                     });
                     mutation.removedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE && node.slot)
-                            this.removeLinkedChild(node)
+                        if (node.nodeType === Node.ELEMENT_NODE)
+                            this._removeLinkedChild(node)
                     })
                 }
         });
@@ -143,26 +150,21 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
 
         // Manually call linked children slot observer to add existing children
         this.linkedChildrenSlotElement.assignedElements().forEach(node => {
-            this.#addLinkedChild(node, false);
+            this.#addLinkedChild(node);
         })
     }
 
     /** Add linked parent element
      * @param {SiriusControlElement} parent - Linked parent element
-     * @param {boolean} append - Append to the parent element
      */
-    #addLinkedParent(parent, append) {
+    #addLinkedParent(parent) {
         if (!parent) return
 
         this.onBuilt = () => {
-            // Remove the current linked parent element
-            this.removeLinkedParent()
+            // Removed current linked parent
+            this._removeLinkedParent()
 
-            // Add the new linked parent
-            if (append)
-                this._linkedParentSlotElement.appendChild(parent);
-
-            // Set the linked parent status and parent ID
+            // Set the linked parent status, slot name and parent ID
             this._linkedParent = parent
             parent.status = this.status
             parent.parentId = this.id
@@ -174,48 +176,43 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
 
     /** Add linked parent element node
      * @param {HTMLElement|SiriusControlElement} element - Linked parent element node/instance
-     * @param {boolean} append - Append to the parent element
      */
-    addLinkedParent(element, append = true) {
+    _addLinkedParent(element) {
         // Check if the linked parent element is a valid SiriusControlElement
-        if (element!==null&&element instanceof SiriusControlElement)
+        if (!(element instanceof SiriusControlElement))
             this.logger.error("The parent element must be an instance of SiriusControlElement");
 
-        this.#addLinkedParent(element, append);
+        this.#addLinkedParent(element);
     }
 
     /** Remove linked parent element */
-    removeLinkedParent() {
-        this.onBuilt = () => {
-            if (!this.linkedParent) return
+    _removeLinkedParent() {
+        if (!this.linkedParent) return
 
-            // Remove the current linked parent from the linked parent slot element
-            this._linkedParentSlotElement.removeChild(this.linkedParent);
+        // Remove slot from linked parent and the child-parent relationship
+        this.linkedParent.slot=""
+        this.linkedParent.parentId = "";
 
-            // Remove the child-parent relationship
-            this.linkedParent.parentId = "";
-            this._linkedParent = null;
+        // Remove the current linked parent from the linked parent slot element
+        this.linkedParent.remove();
 
-            // Remove the existing linked parent element from the linked children elements
-            this.linkedChildren.forEach(child => child.parentId = "");
-        }
+        // Remove the linked parent
+        this._linkedParent = null;
+
+        // Remove the existing linked parent element from the linked children elements
+        this.linkedChildren.forEach(child => child.parentId = "");
     }
 
     /** Add linked child element
      * @param {SiriusControlElement|SiriusTreeView|HTMLElement} child - Linked child element
-     * @param {boolean} append - Append to the children container
      */
-    #addLinkedChild(child, append= true) {
+    #addLinkedChild(child) {
         if(!child) return
 
         this.onBuilt=()=> {
-             // Check if the linked child is already in the linked children elements
+            // Check if the linked child is already in the linked children elements
             if (this.linkedChildren.find(c => c.id === child.id))
                 return
-
-            // Add the children to the linked children slot element
-            if (append)
-                this._linkedChildrenSlotElement.appendChild(child);
 
             // Add to the linked children elements list
             this.linkedChildren.push(child);
@@ -227,11 +224,11 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
     }
 
     /** Add linked child element node
-     * @param {HTMLElement|SiriusControlElement|SiriusTreeView} element - Linked child element node/instance
+     * @param {HTMLElement|SiriusControlElement} element - Linked child element node/instance
      */
-    addLinkedChild(element) {
+    _addLinkedChild(element) {
         // Check if the child element is a valid SiriusControlElement
-        if (element instanceof SiriusControlElement)
+        if (!(element instanceof SiriusControlElement))
             this.logger.error("The child element must be an instance of SiriusControlElement");
 
         this.#addLinkedChild(element);
@@ -240,48 +237,14 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
     /** Remove linked child element
      * @param {SiriusControlElement|HTMLElement} child - Linked child element
      */
-    removeLinkedChild(child) {
+    _removeLinkedChild(child) {
         if (!child) return
 
-        this.onBuilt = () => {
-            // Remove the linked children from the linked children slot element
-            this.linkedChildrenSlotElement.removeChild(child);
+        // Remove the linked child element from the linked children elements
+        this._linkedChildren = this.linkedChildren.filter(child => child.id !== child.id);
 
-            // Remove the linked child element from the linked children elements
-            this._linkedChildren = this.linkedChildren.filter(child => child.id !== child.id);
-
-            // Remove the parent ID
-            child.parentId = "";
-        }
-    }
-
-    /** Remove linked child element by ID
-     * @param {string} id - Linked child element ID
-     */
-    removeLinkedChildById(id) {
-        this.onBuilt = () => {
-            // Get the child element by ID
-            const child = this.linkedChildren.find(child => child.id === id);
-            if (!child) return;
-
-            // Remove the linked child element
-            this.removeLinkedChild(child);
-        }
-    }
-
-    /** Remove linked children elements */
-    removeAllLinkedChildren() {
-        this.onBuilt = () => {
-            if (!this.linkedChildren) return
-
-            this.linkedChildren.forEach(child =>{
-                // Remove the linked children from the linked children slot element
-                this._linkedChildrenSlotElement.removeChild(child);
-
-                // Remove the parent ID
-                this.linkedChildren.forEach(child => child.parentId = "")
-            })
-        }
+        // Remove the parent ID and the slot name
+        child.parentId = "";
     }
 
     /** Protected method to handle the status attribute change to checked */

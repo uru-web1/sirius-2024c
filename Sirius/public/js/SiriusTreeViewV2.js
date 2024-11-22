@@ -1,6 +1,6 @@
 import deepFreeze from "./utils/deep-freeze.js";
 import {SIRIUS_ELEMENT, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
-import {SIRIUS_CONTROL_ELEMENT_ATTRIBUTES} from "./SiriusControlElement.js";
+import SiriusControlElement, {SIRIUS_CONTROL_ELEMENT_ATTRIBUTES} from "./SiriusControlElement.js";
 import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES, SIRIUS_ICON_ATTRIBUTES_DEFAULT} from "./SiriusIcon.js";
 import SiriusLinkedControlElement from "./SiriusLinkedControlElement.js";
 
@@ -380,6 +380,33 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
      */
     set childrenMarginLeft(value) {
         this.setAttribute(SIRIUS_TREE_VIEW_ATTRIBUTES.CHILDREN_MARGIN_LEFT, value);
+    }
+
+    /** Add parent element node
+     * @param {HTMLElement|SiriusControlElement} element - Parent element node/instance
+     */
+    addParent(element) {
+        this.onBuilt = () => this.parentSlotElement.appendChild(element);
+    }
+
+    /** Remove parent element node */
+    removeParent() {
+        this.onBuilt = () => this.parentElement.remove();
+    }
+
+    /** Add children elements node
+     * @param {HTMLElement|SiriusControlElement} elements - Children elements node/instance
+     */
+    addChildren(...elements) {
+        this.onBuilt = () =>
+            elements.forEach(element=>this.childrenSlotElement.appendChild(element));
+    }
+
+    /** Remove children element node
+     * @param {HTMLElement|SiriusControlElement} elements - Children elements node/instance
+     * */
+    removeChild(...elements) {
+        this.onBuilt = () => elements.forEach(element => element.remove())
     }
 
     /** Set parent control element ID
