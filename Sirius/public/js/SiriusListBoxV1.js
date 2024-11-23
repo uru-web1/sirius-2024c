@@ -50,7 +50,7 @@ export default class SiriusListBoxV1 extends SiriusElement {
     #labelElement = null;
     #headElement = null;
     #head = null;
-    
+
     // List elements
     #itemsList = [];
     #itemContainerList = [];
@@ -245,26 +245,26 @@ export default class SiriusListBoxV1 extends SiriusElement {
     /** Public method to get the checked items
      * @returns {Array} - Checked items
      */
-    getCheckedItems(){
-    this.onBuilt = () => {
-        
-        
-        this.#itemContainerList.forEach((item) => {
-            if(item.querySelector("sirius-checkbox").status === "checked" && item.id !== "item_head"){
-                this._checkedItems.push(item);
-            }
-        });
-        console.log(this._checkedItems);
-        return this._checkedItems;
+    getCheckedItems() {
+        this.onBuilt = () => {
+
+
+            this.#itemContainerList.forEach((item) => {
+                if (item.querySelector("sirius-checkbox").status === "checked" && item.id !== "item_head") {
+                    this._checkedItems.push(item);
+                }
+            });
+            console.log(this._checkedItems);
+            return this._checkedItems;
         }
     }
 
     /**Public method to set the items attribute
-         * 
-         * @param {Array} items - Items attribute value
-         * @returns {void}
-         * */
-    addItem(item){
+     *
+     * @param {Array} items - Items attribute value
+     * @returns {void}
+     * */
+    addItem(item) {
 
         this.onBuilt = () => {
 
@@ -283,72 +283,73 @@ export default class SiriusListBoxV1 extends SiriusElement {
         this.onBuilt = () => {
 
             const item = this.#itemsListContainerElement.querySelector(`#${id}`);
-            
-            if(!item) return;
-            
-            if(!this.#head){
-            const parent = this.#headElement.querySelector("sirius-checkbox")
-            parent.removeChildElementById(item.querySelector("sirius-checkbox").id);
+
+            if (!item) return;
+
+            if (!this.#head) {
+                const parent = this.#headElement.querySelector("sirius-checkbox")
+                parent.removeChildElementById(item.querySelector("sirius-checkbox").id);
             }
 
             this.#itemsListContainerElement.removeChild(item);
             this.#updateList(item);
-        } 
+        }
     }
 
     /**Private method to update the list
      * @param {HTMLElement} item - Item to be removed
      * @returns {void}
      * */
-    #updateList(item){   
+    #updateList(item) {
 
         this.onBuilt = () => {
 
-            const itemId= item.id;
+            const itemId = item.id;
 
             // Remove the item from the itemsList
-            this.#itemsList.forEach((item)=>{
-                if(item.id === itemId){
+            this.#itemsList.forEach((item) => {
+                if (item.id === itemId) {
                     this.#itemsList.splice(this.#itemsList.indexOf(item), 1);
                 }
             })
-            
-    
+
+
             // Remove the item from the itemContainerList lists
-            this.#itemContainerList.forEach((item)=>{
-                if(item.id === itemId){
+            this.#itemContainerList.forEach((item) => {
+                if (item.id === itemId) {
                     this.#itemContainerList.splice(this.#itemContainerList.indexOf(item), 1);
-            }})
-            
+                }
+            })
+
         }
     }
 
     /** Private method to set the items attribute
- * @param {string} ruta - Ruta del archivo JSON
- */
-async #setItems(ruta) {
+     * @param {string} ruta - Ruta del archivo JSON
+     */
+    async #setItems(ruta) {
 
-    try {
-        // Fetch the JSON file from the provided route
-        const response = await fetch(ruta);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch items from ${ruta}`);
+        try {
+            // Fetch the JSON file from the provided route
+            const response = await fetch(ruta);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch items from ${ruta}`);
+            }
+            // Parse the JSON data
+            const items = await response.json();
+
+            // Update the items list
+            this.#itemsList = items;
+
+            // Render the items
+            this.#renderItems();
+
+        } catch (error) {
+
+            // Log the error
+            this.logger.error(`Error setting items: ${error.message}`);
         }
-        // Parse the JSON data
-        const items = await response.json();
-
-        // Update the items list
-        this.#itemsList = items;
-
-        // Render the items
-        this.#renderItems();
-
-    } catch (error) {
-
-        // Log the error
-        this.logger.error(`Error setting items: ${error.message}`);
     }
-}
 
     /** Private method to set the head attribute
      * @param {string} head - Head attribute value
@@ -360,22 +361,22 @@ async #setItems(ruta) {
     /** Render the ListBox items
      * @returns {void}
      */
-    #renderItems() {        
+    #renderItems() {
 
-            if (!this.#head) {
-                this.#createHead();
-            }else{
-                // Hide the head container
-                this.#headContainerElement.hidden = true;
-            }
+        if (!this.#head) {
+            this.#createHead();
+        } else {
+            // Hide the head container
+            this.#headContainerElement.hidden = true;
+        }
 
-            // Render new items
-            this.#itemsList.forEach(item => {
-                const itemElement = this.#createItem(item);
-                this.#itemsListContainerElement.appendChild(itemElement);
-            });
+        // Render new items
+        this.#itemsList.forEach(item => {
+            const itemElement = this.#createItem(item);
+            this.#itemsListContainerElement.appendChild(itemElement);
+        });
 
-            this.dispatchEvent(new CustomEvent('itemsRendered'));
+        this.dispatchEvent(new CustomEvent('itemsRendered'));
     }
 
     /** Create the head of the ListBox
@@ -431,11 +432,11 @@ async #setItems(ruta) {
         // Add the click event to the checkbox element
         this.checkboxElement.addEventListener('click', () => {
             this.getCheckedItems();
-            this._checkedItems=[];
+            this._checkedItems = [];
         });
-        
+
         // Set the checkbox element parent id
-        if (!this.#head && this.#itemContainerList.length >= 1 ){
+        if (!this.#head && this.#itemContainerList.length >= 1) {
             this.checkboxElement.parentId = this.#headElement.querySelector("sirius-checkbox").id;
         }
 

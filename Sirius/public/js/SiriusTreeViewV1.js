@@ -20,7 +20,7 @@ export default class SiriusTreeView extends SiriusElement {
         this.#build().then();
     }
 
-     // Built the SiriusTreeView
+    // Built the SiriusTreeView
     async #build() {
         await this._loadAndAdoptStyles(); // Load and adopt styles
 

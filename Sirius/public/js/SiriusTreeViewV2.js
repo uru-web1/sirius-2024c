@@ -1,6 +1,11 @@
 import deepFreeze from "./utils/deep-freeze.js";
-import {SIRIUS_ELEMENT, SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
-import SiriusControlElement, {SIRIUS_CONTROL_ELEMENT_ATTRIBUTES} from "./SiriusControlElement.js";
+import {
+    SIRIUS_ELEMENT,
+    SIRIUS_ELEMENT_ATTRIBUTES,
+    SIRIUS_ELEMENT_PROPERTIES,
+    SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES
+} from "./SiriusElement.js";
+import {SIRIUS_CONTROL_ELEMENT_ATTRIBUTES} from "./SiriusControlElement.js";
 import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES, SIRIUS_ICON_ATTRIBUTES_DEFAULT} from "./SiriusIcon.js";
 import SiriusLinkedControlElement from "./SiriusLinkedControlElement.js";
 import {SIRIUS_SVG_ICONS} from "./SiriusSvg.js";
@@ -52,7 +57,7 @@ export const SIRIUS_TREE_VIEW_MODES = deepFreeze({
 
 /** SiriusTreeView attributes default values */
 export const SIRIUS_TREE_VIEW_ATTRIBUTES_DEFAULT = deepFreeze({
-    [SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_WIDTH]:SIRIUS_ICON_ATTRIBUTES_DEFAULT.WIDTH,
+    [SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_WIDTH]: SIRIUS_ICON_ATTRIBUTES_DEFAULT.WIDTH,
     [SIRIUS_TREE_VIEW_ATTRIBUTES.MODE]: SIRIUS_TREE_VIEW_MODES.OPEN,
     [SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_TRANSITION_DURATION]: "300ms"
 })
@@ -69,14 +74,14 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
     #iconElement = null
 
     /**
-     * Create a Sirius icon element
-     * @param {object} properties - Element properties
+     * Create a SiriusTreeView element
+     * @param {object} properties - SiriusTreeView properties
      */
     constructor(properties) {
-        super(properties, SIRIUS_TREE_VIEW.NAME);
+        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]: SIRIUS_TREE_VIEW.NAME});
 
         // Build the SiriusTreeView
-        this.#build().then();
+        this.#build(properties).then();
     }
 
     /** Define observed attributes */
@@ -108,11 +113,14 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
                 </div>`;
     }
 
-    /** Build the SiriusTreeView */
-    async #build() {
+    /** Build the SiriusTreeView
+     * @param {object} properties - SiriusTreeView properties
+     * @returns {Promise<void>} - Promise that resolves when the SiriusTreeView is built
+     * */
+    async #build(properties) {
         // Load SiriusTreeView attributes
         this._loadAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_TREE_VIEW_ATTRIBUTES,
             attributesDefault: SIRIUS_TREE_VIEW_ATTRIBUTES_DEFAULT
         });
@@ -126,11 +134,15 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
         // Get the required keys
         const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
         const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON
+        const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
 
         // Create SiriusIcon element
         this.#iconElement = new SiriusIcon({
             [idKey]: iconId,
             [iconKey]: SIRIUS_SVG_ICONS.ARROW,
+            [eventsKey]: {
+                "click": () => this.toggleMode()
+            }
         })
 
         // Get HTML inner content
@@ -151,16 +163,15 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
         // Add icon to the icon container
         this.iconContainerElement.appendChild(this.iconElement);
 
-        // Add event listeners
-        this.iconElement.events = {
-            "click": () => this.toggleMode()
-        }
-
         // Set up the linked parent observer
         this._setLinkedParentObserver();
 
         // Set up the linked children observer
         this._setLinkedChildrenObserver();
+
+        // Set the properties
+        this.linkedParent = this._linkedParent
+        this.linkedChildren = this._linkedChildren
 
         // Dispatch the built event
         this.dispatchBuiltEvent();
@@ -204,14 +215,14 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
     /** Get the parent slot element
      * @returns {HTMLSlotElement} - Parent slot element
      */
-    get parentSlotElement(){
+    get parentSlotElement() {
         return this._linkedParentSlotElement
     }
 
     /** Get the children slot element
      * @returns {HTMLSlotElement} - Children slot element
      */
-    get childrenSlotElement(){
+    get childrenSlotElement() {
         return this._linkedChildrenSlotElement
     }
 
@@ -387,27 +398,26 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
      * @param {HTMLElement|SiriusControlElement} element - Parent element node/instance
      */
     addParent(element) {
-        this.onBuilt = () => this.parentSlotElement.appendChild(element);
+        this.onBuilt = () => this._addLinkedParent(element);
     }
 
     /** Remove parent element node */
     removeParent() {
-        this.onBuilt = () => this.parentElement.remove();
+        this.onBuilt = () => this._removeLinkedParent();
     }
 
     /** Add children elements node
      * @param {HTMLElement|SiriusControlElement} elements - Children elements node/instance
      */
     addChildren(...elements) {
-        this.onBuilt = () =>
-            elements.forEach(element=>this.childrenSlotElement.appendChild(element));
+        this.onBuilt = () => this._addLinkedChildren(elements);
     }
 
     /** Remove children elements node
      * @param {HTMLElement|SiriusControlElement} elements - Children elements node/instance
      * */
     removeChildren(...elements) {
-        this.onBuilt = () => elements.forEach(element => element.remove())
+        this.onBuilt = () => this._removeLinkedChildren(elements);
     }
 
     /** Private method to set the SiriusTreeView container element style attribute
@@ -424,7 +434,7 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
     /** Set parent control element ID
      * @param {string} parentId - Parent control element ID
      */
-    #setParentId(parentId){
+    #setParentId(parentId) {
         this.onBuilt = () => {
             // Set the parent ID
             super._setParentId(parentId)
@@ -528,7 +538,7 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
         if (rules)
             this.onBuilt = () => this._setKeyframeRules(SIRIUS_TREE_VIEW.CSS_VARIABLES.ANIMATION_DURATION, rules);
     }
-  
+
     /** Toggle mode */
     toggleMode() {
         if (this.mode === SIRIUS_TREE_VIEW_MODES.OPEN)
@@ -552,7 +562,7 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
                 this.#setStyle(newValue);
                 break;
 
-                case SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.STATUS:
+            case SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.STATUS:
                 this._setStatus(newValue);
                 break;
 
@@ -617,7 +627,7 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
         if (!shouldContinue) return;
 
         // Call the attribute change handler
-        this.onBuilt=()=>this.#attributeChangeHandler(name, oldValue, formattedValue);
+        this.onBuilt = () => this.#attributeChangeHandler(name, oldValue, formattedValue);
     }
 }
 

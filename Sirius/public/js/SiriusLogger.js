@@ -55,11 +55,11 @@ export class SiriusLogger {
      * @param {string} padding - Padding
      * @returns {string} - Padded message
      */
-    addPadding(message, maxLength= message.length, padding='') {
+    addPadding(message, maxLength = message.length, padding = '') {
         // Get the filled message
         const filledMessage = message.concat(SIRIUS_LOGGER.PADDING.FILL_CHAR.repeat(maxLength - message.length));
 
-        return [padding, filledMessage,padding].join('')
+        return [padding, filledMessage, padding].join('')
     }
 
     /** String formatting
@@ -73,17 +73,17 @@ export class SiriusLogger {
         const padding = SIRIUS_LOGGER.PADDING.FILL_CHAR.repeat(SIRIUS_LOGGER.PADDING.WIDTH);
 
         // Get padded class name
-        const paddedClassName = this.addPadding(this.#name,maxLength, padding);
+        const paddedClassName = this.addPadding(this.#name, maxLength, padding);
 
         // Get padded message
-        const paddedMessage = this.addPadding(message,maxLength, padding);
+        const paddedMessage = this.addPadding(message, maxLength, padding);
 
         // Check if element ID is available
         if (!this.#elementId)
             return ['%c', paddedClassName, paddedMessage].join('\n')
 
         // Get padded element ID
-        const paddedElementId = this.addPadding(this.#elementId,maxLength, padding);
+        const paddedElementId = this.addPadding(this.#elementId, maxLength, padding);
 
         return ['%c', paddedClassName, paddedElementId, paddedMessage].join('\n')
     }

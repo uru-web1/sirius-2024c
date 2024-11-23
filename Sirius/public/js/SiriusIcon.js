@@ -1,4 +1,8 @@
-import SiriusElement, {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
+import SiriusElement, {
+    SIRIUS_ELEMENT_ATTRIBUTES,
+    SIRIUS_ELEMENT_PROPERTIES,
+    SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES
+} from "./SiriusElement.js";
 import SiriusSvg from "./SiriusSvg.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
@@ -54,10 +58,10 @@ export default class SiriusIcon extends SiriusElement {
      * @param {object} properties - Element properties
      */
     constructor(properties) {
-        super(properties, SIRIUS_ICON.NAME);
+        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]: SIRIUS_ICON.NAME});
 
         // Build the SiriusIcon
-        this.#build().then();
+        this.#build(properties).then();
     }
 
     /** Define observed attributes
@@ -78,11 +82,14 @@ export default class SiriusIcon extends SiriusElement {
                 </div>`;
     }
 
-    /** Build the SiriusIcon */
-    async #build() {
+    /** Build the SiriusIcon
+     * @param {object} properties - Element properties
+     * @returns {Promise<void>} - Promise that resolves when the SiriusIcon is built
+     * */
+    async #build(properties) {
         // Load SiriusIcon attributes
         this._loadAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_ICON_ATTRIBUTES,
             attributesDefault: SIRIUS_ICON_ATTRIBUTES_DEFAULT
         });
@@ -116,6 +123,9 @@ export default class SiriusIcon extends SiriusElement {
 
         // Add the SVG element to the icon container
         this.iconContainerElement.appendChild(this.svgElement);
+
+        // Set properties
+        this.events = this._events;
 
         // Dispatch the built event
         this.dispatchBuiltEvent();
@@ -391,14 +401,6 @@ export default class SiriusIcon extends SiriusElement {
         }
     }
 
-    /** Set the events property to this
-     * @param {object} events - Events property
-     */
-    set events(events) {
-        if (events)
-            this._setEvents(events, this);
-    }
-
     /** Private method to handle attribute changes
      * @param {string} name - Attribute name
      * @param {string} oldValue - Old value
@@ -483,7 +485,15 @@ export default class SiriusIcon extends SiriusElement {
         if (!shouldContinue) return;
 
         // Call the attribute changed handler
-        this.onBuilt=()=>this.#attributeChangeHandler(name, oldValue, formattedValue);
+        this.onBuilt = () => this.#attributeChangeHandler(name, oldValue, formattedValue);
+    }
+
+    /** Set the events property to this
+     * @param {object} events - Events property
+     */
+    set events(events) {
+        if (events)
+            this.onBuilt = () => this._setEvents(events, this.iconContainerElement);
     }
 }
 

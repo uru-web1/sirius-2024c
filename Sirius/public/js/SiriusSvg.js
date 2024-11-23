@@ -1,5 +1,5 @@
 import deepFreeze from "./utils/deep-freeze.js";
-import SiriusElement, {SIRIUS_ELEMENT_ATTRIBUTES} from "./SiriusElement.js";
+import SiriusElement, {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_PROPERTIES} from "./SiriusElement.js";
 
 /** SiriusSVG constants */
 export const SIRIUS_SVG = deepFreeze({
@@ -165,10 +165,10 @@ export default class SiriusSvg extends SiriusElement {
      * @param {object} properties - Element properties
      * */
     constructor(properties) {
-        super(properties, SIRIUS_SVG.NAME);
+        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]: SIRIUS_SVG.NAME});
 
         // Build the SiriusSvg
-        this.#build().then()
+        this.#build(properties).then()
     }
 
     /** Define the observed attributes
@@ -195,11 +195,14 @@ export default class SiriusSvg extends SiriusElement {
                 </div>`;
     }
 
-    /** Build the SiriusSvg */
-    async #build() {
+    /** Build the SiriusSvg
+     * @param {object} properties - Element properties
+     * @returns {Promise<void>} - Promise
+     * */
+    async #build(properties) {
         // Load Sirius Label attributes
         this._loadAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_SVG_ATTRIBUTES,
             attributesDefault: SIRIUS_SVG_ATTRIBUTES_DEFAULT
         });
@@ -302,10 +305,10 @@ export default class SiriusSvg extends SiriusElement {
     }
 
     /** Set the rotation
-     * @param {string} value - Rotation
+     * @param {string|null} value - Rotation
      * */
     set rotation(value) {
-        this.setAttribute(SIRIUS_SVG_ATTRIBUTES.ROTATION, value);
+        this.setAttribute(SIRIUS_SVG_ATTRIBUTES.ROTATION, value === null ? "" : value);
     }
 
     /** Get the transition duration
@@ -440,7 +443,7 @@ export default class SiriusSvg extends SiriusElement {
         if (!rotate) return
 
         // Get the icon rotation degrees
-        const degrees = this.#getRotationDegrees(rotate)
+        const degrees = this.#getRotationDegrees(rotate.toLowerCase())
         if (degrees === null) return
 
         // Log the rotation

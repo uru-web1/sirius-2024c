@@ -1,6 +1,4 @@
-import { SiriusElement,
-        SIRIUS_ELEMENT_ATTRIBUTES,
-        SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, } from "../js/SiriusElement.js";
+import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement,} from "../js/SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 /** Sirius Edit constants */
@@ -11,7 +9,7 @@ export const SIRIUS_EDIT = deepFreeze({
         INPUT_BACKGROUND: '--sirius-edit--input-background',
         INPUT_FONT_SIZE: '--sirius-edit--input-font-size',
         INPUT_FONT_COLOR: '--sirius-edit--input-color-font',
-        
+
         LABEL_BACKGROUND: '--sirius-edit--labeline-background-color',
         LABEL_FONT_COLOR: '--sirius-edit--labeline-color-font',
         LABEL_BORDER_COLOR: '--sirius-edit--labeline-color-border',
@@ -23,23 +21,23 @@ export const SIRIUS_EDIT = deepFreeze({
         EDIT_CONTAINER: "edit-container",
         EDIT_AREA: "edit-area",
         EDIT_AREA_INPUT: "text",
-        EDIT_LABEL:"labelline",
+        EDIT_LABEL: "labelline",
         EDIT_REQUIRED: "required",
     }
 })
 
 /** Sirius Edit attributes */
-export const SIRIUS_EDIT_ATTRIBUTES = deepFreeze({ 
+export const SIRIUS_EDIT_ATTRIBUTES = deepFreeze({
     WIDTH: "width",
     HEIGHT: "height",
     INPUT_COLOR: "input-background",
     INPUT_FONT_SIZE: "input-font-size",
     INPUT_FONT_COLOR: "input-font-color",
 
-    LABEL_BACKGROUND: "label-color",          
-    LABEL_FONT_COLOR: "label-font-color",         
-    LABEL_BORDER_COLOR: "label-border-color",        
-    LABEL_FONT_COLOR_ONFOCUS: "label-font-color-onfocus",  
+    LABEL_BACKGROUND: "label-color",
+    LABEL_FONT_COLOR: "label-font-color",
+    LABEL_BORDER_COLOR: "label-border-color",
+    LABEL_FONT_COLOR_ONFOCUS: "label-font-color-onfocus",
     LABEL_BORDER_COLOR_ONFOCUS: "label-border-color-onfocus",
     LABEL_CAPTION: "label-caption",
 })
@@ -50,7 +48,7 @@ export const SIRIUS_EDIT_ATTRIBUTES = deepFreeze({
 export const SIRIUS_EDIT_ATTRIBUTES_DEFAULT = deepFreeze({
     [SIRIUS_EDIT_ATTRIBUTES.WIDTH]: "24px",
     [SIRIUS_EDIT_ATTRIBUTES.HEIGHT]: "24px",
-    [SIRIUS_EDIT_ATTRIBUTES.LABEL_CAPTION]:"Enter your name",
+    [SIRIUS_EDIT_ATTRIBUTES.LABEL_CAPTION]: "Enter your name",
 })
 
 export class SiriusEdit extends SiriusElement {
@@ -58,12 +56,13 @@ export class SiriusEdit extends SiriusElement {
     #editContainerElement = null;
 
     constructor(properties) {
-        super(properties,SIRIUS_EDIT.NAME);
+        super(properties, SIRIUS_EDIT.NAME);
         this.#build().then;
         this.lol()
     }
 
-    lol(){console.log(0);
+    lol() {
+        console.log(0);
     }
 
     #getTemplate() {
@@ -202,10 +201,10 @@ export class SiriusEdit extends SiriusElement {
         this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.LABEL_BORDER_COLOR_ONFOCUS, value);
     }
 
-     /** Get icon width attribute
+    /** Get icon width attribute
      * @returns {string} - Icon width attribute
      */
-     get LabelFontColorOnFocus() {
+    get LabelFontColorOnFocus() {
         return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.LABEL_FONT_COLOR_ONFOCUS);
     }
 
@@ -230,32 +229,33 @@ export class SiriusEdit extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_EDIT_ATTRIBUTES)]
     }
 
-    #setInputBackgroundColor(color){
-        if(color) 
+    #setInputBackgroundColor(color) {
+        if (color)
             this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.INPUT_BACKGROUND, color);
     }
 
-    #setInputFontSize(size){
-        if(size)
+    #setInputFontSize(size) {
+        if (size)
             this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.INPUT_FONT_SIZE, size)
     }
 
-    #setInputFontColor(color){
-        if(color)
+    #setInputFontColor(color) {
+        if (color)
             this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.INPUT_FONT_COLOR, color)
     }
 
-    #setLabelBackgroundColor(color){
-        if(color)
+    #setLabelBackgroundColor(color) {
+        if (color)
             this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_BACKGROUND, color)
     }
 
-    #setLabelFontColor(color){
-        if(color)
+    #setLabelFontColor(color) {
+        if (color)
             this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_FONT_COLOR, color)
     }
-    #setLabelBorderColor(color){
-        if(color)
+
+    #setLabelBorderColor(color) {
+        if (color)
             this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_BORDER_COLOR, color)
     }
 
@@ -277,7 +277,7 @@ export class SiriusEdit extends SiriusElement {
         }
     }
 
-    async #build(){
+    async #build() {
 
         // Load Sirius checkbox HTML attributes
         this._loadAttributes({
@@ -369,7 +369,7 @@ export class SiriusEdit extends SiriusElement {
                 break;
         }
     }
-    
+
     /** Attribute change callback
      * @param {string} name - Attribute name
      * @param {string} oldValue - Old attribute value

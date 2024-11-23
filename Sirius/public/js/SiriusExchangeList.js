@@ -1,6 +1,6 @@
 import SiriusElement, {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
-import SiriusListBoxV1, {SIRIUS_LIST_BOX, SIRIUS_LIST_BOX_ATTRIBUTES} from "./SiriusListBoxV1.js";
-import SiriusIcon, { SIRIUS_ICON } from "./SiriusIcon.js";
+import SiriusListBoxV1 from "./SiriusListBoxV1.js";
+import SiriusIcon from "./SiriusIcon.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 /** SiriusListBox class */
@@ -31,20 +31,19 @@ export default class SiriusExchangeList extends SiriusElement {
     #listboxContainerElement1 = null;
     #listboxContainerElement2 = null;
 
- 
-    
+
     // lists
     #itemsList = [];
     #itemContainerList = [];
     _checkedItems = [];
-    
+
     constructor(properties) {
         super(properties, SIRIUS_EXCHANGE_LIST.NAME);
     }
 
     static get observedAttributes() {
-            return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_EXCHANGE_LIST)];
-        }
+        return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_EXCHANGE_LIST)];
+    }
 
     get listBoxElement1() {
         return this.#listBoxElement1;
@@ -53,6 +52,7 @@ export default class SiriusExchangeList extends SiriusElement {
     get listBoxElement2() {
         return this.#listBoxElement2;
     }
+
     get iconElement1() {
         return this.#iconElement1;
     }
@@ -78,11 +78,11 @@ export default class SiriusExchangeList extends SiriusElement {
     }
 
 
-	#setStyle(style) {
+    #setStyle(style) {
         if (!style)
             return
         // Add the style attribute to the element when built
-        this._setStyle = () => this._setStyleAttributes(style,this.checkboxContainerElement);
+        this._setStyle = () => this._setStyleAttributes(style, this.checkboxContainerElement);
     }
 
     #getTemplate() {
@@ -99,6 +99,7 @@ export default class SiriusExchangeList extends SiriusElement {
                     </div>
                 </div>`;
     }
+
     set events(events) {
         if (!events)
             return
@@ -145,7 +146,7 @@ export default class SiriusExchangeList extends SiriusElement {
         // Create SiriusIcon element
         this.#listBoxElement1 = new SiriusListBoxV1({
             [idKey]: 'listbox-1',
-            [itemsKey]:`[
+            [itemsKey]: `[
                 { "id": "item_1", "label": "Item 1"},
                 { "id": "item_2", "label": "Item 2"},
                 { "id": "item_3", "label": "Item 3"}
@@ -153,12 +154,12 @@ export default class SiriusExchangeList extends SiriusElement {
             `,
             [backgroundKey]: 'rgb(205,207,214)',
             [checkboxColorKey]: 'black',
-            
+
         })
 
         this.#listBoxElement2 = new SiriusListBoxV1({
             [idKey]: 'listbox-2',
-            [itemsKey]:`[
+            [itemsKey]: `[
                 { "id": "item_4", "label": "Item 4"},
                 { "id": "item_5", "label": "Item 5"},
                 { "id": "item_6", "label": "Item 6"}
@@ -166,7 +167,7 @@ export default class SiriusExchangeList extends SiriusElement {
             `,
             [backgroundKey]: 'rgb(205,207,214)',
             [checkboxColorKey]: 'black',
-            
+
         })
 
         this.#iconElement1 = new SiriusIcon({
@@ -181,13 +182,13 @@ export default class SiriusExchangeList extends SiriusElement {
             [colorKey]: 'blue'
         })
 
-        const boton1= document.createElement('div');
-        const boton2= document.createElement('div');
+        const boton1 = document.createElement('div');
+        const boton2 = document.createElement('div');
 
         boton1.appendChild(this.#iconElement1);
         boton2.appendChild(this.#iconElement2);
 
-        
+
         // // Create SiriusLabel element
         // this.#labelElement = new SiriusLabel({
         //     [idKey]: labelId,
@@ -209,10 +210,10 @@ export default class SiriusExchangeList extends SiriusElement {
 
         // Add ListBox to the shadow DOM
         this.shadowRoot.appendChild(this.containerElement);
-   
+
         // Dispatch the built event
         this.dispatchBuiltEvent();
-        }
+    }
 
     get checkedItems() {
         return this._checkedItems;

@@ -25,11 +25,19 @@ export const SIRIUS_CONTROL_ELEMENT_ATTRIBUTES_DEFAULT = deepFreeze({
     [SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.STATUS]: SIRIUS_CONTROL_ELEMENT_STATUS.UNCHECKED,
 })
 
+/** SiriusControlElement properties */
+export const SIRIUS_CONTROL_ELEMENT_PROPERTIES = deepFreeze({
+    CHILDREN: 'children',
+})
+
 /** Sirius class that represents a control element component */
 export default class SiriusControlElement extends SiriusElement {
     // Main elements
     _parent = null;
+
+    // Element properties
     _children = []
+    #childrenFlag = false
 
     // Status
     _previousStatus = null;
@@ -39,14 +47,21 @@ export default class SiriusControlElement extends SiriusElement {
 
     /**
      * Create a SiriusControlElement
-     * @param {Object} properties - The properties of the SiriusControlElement
-     * @param {string} elementName - Element name
+     * @param {Object} properties - SiriusControlElement properties
+     * @param {string} childrenProperty - Children property name
      */
-    constructor(properties, elementName) {
-        super(properties, elementName);
+    constructor(properties, childrenProperty = SIRIUS_CONTROL_ELEMENT_PROPERTIES.CHILDREN) {
+        super(properties);
 
-        // Prepare the SiriusControlElement
-        this.#prepare().then();
+        // Check if the properties contains the children
+        const children = properties?.[childrenProperty];
+        if (children) {
+            this._children = children;
+            this.#childrenFlag = true;
+        }
+
+        // Build the SiriusControlElement
+        this.#build(properties).then();
     }
 
     /** Define observed attributes */
@@ -54,11 +69,14 @@ export default class SiriusControlElement extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_CONTROL_ELEMENT_ATTRIBUTES)];
     }
 
-    /** Prepare the SiriusControlElement */
-    async #prepare() {
+    /** Build the SiriusControlElement
+     * @param {Object} properties - SiriusControlElement properties
+     * @returns {Promise<void>} - A promise that resolves when the SiriusControlElement is built
+     * */
+    async #build(properties) {
         // Load SiriusControlElement HTML attributes
         this._loadAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_CONTROL_ELEMENT_ATTRIBUTES,
             attributesDefault: SIRIUS_CONTROL_ELEMENT_ATTRIBUTES_DEFAULT
         });
@@ -75,7 +93,27 @@ export default class SiriusControlElement extends SiriusElement {
      * @returns {SiriusControlElement[]} - Children elements
      */
     get children() {
-        return Object.freeze([...this._children]);
+        return this._children;
+    }
+
+    /** Set children elements
+     * @param {SiriusControlElement[]} elements - Children elements
+     */
+    set children(elements) {
+        if (!elements) return;
+
+        // Check if the children elements are the same
+        if (!this.#childrenFlag && this.children === elements) return;
+
+        // Remove the current children elements
+        if (this.#childrenFlag) {
+            this.#childrenFlag = false;
+            this._children = []
+        } else if (this.children)
+            this._removeAllChildren();
+
+        // Set the children elements
+        this._addChildren(elements);
     }
 
     /** Get parent ID attribute
@@ -111,10 +149,10 @@ export default class SiriusControlElement extends SiriusElement {
 
     /** Toggle the status attribute */
     toggleStatus() {
-        if(this.status === SIRIUS_CONTROL_ELEMENT_STATUS.CHECKED)
+        if (this.status === SIRIUS_CONTROL_ELEMENT_STATUS.CHECKED)
             this.status = SIRIUS_CONTROL_ELEMENT_STATUS.UNCHECKED
         else
-            this.status=SIRIUS_CONTROL_ELEMENT_STATUS.CHECKED;
+            this.status = SIRIUS_CONTROL_ELEMENT_STATUS.CHECKED;
     }
 
     /** Protected method to set the status attribute for the children elements
@@ -129,16 +167,16 @@ export default class SiriusControlElement extends SiriusElement {
 
         // Set the changing children status flag
         this._changedChildrenStatus = this.children.reduce((acc, child) => {
-            if (child.status === status) return acc+1;
+            if (child.status === status) return acc + 1;
             return acc;
-        },0);
+        }, 0);
 
         // Set the status attribute for the children elements
         this.children.forEach(child => {
             if (child.status === status) return;
 
             child._changingStatusByParent = true;
-            if(status === SIRIUS_CONTROL_ELEMENT_STATUS.CHECKED)
+            if (status === SIRIUS_CONTROL_ELEMENT_STATUS.CHECKED)
                 child.status = SIRIUS_CONTROL_ELEMENT_STATUS.CHECKED;
             else
                 child.status = SIRIUS_CONTROL_ELEMENT_STATUS.UNCHECKED
@@ -151,8 +189,8 @@ export default class SiriusControlElement extends SiriusElement {
 
         // Check the children elements status attribute
         const numberChildren = this.children.length;
-        let numberChildrenChecked=0
-        let numberChildrenIndeterminate=0
+        let numberChildrenChecked = 0
+        let numberChildrenIndeterminate = 0
 
         this.children.map(child => child.status).forEach(status => {
             if (status === SIRIUS_CONTROL_ELEMENT_STATUS.CHECKED) numberChildrenChecked++;
@@ -161,7 +199,7 @@ export default class SiriusControlElement extends SiriusElement {
 
         // Set the checked attribute value
         let status
-        if (numberChildrenChecked === 0&&numberChildrenIndeterminate===0)
+        if (numberChildrenChecked === 0 && numberChildrenIndeterminate === 0)
             status = SIRIUS_CONTROL_ELEMENT_STATUS.UNCHECKED;
         else if (numberChildrenChecked === numberChildren)
             status = SIRIUS_CONTROL_ELEMENT_STATUS.CHECKED;
@@ -185,19 +223,19 @@ export default class SiriusControlElement extends SiriusElement {
     _addParent(parent) {
         this.onBuilt = () => {
             this._parent = parent;
-            parent._children.push(this);
+            parent.children.push(this);
         }
     }
 
     /** Protected method to remove the parent element */
     _removeParent() {
         // Check if the parent element is set
-        if (!this._parent){
+        if (!this._parent) {
             this.logger.error('Parent element must be set')
             return
         }
 
-        this._parent._children = this._parent._children.filter(child => child !== this);
+        this._parent.children = this._parent.children.filter(child => child !== this);
         this._parent = null;
     }
 
@@ -205,30 +243,24 @@ export default class SiriusControlElement extends SiriusElement {
      * @param {SiriusControlElement} child - Child element
      */
     _addChild(child) {
-        if (!child) return;
-
-        // Add the child element
-        this.onBuilt = () => child.parentId = this.id;
+        if (child)
+            this.onBuilt = () => child.parentId = this.id;
     }
 
     /** Add children elements
      * @param {SiriusControlElement[]} children - Children elements
      */
     _addChildren(children) {
-        if (!children) return;
-
-        // Add the children elements
-        this.onBuilt = () => children.forEach(child => child.parentId = this.id)
+        if (children)
+            this.onBuilt = () => children.forEach(child => child.parentId = this.id)
     }
 
     /** Remove child element
      * @param {SiriusControlElement} child - Child element
      */
     _removeChild(child) {
-        if (!child) return;
-
-        // Remove the child element
-        child.parentId = ""
+        if (child)
+            child.parentId = ""
     }
 
     /** Remove child element by ID
@@ -249,9 +281,7 @@ export default class SiriusControlElement extends SiriusElement {
      * @param {SiriusControlElement[]} children - Children elements
      */
     _removeChildren(children) {
-        if (!children) return;
-
-        children.forEach(child => child.parentId = "")
+        if (children) children.forEach(child => child.parentId = "")
     }
 
     /** Remove all children elements */
@@ -269,7 +299,7 @@ export default class SiriusControlElement extends SiriusElement {
     /** Get the checked children elements
      * @returns {SiriusControlElement[]} - Checked children elements
      */
-    get checkedChildrenElements(){
+    get checkedChildrenElements() {
         return this.children.filter(child => child.isChecked);
     }
 
@@ -321,19 +351,19 @@ export default class SiriusControlElement extends SiriusElement {
         this.logger.error("Method not implemented");
     }
 
-     /** Protected method to handle the status attribute change to unchecked
+    /** Protected method to handle the status attribute change to unchecked
      * NOTE: This method should be implemented by the child class
      * */
     _statusUncheckedHandler() {
         this.logger.error("Method not implemented");
-     }
+    }
 
-     /** Protected method to handle the status attribute change to indeterminate
+    /** Protected method to handle the status attribute change to indeterminate
      * NOTE: This method should be implemented by the child class
      * */
     _statusIndeterminateHandler() {
         this.logger.error("Method not implemented");
-     }
+    }
 
     /** Protected method to set the status attribute
      * @param {string} status - Status attribute value
@@ -362,7 +392,7 @@ export default class SiriusControlElement extends SiriusElement {
         if (status === this._previousStatus) return;
 
         // Check if the status is being set manually to indeterminate
-        if (status === SIRIUS_CONTROL_ELEMENT_STATUS.INDETERMINATE && !changingStatusByChildren && !changingStatusByParent){
+        if (status === SIRIUS_CONTROL_ELEMENT_STATUS.INDETERMINATE && !changingStatusByChildren && !changingStatusByParent) {
             this.logger.error("Cannot set status to 'indeterminate' manually");
             return
         }

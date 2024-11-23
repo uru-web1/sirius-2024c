@@ -22,20 +22,19 @@
         SIRIUS_ELEMENT_PROPERTIES
     } from "../js/SiriusElement.js";
 
+    // Get the attributes keys
+    const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+    const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+    const captionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION;
+    const alignKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_TEXT_ALIGN;
+    const colorKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR;
+    const fontFamilyKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_FAMILY;
+
+    // Get the properties keys
+    const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
+
     // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
-
-        // Get the attributes keys
-        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
-        const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
-        const captionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION;
-        const alignKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_TEXT_ALIGN;
-        const colorKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR;
-        const fontFamilyKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_FAMILY;
-
-        // Get the properties keys
-        const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
-
         // Create the label
         const siriusLabel2 = new SiriusLabel({
             [idKey]: 'label-1',
@@ -43,18 +42,16 @@
             [alignKey]: 'right',
             [colorKey]: 'blue',
             [fontFamilyKey]: 'fantasy',
-            [styleKey]: "{'border': '1px solid red', 'padding': '20px'}"
+            [styleKey]: "{'border': '1px solid red', 'padding': '20px'}",
+            [eventsKey]: {
+                'click': () => siriusLabel2.logger.log('click'),
+                'mouseover': () => siriusLabel2.logger.log('mouseover'),
+                'mouseout': () => siriusLabel2.logger.log('mouseout')
+            },
         });
 
         // Add the label to the DOM
         siriusLabel2.addToBody()
-
-        // Add an events to the label
-        siriusLabel2.events = {
-            'click': () => siriusLabel2.logger.log('click'),
-            'mouseover': () => siriusLabel2.logger.log('mouseover'),
-            'mouseout': () => siriusLabel2.logger.log('mouseout')
-        }
     }
 </script>
 </body>

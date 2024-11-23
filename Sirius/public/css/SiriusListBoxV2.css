@@ -32,7 +32,7 @@
     padding: var(--sirius-list-box--head-container--padding);
 }
 
-.items-container{
+.items-container {
     display: flex;
     align-items: center;
     flex-direction: column;

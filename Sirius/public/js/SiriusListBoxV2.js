@@ -1,4 +1,8 @@
-import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
+import {
+    SIRIUS_ELEMENT_ATTRIBUTES,
+    SIRIUS_ELEMENT_PROPERTIES,
+    SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES
+} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 import {SIRIUS_CONTROL_ELEMENT_ATTRIBUTES} from "./SiriusControlElement.js";
 import SiriusLinkedControlElement from "./SiriusLinkedControlElement.js";
@@ -19,7 +23,7 @@ export const SIRIUS_LIST_BOX = deepFreeze({
         ITEMS_CONTAINER_GAP: "--sirius-list-box--items-container--gap",
         ITEMS_CONTAINER_PADDING: "--sirius-list-box--items-container--padding",
     },
-    SLOTS:{
+    SLOTS: {
         HEAD: 'head',
         ITEMS: 'items',
     },
@@ -49,6 +53,12 @@ export const SIRIUS_LIST_BOX_ATTRIBUTES = deepFreeze({
 /** SiriusListBox attributes default values */
 export const SIRIUS_LIST_BOX_ATTRIBUTES_DEFAULT = deepFreeze({});
 
+/** SiriusListBox properties */
+export const SIRIUS_LIST_BOX_PROPERTIES = deepFreeze({
+    HEAD: 'head',
+    ITEMS: 'items',
+})
+
 /** Sirius class that represents a list box component */
 export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
     // Container elements
@@ -61,10 +71,11 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
      * @param {object} properties - Element properties
      */
     constructor(properties) {
-        super(properties, SIRIUS_LIST_BOX.NAME);
+        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]: SIRIUS_LIST_BOX.NAME},
+            SIRIUS_LIST_BOX_PROPERTIES.HEAD, SIRIUS_LIST_BOX_PROPERTIES.ITEMS);
 
         // Build the SiriusListBox
-        this.#build().then();
+        this.#build(properties).then();
 
     }
 
@@ -96,11 +107,14 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
                 </div>`;
     }
 
-    /** Build the SiriusListBox */
-    async #build() {
+    /** Build the SiriusListBox
+     * @param {object} properties - Element properties
+     * @returns {Promise<void>} - Build the SiriusListBox
+     * */
+    async #build(properties) {
         // Load Sirius ListBox HTML attributes
         await this._loadAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_LIST_BOX_ATTRIBUTES,
             defaultAttributes: SIRIUS_LIST_BOX_ATTRIBUTES_DEFAULT
         });
@@ -122,11 +136,15 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
         this._linkedChildrenSlotElement = this.itemsContainerElement.firstElementChild;
         this.shadowRoot.appendChild(this.containerElement);
 
-         // Set up the linked parent observer
+        // Set up the linked parent observer
         this._setLinkedParentObserver();
 
         // Set up the linked children observer
         this._setLinkedChildrenObserver();
+
+        // Set the properties
+        this.linkedParent = this._linkedParent;
+        this.linkedChildren = this._linkedChildren
 
         // Dispatch the built event
         this.dispatchBuiltEvent();
@@ -185,7 +203,7 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
     /** Get the checked items
      * @returns {SiriusControlElement[]} - Checked items
      */
-    get checkedItems(){
+    get checkedItems() {
         return this.checkedChildrenElements;
     }
 
@@ -334,27 +352,26 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
      * @param {HTMLElement|SiriusControlElement} element - Head element node/instance
      */
     addHead(element) {
-        this.onBuilt = () => this.headSlotElement.appendChild(element);
+        this.onBuilt = () => this._addLinkedParent(element)
     }
 
     /** Remove head element node */
     removeHead() {
-        this.onBuilt = () => this.headSlotElement.remove();
+        this.onBuilt = () => this._removeLinkedParent()
     }
 
     /** Add items elements node
      * @param {HTMLElement|SiriusControlElement} elements - Items elements node/instance
      */
     addItems(...elements) {
-        this.onBuilt = () =>
-            elements.forEach(element=>this.itemsSlotElement.appendChild(element));
+        this.onBuilt = () => this._addLinkedChildren(elements)
     }
 
     /** Remove items elements node
      * @param {HTMLElement|SiriusControlElement} elements - Items elements node/instance
      * */
     removeItems(...elements) {
-        this.onBuilt = () => elements.forEach(element => element.remove())
+        this.onBuilt = () => this._removeLinkedChildren(elements)
     }
 
     /** Private method to set the ListBox container element style attribute
@@ -394,7 +411,7 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
 
     /** Private method to set the margin attribute
      * @param {string} margin - Margin attribute value
-      */
+     */
     #setMargin(margin) {
         if (margin)
             this._setCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.MARGIN, margin);

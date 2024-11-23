@@ -1,11 +1,14 @@
 import {
     SIRIUS_ELEMENT_ATTRIBUTES,
+    SIRIUS_ELEMENT_PROPERTIES,
     SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES
 } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES} from "./SiriusIcon.js";
 import SiriusControlElement, {
-    SIRIUS_CONTROL_ELEMENT_ATTRIBUTES, SIRIUS_CONTROL_ELEMENT_ATTRIBUTES_DEFAULT, SIRIUS_CONTROL_ELEMENT_STATUS
+    SIRIUS_CONTROL_ELEMENT_ATTRIBUTES,
+    SIRIUS_CONTROL_ELEMENT_ATTRIBUTES_DEFAULT,
+    SIRIUS_CONTROL_ELEMENT_STATUS
 } from "./SiriusControlElement.js";
 import {SIRIUS_SVG_ICONS} from "./SiriusSvg.js";
 
@@ -61,6 +64,11 @@ export const SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT = deepFreeze({
     [SIRIUS_CHECKBOX_ATTRIBUTES.ICON_PADDING]: "2px",
 })
 
+/** SiriusCheckbox properties */
+export const SIRIUS_CHECKBOX_PROPERTIES = deepFreeze({
+    LABEL: 'label',
+})
+
 /** Sirius class that represents a checkbox component */
 export default class SiriusCheckbox extends SiriusControlElement {
     // Container elements
@@ -69,20 +77,27 @@ export default class SiriusCheckbox extends SiriusControlElement {
     #iconContainerElement = null;
 
     // Slot elements
-    #labelSlotElement=null
+    #labelSlotElement = null
 
     // Main elements
     #iconElement = null;
 
+    // Element properties
+    #label = null
+
     /**
      * Create a SiriusCheckbox element
-     * @param {Object} properties - The properties of the SiriusCheckbox
+     * @param {Object} properties - SiriusCheckbox properties
      */
     constructor(properties) {
-        super(properties, SIRIUS_CHECKBOX.NAME);
-      
+        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]: SIRIUS_CHECKBOX.NAME});
+
+        // Check if the properties contains the label
+        const label = properties?.[SIRIUS_CHECKBOX_PROPERTIES.LABEL];
+        if (label) this.#label = label;
+
         // Build the SiriusCheckbox
-        this.#build().then();
+        this.#build(properties).then();
     }
 
     /** Define observed attributes */
@@ -109,11 +124,14 @@ export default class SiriusCheckbox extends SiriusControlElement {
                 </div>`;
     }
 
-    /** Build the SiriusCheckbox */
-    async #build() {
+    /** Build the SiriusCheckbox
+     * @param {Object} properties - SiriusCheckbox properties
+     * @returns {Promise<void>} - Promise that resolves when the SiriusCheckbox is built
+     * */
+    async #build(properties) {
         // Load SiriusCheckbox HTML attributes
         this._loadAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_CHECKBOX_ATTRIBUTES,
             attributesDefault: SIRIUS_CHECKBOX_ATTRIBUTES_DEFAULT
         });
@@ -129,6 +147,7 @@ export default class SiriusCheckbox extends SiriusControlElement {
         const hideKey = SIRIUS_ELEMENT_ATTRIBUTES.HIDE
         const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON
         const statusKey = SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.STATUS
+        const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
 
         // Check if the checkbox is hidden
         let hide
@@ -142,6 +161,9 @@ export default class SiriusCheckbox extends SiriusControlElement {
             [idKey]: iconId,
             [iconKey]: SIRIUS_SVG_ICONS.CHECK_MARK,
             [hideKey]: hide,
+            [eventsKey]: {
+                "click": () => this.toggleStatus()
+            }
         })
 
         // Get HTML inner content
@@ -160,10 +182,10 @@ export default class SiriusCheckbox extends SiriusControlElement {
         // Add icon and label to the checkbox container
         this.#iconContainerElement.appendChild(this.iconElement);
 
-        // Add event listeners
-        this.iconElement.events = {
-            "click": () => this.toggleStatus()
-        }
+        // Set properties
+        this.events = this._events
+        this.children = this._children
+        this.label = this.#label
 
         // Dispatch the built event
         this.dispatchBuiltEvent();
@@ -445,9 +467,9 @@ export default class SiriusCheckbox extends SiriusControlElement {
     /** Protected method to handle the status attribute change to indeterminate */
     _statusIndeterminateHandler() {
         this.onBuilt = () => {
-                this.iconElement.hide = "false";
-                this.iconElement.icon = SIRIUS_SVG_ICONS.INDETERMINATE;
-            }
+            this.iconElement.hide = "false";
+            this.iconElement.icon = SIRIUS_SVG_ICONS.INDETERMINATE;
+        }
     }
 
     /** Private method to set the gap attribute
@@ -589,33 +611,6 @@ export default class SiriusCheckbox extends SiriusControlElement {
         this._setStyle = () => this._setStyleAttributes(style, this.checkboxContainerElement);
     }
 
-    /** Set the events property to the icon element
-     * @param {object} events - Events property
-     */
-    set events(events) {
-        if (!events)
-            return
-
-        // Add the events property to the element when built
-        this.onBuilt = () => this.iconElement.events = events;
-    }
-
-    /** Set the label element
-     * @param {HTMLElement} label - Label element
-     */
-    set label(label) {
-        if (label)
-            this.onBuilt = () => {
-                label.slot = SIRIUS_CHECKBOX.SLOTS.LABEL
-                this.labelSlotElement.appendChild(label)
-            }
-    }
-
-    /** Clear the label slot element */
-    clearLabelSlotElement() {
-        this.onBuilt = () => this.labelSlotElement.innerHTML = "";
-    }
-
     /** Private method to handle attribute changes
      * @param {string} name - Attribute name
      * @param {string} oldValue - Old value
@@ -721,6 +716,52 @@ export default class SiriusCheckbox extends SiriusControlElement {
 
         // Call the attribute change handler
         this.onBuilt = () => this.#attributeChangeHandler(name, oldValue, formattedValue);
+    }
+
+    /** Set the events property to the icon element
+     * @param {object} events - Events property
+     */
+    set events(events) {
+        if (events)
+            this.onBuilt = () => this.iconElement.events = events;
+    }
+
+    /** Get the label element
+     * @returns {HTMLElement} - Label element
+     */
+    get label() {
+        return this.#label;
+    }
+
+    /** Set the label element
+     * @param {HTMLElement} label - Label element
+     */
+    set label(label) {
+        if (!label) return
+
+        // Check if the label is an instance of HTMLElement
+        if (!(label instanceof HTMLElement)) {
+            this.logger.error("Label must be an instance of HTMLElement")
+            return
+        }
+
+        // Set the label element when built
+        this.onBuilt = () => {
+            // Clear the current label
+            if (this.label)
+                this.clearLabelSlotElement();
+
+            // Set the label
+            this.#label = label
+
+            label.slot = SIRIUS_CHECKBOX.SLOTS.LABEL
+            this.labelSlotElement.appendChild(label)
+        }
+    }
+
+    /** Clear the label slot element */
+    clearLabelSlotElement() {
+        this.labelSlotElement.innerHTML = "";
     }
 }
 
