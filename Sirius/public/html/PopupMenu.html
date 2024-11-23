@@ -40,7 +40,7 @@
                     id: 2,
                     text: 'Option 2',
                     action: 'option-2',
-                    nextLevel: null,
+                    nextLevel: 2,
                     priorLevel: null,
                     level: 0
                 });
@@ -48,7 +48,7 @@
                     id: 3,
                     text: 'Sub-option 1',
                     action: 'sub-option-1',
-                    nextLevel: null,
+                    nextLevel: 3,
                     priorLevel: 0,
                     level: 1
                 });
@@ -60,6 +60,33 @@
                     priorLevel: 0,
                     level: 1
                 });
+                menu.addOption({
+                    id: 5,
+                    text: "Suboption 3",
+                    action: "suboption-3",
+                    nextLevel: null,
+                    priorLevel: 0,
+                    level: 2
+                });
+                menu.addOption({
+                    id: 6,
+                    text: "Suboption 4",
+                    action: "suboption-4",
+                    nextLevel: null,
+                    priorLevel: 1,
+                    level: 3
+                });
+                menu.addFixedOption({
+                    id: "fixed-1",
+                    text: "Home",
+                    action: "home",
+                });
+                menu.addFixedOption({
+                    id: "fixed-2",
+                    text: "Settings",
+                    action: "settings",
+                });
+                
                 console.log("Carga exitosa");
             } else {
                 console.error("PopupMenu instance not found or not correctly initialized:", menu);
