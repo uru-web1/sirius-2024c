@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>SiriusListBoxV1 Example</title>
+    <script defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusCheckbox.js" type="module"></script>
+    <script defer src="../js/SiriusLabel.js" type="module"></script>
+    <script defer src="../js/SiriusListBoxV2.js" type="module"></script>
+
+    <style>
+        body {
+            background-color: gray;
+        }
+    </style>
+</head>
+<body>
+
+<sirius-list-box id="list-box-1" background-color='lightblue'>
+    <sirius-checkbox slot="head" id="head">
+        <sirius-label slot="label" id="head__label" caption="Head"></sirius-label>
+    </sirius-checkbox>
+    <sirius-checkbox slot="items" id="item-1">
+        <sirius-label slot="label" id="item-1__label" caption="Item 1"></sirius-label>
+    </sirius-checkbox>
+    <sirius-checkbox slot="items" id="item-2">
+        <sirius-label slot="label" id="item-2__label" caption="Item 2"></sirius-label>
+    </sirius-checkbox>
+</sirius-list-box>
+
+<!-- With JS -->
+<script type="module">
+    import sirius from '../js/Sirius.js';
+    import SiriusListBox, {SIRIUS_LIST_BOX_ATTRIBUTES, SIRIUS_LIST_BOX_PROPERTIES} from '../js/SiriusListBoxV2.js';
+    import {
+        SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
+        SIRIUS_ELEMENT_ATTRIBUTES
+    } from "../js/SiriusElement.js";
+    import SiriusLabel from "../js/SiriusLabel.js";
+    import SiriusCheckbox from "../js/SiriusCheckbox.js";
+
+    // Get the required keys
+    const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+    const backgroundKey = SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR;
+    const checkboxColorKey = SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR;
+    const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+    const headKey = SIRIUS_LIST_BOX_PROPERTIES.HEAD;
+    const itemsKey = SIRIUS_LIST_BOX_PROPERTIES.ITEMS;
+
+    sirius.onLoaded = async () => {
+        // Create a new list box
+        const siriusListBox2 = new SiriusListBox({
+            [idKey]: 'list-box-2',
+            [backgroundKey]: 'rgb(205,207,214)',
+            [checkboxColorKey]: 'black',
+            [styleKey]: 'margin: 40px',
+            [headKey]: new SiriusCheckbox({
+                [idKey]: 'head',
+                [styleKey]: 'background-color: yellow',
+                label: new SiriusLabel({
+                    [idKey]: 'head__label',
+                    caption: 'Head'
+                })
+            }),
+            [itemsKey]: [
+                new SiriusCheckbox({
+                    [idKey]: 'item-1',
+                    [styleKey]: 'background-color: lightgreen',
+                    label: new SiriusLabel({
+                        [idKey]: 'item-1__label',
+                        caption: 'Item 1'
+                    })
+                }),
+                new SiriusCheckbox({
+                    [idKey]: 'item-2',
+                    [styleKey]: 'background-color: lightgreen',
+                    label: new SiriusLabel({
+                        [idKey]: 'item-2__label',
+                        caption: 'Item 2'
+                    })
+                })
+            ]
+        })
+        siriusListBox2.addToBody();
+    };
+</script>
+</body>
+</html>

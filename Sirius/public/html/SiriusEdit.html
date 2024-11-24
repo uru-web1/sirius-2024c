@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <link rel="stylesheet" href="../css/SiriusEdit.css">
+    <link rel="stylesheet" href="../css/SiriusEdit.css">
     <script src="../js/Sirius.js" type="module"></script>
     <script src="../js/SiriusEdit.js" type="module"></script>
     <title>Document</title>
 
     <style>
-
         * {
             margin: 0;
             padding: 0;
@@ -24,41 +23,77 @@
             background-color: #1C2841;
             align-items: center;
             justify-content: center;
-        }  
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Space between elements */
+        }
     </style>
 </head>
 <body>
 
+    <div class="container">
+        <sirius-edit 
+        id="8" input-background="transparent" input-type="text" input-font-size="3em" input-font-color="red"
+        label-font-color="red" label-caption="Edit creado con HTML" label-border-color="red"
+        label-font-color-onfocus="yellow" label-border-color-onfocus="yellow" width="500px" height="40px"
+        label-y-position="60px">
+        </sirius-edit>
+        
+    </div>
+
     <script type="module">
-    import sirius from '../js/Sirius.js';
-    import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
-    import {SIRIUS_EDIT_ATTRIBUTES, SiriusEdit} from "../js/SiriusEdit.js"
-    // Get the attributes keys
-    const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
-    const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
-    
-    const widthKey = SIRIUS_EDIT_ATTRIBUTES.WIDTH;
-    const heightKey = SIRIUS_EDIT_ATTRIBUTES.HEIGHT;
-    const inputColorKey = SIRIUS_EDIT_ATTRIBUTES.INPUT_COLOR;
-    const inputFontSizeKey = SIRIUS_EDIT_ATTRIBUTES.INPUT_FONT_SIZE;
-    const inputFontColorKey = SIRIUS_EDIT_ATTRIBUTES.INPUT_FONT_COLOR;
-    const labelBackgroundKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_BACKGROUND;
-    const labelFontColorKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_FONT_COLOR;
-    const labelBorderColorKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_BORDER_COLOR;
-    const labelFontColorOnFocusKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_FONT_COLOR_ONFOCUS;
-    const labelBorderColorOnFocusKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_BORDER_COLOR_ONFOCUS;    
+        import sirius from '../js/Sirius.js';
+        import { SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES } from "../js/SiriusElement.js";
+        import { SIRIUS_EDIT_ATTRIBUTES, SiriusEdit } from "../js/SiriusEdit.js";
 
-    sirius.onLoaded = async () =>{
-        const SiriusEdit1 = new SiriusEdit({
-            [idKey]:"edit1",
-            [inputColorKey] : "black",
-        })
-    } 
+        // Get the attributes keys
+        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+        const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+        const widthKey = SIRIUS_EDIT_ATTRIBUTES.WIDTH;
+        const heightKey = SIRIUS_EDIT_ATTRIBUTES.HEIGHT;
+        const inputColorKey = SIRIUS_EDIT_ATTRIBUTES.INPUT_COLOR;
+        const inputFontSizeKey = SIRIUS_EDIT_ATTRIBUTES.INPUT_FONT_SIZE;
+        const inputFontColorKey = SIRIUS_EDIT_ATTRIBUTES.INPUT_FONT_COLOR;
+        const labelBackgroundKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_BACKGROUND;
+        const labelFontColorKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_FONT_COLOR;
+        const labelBorderColorKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_BORDER_COLOR;
+        const labelFontColorOnFocusKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_FONT_COLOR_ONFOCUS;
+        const labelBorderColorOnFocusKey = SIRIUS_EDIT_ATTRIBUTES.LABEL_BORDER_COLOR_ONFOCUS;
+        const labelCaption = SIRIUS_EDIT_ATTRIBUTES.LABEL_CAPTION;    
+        const inputType = SIRIUS_EDIT_ATTRIBUTES.INPUT_TYPE;
 
+        sirius.onLoaded = async () => {
+            const container = document.querySelector('.container');
+
+            const SiriusEdit1 = new SiriusEdit({
+                [idKey]: "edit1",
+                [inputColorKey]: "transparent",
+                [labelCaption]: "Edit creado con JavaScript",
+                [inputType]: "text",
+                [SIRIUS_EDIT_ATTRIBUTES.WIDTH]:"500px",
+                [SIRIUS_EDIT_ATTRIBUTES.HEIGHT]:"60px",
+                [SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_RIGHT]: "10px",
+                [SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_TOP]: "20px",
+                [SIRIUS_EDIT_ATTRIBUTES.INPUT_FONT_SIZE]: "2em",
+            });
+            container.appendChild(SiriusEdit1);
+
+            SiriusEdit1.setAttribute(inputType, "password");
+
+            const SiriusEdit2 = new SiriusEdit({
+                [idKey]: "edit2",
+                [inputColorKey]: "transparent",
+                [labelCaption]: "Edit creado con JavaScript",
+                [inputType]: "number",
+                [SIRIUS_EDIT_ATTRIBUTES.HEIGHT]:"80px",
+                [SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_RIGHT]: "10px",
+                [SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_TOP]: "20px",
+            });
+            container.appendChild(SiriusEdit2);
+        };
     </script>
-    
-    <sirius-edit id="8" input-background="transparent" input-font-size="3em" input-font-color="red"
-    label-font-color="red" label-caption="Enter your Name" label-border-color="red" label-font-color-onfocus="yellow" label-border-color-onfocus="yellow"></sirius-edit>
     
 </body>
 </html>

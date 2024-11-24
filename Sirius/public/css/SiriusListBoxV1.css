@@ -1,0 +1,35 @@
+:host {
+    display: inline-block;
+
+    --gap: 5px;
+    --padding: 10px;
+    --background-color: white;
+}
+
+.list-box-container {
+    display: block;
+    overflow-y: auto;
+    padding: var(--padding);
+    background-color: var(--background-color);
+    margin: 40px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+}
+
+.head-container {
+    border-bottom: 1px solid rgb(48, 48, 48);
+    padding: 5px;
+}
+
+
+.items-container {
+    display: grid;
+    padding: 5px;
+    gap: var(--gap);
+}
+
+.item-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
