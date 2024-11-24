@@ -48,23 +48,32 @@
 
 <script type="module">
     import sirius from '../js/Sirius.js'
-    import {SiriusIcon, SIRIUS_ICON_ATTRIBUTES} from "../js/SiriusIcon.js";
-    import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "../js/SiriusElement.js";
+    import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES} from "../js/SiriusIcon.js";
+    import {SIRIUS_ELEMENT_PROPERTIES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "../js/SiriusElement.js";
     import {SIRIUS_SVG_ICONS} from "../js/SiriusSvg.js";
+
+    // Get the attributes keys
+    const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+    const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON;
+    const showAnimationKey = SIRIUS_ICON_ATTRIBUTES.SHOW_ANIMATION;
+
+    // Get the properties keys
+    const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
 
     // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
-        const idName = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
-        const iconName = SIRIUS_ICON_ATTRIBUTES.ICON;
-        const showAnimationName = SIRIUS_ICON_ATTRIBUTES.SHOW_ANIMATION;
-
         // Create the icon
         const siriusIcon4 = new SiriusIcon({
-            [idName]: 'icon-4',
-            [iconName]: SIRIUS_SVG_ICONS.ARROW,
-            [showAnimationName]: `
+            [idKey]: 'icon-4',
+            [iconKey]: SIRIUS_SVG_ICONS.ARROW,
+            [showAnimationKey]: `
                 0% { transform: scale(0); fill: red; } 100% { transform: scale(1); fill: blue; }
                 `,
+            [eventsKey]: {
+                'click': () => siriusIcon4.logger.log('click'),
+                'mouseover': () => siriusIcon4.logger.log('mouseover'),
+                'mouseout': () => siriusIcon4.logger.log('mouseout')
+            }
         })
 
         // Add the icon to the DOM
@@ -72,13 +81,6 @@
 
         // Change the icon
         siriusIcon4.icon = SIRIUS_SVG_ICONS.HOME;
-
-        // Add events to the icon
-        siriusIcon4.events = {
-            'click': () => siriusIcon4.logger.log('click'),
-            'mouseover': () => siriusIcon4.logger.log('mouseover'),
-            'mouseout': () => siriusIcon4.logger.log('mouseout')
-        }
 
         // Link the button to the icon and center it
         const icon4 = document.getElementById('icon-4');

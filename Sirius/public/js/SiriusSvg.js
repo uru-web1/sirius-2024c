@@ -1,7 +1,7 @@
 import deepFreeze from "./utils/deep-freeze.js";
-import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
+import SiriusElement, {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_PROPERTIES} from "./SiriusElement.js";
 
-/** Sirius SVG constants */
+/** SiriusSVG constants */
 export const SIRIUS_SVG = deepFreeze({
     NAME: "SiriusSvg",
     TAG: "sirius-svg",
@@ -18,7 +18,7 @@ export const SIRIUS_SVG = deepFreeze({
     }
 })
 
-/** Sirius icons */
+/** SiriusSVG icons */
 export const SIRIUS_SVG_ICONS = {
     ARROW: 'arrow',
     DOUBLE_ARROW: 'double-arrow',
@@ -42,7 +42,7 @@ export const SIRIUS_SVG_ICONS = {
     EYE_CLOSE: 'eye-close'
 }
 
-/** Sirius icons inner HTML */
+/** SiriusSVG icons inner HTML */
 export const SIRIUS_SVG_ICONS_INNER_HTML = {
     // Arrow icon
     [SIRIUS_SVG_ICONS.ARROW]:
@@ -125,7 +125,7 @@ export const SIRIUS_SVG_ICONS_INNER_HTML = {
         `<path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z"/>`,
 }   
 
-/** Sirius SVG attributes */
+/** SiriusSVG attributes */
 export const SIRIUS_SVG_ATTRIBUTES = deepFreeze({
     ICON: 'icon',
     WIDTH: 'width',
@@ -138,9 +138,7 @@ export const SIRIUS_SVG_ATTRIBUTES = deepFreeze({
     HIDING_ANIMATION: 'hiding-animation',
 })
 
-/** Sirius SVG attributes default values
- * If an attribute is not present in the object, the default value is null
- * */
+/** SiriusSVG attributes default values */
 export const SIRIUS_SVG_ATTRIBUTES_DEFAULT = deepFreeze({
     [SIRIUS_SVG_ATTRIBUTES.ICON]: SIRIUS_SVG_ICONS.WARNING,
 })
@@ -162,20 +160,25 @@ export const SIRIUS_SVG_ROTATION_DEGREES = deepFreeze({
 })
 
 /** Sirius class that represents the SVG icon */
-export class SiriusSvg extends SiriusElement {
+export default class SiriusSvg extends SiriusElement {
+    // Container elements
+    #svgContainerElement = null
+
+    // Main elements
+    #svgElement = null
+
+    // Icon properties
     #icon = null
     #rotation = null
-    #svgContainerElement = null
-    #svgElement = null
 
     /** Create a SiriusSvg element
      * @param {object} properties - Element properties
      * */
     constructor(properties) {
-        super(properties, SIRIUS_SVG.NAME);
+        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]: SIRIUS_SVG.NAME});
 
         // Build the SiriusSvg
-        this.#build().then()
+        this.#build(properties).then()
     }
 
     /** Define the observed attributes
@@ -185,7 +188,7 @@ export class SiriusSvg extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_SVG_ATTRIBUTES)];
     }
 
-    /** Get the template for the Sirius SVG
+    /** Get the template for the SiriusSVG
      * @returns {string} - Template
      */
     #getTemplate() {
@@ -202,11 +205,14 @@ export class SiriusSvg extends SiriusElement {
                 </div>`;
     }
 
-    /** Build the SiriusSvg */
-    async #build() {
+    /** Build the SiriusSvg
+     * @param {object} properties - Element properties
+     * @returns {Promise<void>} - Promise
+     * */
+    async #build(properties) {
         // Load Sirius Label attributes
         this._loadAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_SVG_ATTRIBUTES,
             attributesDefault: SIRIUS_SVG_ATTRIBUTES_DEFAULT
         });
@@ -223,6 +229,8 @@ export class SiriusSvg extends SiriusElement {
         // Add SVG to the shadow DOM
         this.#svgContainerElement = this._containerElement = this._templateContent.firstChild;
         this.#svgElement = this.svgContainerElement.firstElementChild;
+
+        // Add the
         this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event
@@ -307,10 +315,10 @@ export class SiriusSvg extends SiriusElement {
     }
 
     /** Set the rotation
-     * @param {string} value - Rotation
+     * @param {string|null} value - Rotation
      * */
     set rotation(value) {
-        this.setAttribute(SIRIUS_SVG_ATTRIBUTES.ROTATION, value);
+        this.setAttribute(SIRIUS_SVG_ATTRIBUTES.ROTATION, value === null ? "" : value);
     }
 
     /** Get the transition duration
@@ -445,7 +453,7 @@ export class SiriusSvg extends SiriusElement {
         if (!rotate) return
 
         // Get the icon rotation degrees
-        const degrees = this.#getRotationDegrees(rotate)
+        const degrees = this.#getRotationDegrees(rotate.toLowerCase())
         if (degrees === null) return
 
         // Log the rotation

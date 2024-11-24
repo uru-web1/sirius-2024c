@@ -9,34 +9,34 @@
 </head>
 <body>
 
-    <script type="module">
-        import sirius from '../js/Sirius.js';
-        import {SIRIUS_EXCHANGE_LIST_ATTRIBUTES, SiriusExchangeList} from '../js/SiriusExchangeList.js';
-        import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
+<script type="module">
+    import sirius from '../js/Sirius.js';
+    import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
+    import SiriusListBoxV1, {SIRIUS_LIST_BOX_ATTRIBUTES} from "../js/SiriusListBoxV1.js";
 
-        sirius.onLoaded = async () => {
-            const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
-            const itemsKey = SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS;
-            const headKey = SIRIUS_LIST_BOX_ATTRIBUTES.HEAD;
-            const backgroundKey = SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR;
-            const checkboxColorKey = SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR;
-            const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+    sirius.onLoaded = async () => {
+        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+        const itemsKey = SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS;
+        const headKey = SIRIUS_LIST_BOX_ATTRIBUTES.HEAD;
+        const backgroundKey = SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR;
+        const checkboxColorKey = SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR;
+        const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
 
-            // Create a new ListBox
-            const listBox1 = new SiriusListBox({
-                [idKey]: 'listbox-1',
-                [itemsKey]:`[
+        // Create a new ListBox
+        const listBox1 = new SiriusListBoxV1({
+            [idKey]: 'listbox-1',
+            [itemsKey]: `[
                     { "id": "item_1", "label": "Item 1"},
                     { "id": "item_2", "label": "Item 2"},
                     { "id": "item_3", "label": "Item 3"}
                 ]
                 `,
-                [backgroundKey]: 'rgb(205,207,214)',
-                [checkboxColorKey]: 'black',
-                
-            });
-        
-        };
-    </script>
+            [backgroundKey]: 'rgb(205,207,214)',
+            [checkboxColorKey]: 'black',
+
+        });
+
+    };
+</script>
 </body>
 </html>

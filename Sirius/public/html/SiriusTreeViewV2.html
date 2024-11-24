@@ -29,7 +29,7 @@
             <sirius-label slot="label" id="checkbox-5__label" caption="Grandchild 3"></sirius-label>
         </sirius-checkbox>
     </sirius-tree-view>
-    <sirius-tree-view slot="children" id="tree-view-3" icon-fill="yellow">
+    <sirius-tree-view slot="children" id="tree-view-3" icon-fill="purple">
         <sirius-checkbox slot="parent" id="checkbox-6">
             <sirius-label slot="label" id="checkbox-6__label" caption="Child 2"></sirius-label>
         </sirius-checkbox>
@@ -49,5 +49,61 @@
         <sirius-label slot="label" id="checkbox-10__label" caption="Child 3"></sirius-label>
     </sirius-checkbox>
 </sirius-tree-view>
+
+<script type="module">
+    import SiriusTreeView from "../js/SiriusTreeViewV2.js";
+    import sirius from "../js/Sirius.js"
+    import SiriusCheckbox, {SIRIUS_CHECKBOX_PROPERTIES} from "../js/SiriusCheckbox.js";
+    import SiriusLabel, {SIRIUS_LABEL_ATTRIBUTES} from "../js/SiriusLabel.js";
+    import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "../js/SiriusElement.js";
+    import {SIRIUS_CONTROL_ELEMENT_PROPERTIES} from "../js/SiriusControlElement.js";
+    import {SIRIUS_LINKED_CONTROL_ELEMENT_PROPERTIES} from "../js/SiriusLinkedControlElement.js";
+
+    // Get the attributes keys
+    const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+    const captionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION
+    const labelKey = SIRIUS_CHECKBOX_PROPERTIES.LABEL
+    const parentKey = SIRIUS_LINKED_CONTROL_ELEMENT_PROPERTIES.PARENT
+    const childrenKey = SIRIUS_CONTROL_ELEMENT_PROPERTIES.CHILDREN
+
+    sirius.onLoaded = () => {
+
+        // Create SiriusTreeView
+        const siriusTreeView2 = new SiriusTreeView({
+            [idKey]: 'tree-view',
+            [parentKey]: new SiriusCheckbox({
+                [idKey]: 'checkbox-parent',
+                [labelKey]: new SiriusLabel({
+                    [idKey]: 'checkbox-parent__label',
+                    [captionKey]: 'Parent',
+                })
+            }),
+            [childrenKey]: [
+                new SiriusCheckbox({
+                    [idKey]: 'checkbox-child1',
+                    [labelKey]: new SiriusLabel({
+                        [idKey]: 'checkbox-child1__label',
+                        [captionKey]: 'Child 1',
+                    })
+                }),
+                new SiriusCheckbox({
+                    [idKey]: 'checkbox-child2',
+                    [labelKey]: new SiriusLabel({
+                        [idKey]: 'checkbox-child2__label',
+                        [captionKey]: 'Child 2',
+                    })
+                }),
+                new SiriusCheckbox({
+                    [idKey]: 'checkbox-child3',
+                    [labelKey]: new SiriusLabel({
+                        [idKey]: 'checkbox-child3__label',
+                        [captionKey]: 'Child 3',
+                    })
+                })
+            ],
+        });
+        siriusTreeView2.addToBody()
+    }
+</script>
 </body>
 </html>

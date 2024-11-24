@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>SiriusCheckbox Example</title>
-    <link href="../css/SiriusEdit.css" rel="stylesheet">
+    <link href="../css/SiriusCheckbox.css" rel="stylesheet">
+    <script defer src="../js/SiriusCheckbox.js" type="module"></script>
     <script defer src="../js/Sirius.js" type="module"></script>
 
     <style>
@@ -24,9 +25,10 @@
 
 <script type="module">
     import sirius from '../js/Sirius.js';
-    import {SIRIUS_CHECKBOX_ATTRIBUTES, SiriusCheckbox} from '../js/SiriusCheckbox.js';
+    import SiriusCheckbox, {SIRIUS_CHECKBOX_ATTRIBUTES, SIRIUS_CHECKBOX_PROPERTIES} from '../js/SiriusCheckbox.js';
     import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
-    import {SIRIUS_LABEL_ATTRIBUTES, SiriusLabel} from "../js/SiriusLabel.js";
+    import SiriusLabel, {SIRIUS_LABEL_ATTRIBUTES} from "../js/SiriusLabel.js";
+    import {SIRIUS_CONTROL_ELEMENT_ATTRIBUTES, SIRIUS_CONTROL_ELEMENT_PROPERTIES} from "../js/SiriusControlElement.js";
 
     // Get the checkboxes container
     const checkboxesContainer = document.querySelector('.checkboxes-container');
@@ -34,13 +36,18 @@
     // Get the attributes keys
     const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
     const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+    const parentIdKey = SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.PARENT_ID;
     const captionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION;
     const iconWidthKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_WIDTH;
     const iconHeightKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_HEIGHT;
     const iconFillKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_FILL;
-    const parentIdKey = SIRIUS_CHECKBOX_ATTRIBUTES.PARENT_ID;
+
+    // Get the properties keys
+    const labelKey = SIRIUS_CHECKBOX_PROPERTIES.LABEL
+    const childrenKey = SIRIUS_CONTROL_ELEMENT_PROPERTIES.CHILDREN
 
     sirius.onLoaded = async () => {
+        // Create the checkbox with a label
         const siriusCheckbox2 = new SiriusCheckbox({
             [idKey]: 'checkbox-2',
             [parentIdKey]: "checkbox-1",
@@ -48,26 +55,18 @@
             [styleKey]: 'background-color: yellow',
             [iconWidthKey]: '50px',
             [iconHeightKey]: '50px',
-        });
-        siriusCheckbox2.label= new SiriusLabel({
-            [idKey]: 'checkbox-2__label',
-            [captionKey]: 'Uncharted',
+            [labelKey]: new SiriusLabel({
+                [idKey]: 'checkbox-2__label',
+                [captionKey]: 'Uncharted',
+            }),
         });
         checkboxesContainer.appendChild(siriusCheckbox2);
 
+        // Create the checkbox without a label
         const siriusCheckbox3 = new SiriusCheckbox({
             [idKey]: 'checkbox-3'
         });
         checkboxesContainer.appendChild(siriusCheckbox3);
-
-        const siriusCheckbox4 = new SiriusCheckbox({
-            [idKey]: 'checkbox-4'
-        });
-        siriusCheckbox4.label = new SiriusLabel({
-            [idKey]: 'checkbox-4__label',
-            [captionKey]: 'Parent 1',
-        });
-        checkboxesContainer.appendChild(siriusCheckbox4);
 
         // Create the first parent container
         const parentContainer1 = document.createElement('div');
@@ -76,30 +75,41 @@
 
         const siriusCheckbox5 = new SiriusCheckbox({
             [idKey]: 'checkbox-5',
-        });
-        siriusCheckbox5.label = new SiriusLabel({
-            [idKey]: 'checkbox-5__label',
-            [captionKey]: 'Child 1 (Parent 1)',
+            [labelKey]: new SiriusLabel({
+                [idKey]: 'checkbox-5__label',
+                [captionKey]: 'Child 1 (Parent 1)',
+            })
         });
         parentContainer1.appendChild(siriusCheckbox5);
 
         const siriusCheckbox6 = new SiriusCheckbox({
             [idKey]: 'checkbox-6',
-        });
-        siriusCheckbox6.label = new SiriusLabel({
-            [idKey]: 'checkbox-6__label',
-            [captionKey]: 'Child 2 (Parent 1)',
+            [labelKey]: new SiriusLabel({
+                [idKey]: 'checkbox-6__label',
+                [captionKey]: 'Child 2 (Parent 1)',
+            })
         });
         parentContainer1.appendChild(siriusCheckbox6);
 
         const siriusCheckbox7 = new SiriusCheckbox({
             [idKey]: 'checkbox-7',
-        });
-        siriusCheckbox7.label = new SiriusLabel({
-            [idKey]: 'checkbox-7__label',
-            [captionKey]: 'Child 3 (Parent 2)',
+            [labelKey]: new SiriusLabel({
+                [idKey]: 'checkbox-7__label',
+                [captionKey]: 'Child 3 (Parent 2)',
+            })
         });
         parentContainer1.appendChild(siriusCheckbox7);
+
+        // Create the parent checkbox
+        const siriusCheckbox4 = new SiriusCheckbox({
+            [idKey]: 'checkbox-4',
+            [labelKey]: new SiriusLabel({
+                [idKey]: 'checkbox-4__label',
+                [captionKey]: 'Parent 1',
+            }),
+            [childrenKey]: [siriusCheckbox5, siriusCheckbox6, siriusCheckbox7]
+        });
+        checkboxesContainer.appendChild(siriusCheckbox4);
 
         // Create the second parent container
         const parentContainer2 = document.createElement('div');
@@ -116,9 +126,6 @@
         parentContainer2.appendChild(siriusCheckbox8);
 
         // Add children to the checkbox
-        for(const element of [siriusCheckbox5, siriusCheckbox6, siriusCheckbox7])
-            element.parentId = siriusCheckbox4.id
-
         siriusCheckbox8.parentId = siriusCheckbox7.id
     };
 

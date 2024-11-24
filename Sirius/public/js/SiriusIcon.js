@@ -1,9 +1,12 @@
-import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
-import {SiriusSvg} from "./SiriusSvg.js";
+import SiriusElement, {
+    SIRIUS_ELEMENT_ATTRIBUTES,
+    SIRIUS_ELEMENT_PROPERTIES,
+    SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES
+} from "./SiriusElement.js";
+import SiriusSvg from "./SiriusSvg.js";
 import deepFreeze from "./utils/deep-freeze.js";
-import {SIRIUS_CHECKBOX_ATTRIBUTES} from "./SiriusCheckbox.js";
 
-/** Sirius icon constants */
+/** SiriusIcon constants */
 export const SIRIUS_ICON = deepFreeze({
     NAME: "SiriusIcon",
     TAG: "sirius-icon",
@@ -20,7 +23,7 @@ export const SIRIUS_ICON = deepFreeze({
     }
 })
 
-/** Sirius icon attributes */
+/** SiriusIcon attributes */
 export const SIRIUS_ICON_ATTRIBUTES = deepFreeze({
     ICON: "icon",
     WIDTH: "width",
@@ -34,7 +37,7 @@ export const SIRIUS_ICON_ATTRIBUTES = deepFreeze({
     PADDING: 'padding',
 })
 
-/** Sirius icon attributes default values
+/** SiriusIcon attributes default values
  * If an attribute is not present in the object, the default value is null
  * */
 export const SIRIUS_ICON_ATTRIBUTES_DEFAULT = deepFreeze({
@@ -43,19 +46,22 @@ export const SIRIUS_ICON_ATTRIBUTES_DEFAULT = deepFreeze({
 })
 
 /** Sirius class that represents an icon component */
-export class SiriusIcon extends SiriusElement {
+export default class SiriusIcon extends SiriusElement {
+    // Container elements
     #iconContainerElement = null
+
+    // Main elements
     #svgElement = null
 
     /**
-     * Create a Sirius icon element
+     * Create a SiriusIcon element
      * @param {object} properties - Element properties
      */
     constructor(properties) {
-        super(properties, SIRIUS_ICON.NAME);
+        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]: SIRIUS_ICON.NAME});
 
         // Build the SiriusIcon
-        this.#build().then();
+        this.#build(properties).then();
     }
 
     /** Define observed attributes
@@ -65,7 +71,7 @@ export class SiriusIcon extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_ICON_ATTRIBUTES)]
     }
 
-    /** Get the template for the Sirius icon
+    /** Get the template for the SiriusIcon
      * @returns {string} - Template
      * */
     #getTemplate() {
@@ -76,11 +82,14 @@ export class SiriusIcon extends SiriusElement {
                 </div>`;
     }
 
-    /** Build the SiriusIcon */
-    async #build() {
+    /** Build the SiriusIcon
+     * @param {object} properties - Element properties
+     * @returns {Promise<void>} - Promise that resolves when the SiriusIcon is built
+     * */
+    async #build(properties) {
         // Load SiriusIcon attributes
         this._loadAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_ICON_ATTRIBUTES,
             attributesDefault: SIRIUS_ICON_ATTRIBUTES_DEFAULT
         });
@@ -114,6 +123,9 @@ export class SiriusIcon extends SiriusElement {
 
         // Add the SVG element to the icon container
         this.iconContainerElement.appendChild(this.svgElement);
+
+        // Set properties
+        this.events = this._events;
 
         // Dispatch the built event
         this.dispatchBuiltEvent();
@@ -389,14 +401,6 @@ export class SiriusIcon extends SiriusElement {
         }
     }
 
-    /** Set the events property to this
-     * @param {object} events - Events property
-     */
-    set events(events) {
-        if (events)
-            this._setEvents(events, this);
-    }
-
     /** Private method to handle attribute changes
      * @param {string} name - Attribute name
      * @param {string} oldValue - Old value
@@ -481,7 +485,15 @@ export class SiriusIcon extends SiriusElement {
         if (!shouldContinue) return;
 
         // Call the attribute changed handler
-        this.onBuilt=()=>this.#attributeChangeHandler(name, oldValue, formattedValue);
+        this.onBuilt = () => this.#attributeChangeHandler(name, oldValue, formattedValue);
+    }
+
+    /** Set the events property to this
+     * @param {object} events - Events property
+     */
+    set events(events) {
+        if (events)
+            this.onBuilt = () => this._setEvents(events, this.iconContainerElement);
     }
 }
 

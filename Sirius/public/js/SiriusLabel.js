@@ -1,7 +1,11 @@
-import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
+import SiriusElement, {
+    SIRIUS_ELEMENT_ATTRIBUTES,
+    SIRIUS_ELEMENT_PROPERTIES,
+    SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES
+} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
-/** Sirius label constants */
+/** SiriusLabel constants */
 export const SIRIUS_LABEL = deepFreeze({
     NAME: "SiriusLabel",
     TAG: "sirius-label",
@@ -19,7 +23,7 @@ export const SIRIUS_LABEL = deepFreeze({
     }
 });
 
-/** Sirius label attributes */
+/** SiriusLabel attributes */
 export const SIRIUS_LABEL_ATTRIBUTES = deepFreeze({
     CAPTION: "caption",
     CAPTION_TEXT_ALIGN: "caption-text-align",
@@ -30,25 +34,26 @@ export const SIRIUS_LABEL_ATTRIBUTES = deepFreeze({
     CAPTION_PADDING: "caption-padding"
 })
 
-/** Sirius label attributes default values */
+/** SiriusLabel attributes default values */
 export const SIRIUS_LABEL_ATTRIBUTES_DEFAULT = deepFreeze({
     [SIRIUS_LABEL_ATTRIBUTES.CAPTION]: "Please enter a caption",
 })
 
 /** Sirius class that represents a label component */
-export class SiriusLabel extends SiriusElement {
+export default class SiriusLabel extends SiriusElement {
+    // Container elements
     #labelContainerElement = null
     #captionContainerElement = null
 
     /**
-     * Create a Sirius label element
+     * Create a SiriusLabel element
      * @param {object} properties - Element properties
      */
     constructor(properties) {
-        super(properties, SIRIUS_LABEL.NAME);
+        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]: SIRIUS_LABEL.NAME});
 
         // Build the SiriusLabel
-        this.#build().then();
+        this.#build(properties).then();
     }
 
     /** Define observed attributes
@@ -58,7 +63,7 @@ export class SiriusLabel extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_LABEL_ATTRIBUTES)];
     }
 
-    /** Get the template for the Sirius label
+    /** Get the template for the SiriusLabel
      * @returns {string} - Template
      * */
     #getTemplate() {
@@ -69,11 +74,14 @@ export class SiriusLabel extends SiriusElement {
                 </div>`;
     }
 
-    /** Build the SiriusLabel */
-    async #build() {
+    /** Build the SiriusLabel
+     * @param {object} properties - Element properties
+     * @returns {Promise<void>} - Promise
+     * */
+    async #build(properties) {
         // Load Sirius Label attributes
         this._loadAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_LABEL_ATTRIBUTES,
             attributesDefault: SIRIUS_LABEL_ATTRIBUTES_DEFAULT
         });
@@ -91,6 +99,9 @@ export class SiriusLabel extends SiriusElement {
         this.#labelContainerElement = this._containerElement = this._templateContent.firstChild;
         this.#captionContainerElement = this.labelContainerElement.firstElementChild;
         this.shadowRoot.appendChild(this.containerElement);
+
+        // Set properties
+        this.events = this._events;
 
         // Dispatch the built event
         this.dispatchBuiltEvent();
@@ -272,14 +283,6 @@ export class SiriusLabel extends SiriusElement {
             this._setStyle = () => this._setStyleAttributes(style, this.captionContainerElement);
     }
 
-    /** Set the events property to the caption container element
-     * @param {object} events - Events property
-     */
-    set events(events) {
-        if (events)
-            this.onBuilt = () => this._setEvents(events, this.captionContainerElement);
-    }
-
     /** Private method to handle attribute changes
      * @param {string} name - Attribute name
      * @param {string} oldValue - Old value
@@ -341,6 +344,14 @@ export class SiriusLabel extends SiriusElement {
 
         // Call the on attribute change handler
         this.onBuilt = () => this.#attributeChangeHandler(name, oldValue, formattedValue);
+    }
+
+    /** Set the events property to the caption container element
+     * @param {object} events - Events property
+     */
+    set events(events) {
+        if (events)
+            this.onBuilt = () => this._setEvents(events, this.captionContainerElement);
     }
 }
 

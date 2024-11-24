@@ -2,19 +2,7 @@ import {SiriusLogger} from "./SiriusLogger.js";
 import sirius from "./Sirius.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
-/** Sirius types */
-export const SIRIUS_TYPES = deepFreeze({
-    STRING: 'string',
-    NUMBER: 'number',
-    BOOLEAN: 'boolean',
-    OBJECT: 'object',
-    FUNCTION: 'function',
-    UNDEFINED: 'undefined',
-    BIGINT: 'bigint',
-    ANY: 'any'
-})
-
-/** Sirius element constants */
+/** SiriusElement constants */
 export const SIRIUS_ELEMENT = deepFreeze({
     NAME: 'SiriusElement',
     STYLE_SHEETS: {
@@ -33,64 +21,77 @@ export const SIRIUS_ELEMENT = deepFreeze({
     }
 })
 
-/** Sirius element required attributes */
+/** SiriusElement required attributes */
 export const SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES = deepFreeze({
     ID: 'id'
 })
 
-/** Sirius element attributes */
+/** SiriusElement attributes */
 export const SIRIUS_ELEMENT_ATTRIBUTES = deepFreeze({
     STYLE: 'style',
     HIDE: 'hide',
     DISABLED: 'disabled'
 })
 
-/** Sirius element attributes default values */
+/** SiriusElement attributes default values
+ * If an attribute is not present in the object, the default value is null
+ * */
 export const SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT = deepFreeze({})
 
-/** Sirius element properties */
+/** SiriusElement properties */
 export const SIRIUS_ELEMENT_PROPERTIES = deepFreeze({
     EVENTS: 'events',
-})
-
-/** Sirius element properties details */
-export const SIRIUS_ELEMENT_PROPERTIES_DETAILS = deepFreeze({
-    [SIRIUS_ELEMENT_PROPERTIES.EVENTS]: {DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT},
+    NAME: 'name'
 })
 
 /** Sirius class that represents an element component */
-export class SiriusElement extends HTMLElement {
-    _properties = {}
+export default class SiriusElement extends HTMLElement {
+    // Container elements
+    _containerElement = null
+
+    // Shadow DOM
+    _template = null
     _styleSheets = {}
     _elementStyleSheetRules = new Map()
+
+    // Attributes
     _applyingAttribute = new Map();
+    _id = ''
+
+    // Hidden state
     _hidden = false;
     _hiding = false;
-    _containerElement = null
-    #elementId = ''
-    #elementName = ''
-    #logger = null
+
+    // Element properties
+    _events = {}
+    _name = ''
+
+    // Built
     #isBuilt = false
     #onBuilt = []
+
+    // Logger
+    #logger = null
     #isLoggerInjected = false
     #onInjectedLogger = []
 
     /**
-     * Create a Sirius element
-     * @param {object} properties - Element properties
-     * @param {string} elementName - Element name
+     * Create a SiriusElement
+     * @param {object} properties - SiriusElement properties
      */
-    constructor(properties, elementName) {
+    constructor(properties) {
         super();
 
-        // Add element name
-        this.#elementName = elementName;
+        // Check if the properties contains the events
+        const events = properties?.[SIRIUS_ELEMENT_PROPERTIES.EVENTS];
+        if (events) this._events = events;
 
-        // Add properties
-        this._properties = properties;
+        // Check if the parameters contains the name
+        const name = properties?.[SIRIUS_ELEMENT_PROPERTIES.NAME];
+        if (name) this._name = name;
 
         // Build the SiriusElement
-        this.#build().then();
+        this.#build(properties).then();
     }
 
     /** Define observed attributes
@@ -100,8 +101,10 @@ export class SiriusElement extends HTMLElement {
         return [...Object.values(SIRIUS_ELEMENT_ATTRIBUTES), ...Object.values(SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES)];
     }
 
-    /** Build the SiriusElement */
-    async #build() {
+    /** Build the SiriusElement
+     * @param {object} properties - Element properties
+     * */
+    async #build(properties) {
         // Inject logger event listener
         this.addEventListener(SIRIUS_ELEMENT.EVENTS.INJECTED_LOGGER, async () => {
             // Set the logger as injected
@@ -114,24 +117,24 @@ export class SiriusElement extends HTMLElement {
             this.#onInjectedLogger = [];
         });
 
-        // Load Sirius element required HTML attributes
+        // Load SiriusElement required HTML attributes
         this._loadRequiredAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
         });
 
         // Inject logger
         this.#logger = new SiriusLogger({
-            name: this.#elementName,
+            name: this.name,
             elementId: this.id
         });
 
         // Dispatch injected logger event
         this.dispatchInjectedLoggerEvent();
 
-        // Load Sirius element HTML attributes
+        // Load SiriusElement HTML attributes
         this._loadAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_ELEMENT_ATTRIBUTES,
             attributesDefault: SIRIUS_ELEMENT_ATTRIBUTES_DEFAULT,
         });
@@ -213,13 +216,6 @@ export class SiriusElement extends HTMLElement {
      */
     set style(style) {
         this.setAttribute(SIRIUS_ELEMENT_ATTRIBUTES.STYLE, style)
-    }
-
-    /** Get the element events
-     * @returns {object} - Element events
-     */
-    get events() {
-        return this._properties[SIRIUS_ELEMENT_PROPERTIES.EVENTS]
     }
 
     /** Get Sirius logger
@@ -338,15 +334,15 @@ export class SiriusElement extends HTMLElement {
         }
 
         // Remove the old element ID
-        if (this.#elementId)
-            sirius.removeInstance(this.#elementId)
+        if (this._id)
+            sirius.removeInstance(this._id)
 
         // Set the element ID attribute
         try {
             sirius.setInstance(id, this);
-            this.#elementId = id
+            this._id = id;
         } catch (error) {
-            this._onInjectedLogger = () => this.logger.error(error);
+            this._onInjectedLogger = () => this.logger.error(error.message);
         }
     }
 
@@ -391,30 +387,75 @@ export class SiriusElement extends HTMLElement {
         })
     }
 
+    /** Get the element name
+     * @returns {string} - Element name
+     */
+    get name() {
+        return this._name
+    }
+
     /** Protected method to set events property to the given element
      * @param {object} events - Events attribute value
      * @param {HTMLElement} element - Element to set the events
      */
     _setEvents(events, element) {
-        // Check if the events or element is not set
-        if (!events || !element) {
-            this.logger.error('Events or element is not set');
+        this.onBuilt = () => {
+            // Check if the events or element is not set
+            if (!events || !element) {
+                this.logger.error('Events or element is not set');
+                return
+            }
+
+            // Check if the events are not an object
+            if (typeof events !== 'object') {
+                this.logger.error('Events are not an object');
+                return
+            }
+
+            // Add event listeners
+            let fn
+            for (const event in events) {
+                // Remove current event listener
+                this.removeEventListener(event, element)
+
+                // Get the event function
+                fn = events[event]
+
+                // Check if the event is not a function
+                if (typeof fn !== 'function') {
+                    this.logger.error(`Event '${event}' is not a function`);
+                    continue
+                }
+
+                // Add the event listener
+                element.addEventListener(event, fn)
+
+                // Set the event
+                this._events[event] = fn
+            }
+        }
+    }
+
+    /** Remove event listener
+     * @param {string} event - Event to be removed
+     * @param {HTMLElement} element - Element to remove the event listener
+     */
+    removeEventListener(event, element) {
+        // Check if the event or element is not set
+        if (!event || !element) {
+            this.logger.error('Event or element is not set');
             return
         }
 
-        // Get the events key
-        const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
+        // Check if the event is set
+        if (!this._events[event])
+            return
 
-        // Validate the element property
-        this._updateProperty({
-            name: eventsKey,
-            value: events,
-            propertiesDetails: SIRIUS_ELEMENT_PROPERTIES_DETAILS
-        })
+        // Get the event function
+        const fn = this._events[event]
 
-        // Add event listeners
-        for (let event in events)
-            element.addEventListener(event, events[event])
+        // Remove the event listener
+        element.removeEventListener(event, fn)
     }
 
     /** Get element style sheet CSS rule
@@ -617,75 +658,6 @@ export class SiriusElement extends HTMLElement {
         })
     }
 
-    /** Parse property types
-     * @param {string[]|string} types - Property valid types
-     * @returns {string[]} - Parsed types
-     */
-    _parseTypes(types) {
-        return Array.isArray(types) ? types : [types]
-    }
-
-    /** Check if the property has the given type
-     * @param {string[]|string} types - Property valid types
-     * @param {string} type - Property type
-     * @returns {{parsedTypes: string[], hasType: boolean}} - Parsed types and if the property has the given type
-     */
-    _hasPropertyType(types, type) {
-        // Check if the valid types are an array
-        const parsedTypes = this._parseTypes(types)
-        return {parsedTypes, hasType: parsedTypes.includes(type)}
-    }
-
-    /** Validate and update the element property
-     * @param {string} name - Property name
-     * @param {any} value - Property value
-     * @param {object} propertiesDetails - Properties details
-     */
-    _updateProperty({name, value, propertiesDetails}) {
-        // Check if the property name is not set
-        if (name === undefined) {
-            this.logger.error(`Property '${name}' is not set`);
-            return;
-        }
-
-        // Check if the property value is not set
-        if (value === undefined) {
-            this.logger.error(`Property value is not set for '${name}' property`);
-            return;
-        }
-
-        // Check if the property details for the given property are not set
-        if (!propertiesDetails[name]) {
-            this.logger.error(`Property details are not set for '${name}' property`);
-            return
-        }
-
-        // Get the property default value and types
-        const {DEFAULT: def, TYPE: types} = propertiesDetails[name]
-
-        // Get the property parsed types and check if the property has the given type
-        const {parsedTypes, hasType: hasBoolean} = this._hasPropertyType(types, SIRIUS_TYPES.BOOLEAN)
-
-        // Check if the property has any type
-        if (parsedTypes.includes(SIRIUS_TYPES.ANY))
-            return
-
-        // Check if the property is a boolean and the value is an empty string
-        if (value === "" && hasBoolean)
-            value = true
-
-        // Check if the default value is null
-        if (def === null && value === null)
-            return
-
-        // Check if the property value is in the valid types array
-        if (!parsedTypes.includes(typeof value))
-            throw new Error(`Invalid property value '${value}' for '${name}' property. Valid types: ${parsedTypes.join(', ')}`)
-
-        // Set the property value
-        this._properties[name] = value
-    }
-
     /** Load a given CSS style sheet file content
      * @param {string} cssFilename - CSS filename
      */
@@ -703,7 +675,7 @@ export class SiriusElement extends HTMLElement {
     }
 
     /**
-     * Get the Sirius element style sheets
+     * Get the SiriusElement style sheets
      * @param {string} cssFilename - CSS filename
      * @returns {Promise<void>} - Stylesheets
      */
@@ -719,14 +691,14 @@ export class SiriusElement extends HTMLElement {
         };
     }
 
-    /** Get the Sirius element style sheet
+    /** Get the SiriusElement style sheet
      * @returns {CSSStyleSheet} - Element style sheet
      */
     _getElementStyleSheet() {
         return this._styleSheets[SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT];
     }
 
-    /** Get the Sirius element general style sheet
+    /** Get the SiriusElement general style sheet
      * @returns {CSSStyleSheet} - General style sheet
      */
     _getGeneralStyleSheet() {
@@ -747,14 +719,14 @@ export class SiriusElement extends HTMLElement {
         }
 
         // Add the style sheets to the shadow DOM
-        this.shadowRoot.adoptedStyleSheets = [element, general];
+        this.shadowRoot.adoptedStyleSheets = [general, element];
     }
 
     /**
      * Load element styles sheets and adopt them by the shadow DOM
      * @param {string} cssFilename - CSS filename
      */
-    async _loadAndAdoptStyles(cssFilename = this.#elementName) {
+    async _loadAndAdoptStyles(cssFilename = this.name) {
         // Create the CSS style sheets and add them to the shadow DOM
         await this.#loadStyles(cssFilename);
         this.#adoptStyles();
@@ -793,15 +765,19 @@ export class SiriusElement extends HTMLElement {
 
     /** Center the element on the screen */
     centerScreen() {
-        // Center the element when built
-        this.classList.add(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
-        this.logger.log('Element centered on the screen');
+        this.onBuilt = () => {
+            // Center the element when built
+            this.containerElement.classList.add(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
+            this.logger.log('Element centered on the screen');
+        }
     }
 
     /** Remove centering of the element */
     removeCenterScreen() {
-        this.classList.remove(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
-        this.logger.log('Element removed from center screen');
+        this.onBuilt = () => {
+            this.containerElement.classList.remove(SIRIUS_ELEMENT.CLASSES.CENTER_SCREEN);
+            this.logger.log('Element removed from center screen');
+        }
     }
 
     /** Dispatch event
