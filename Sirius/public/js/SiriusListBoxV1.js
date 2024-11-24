@@ -1,4 +1,8 @@
-import SiriusElement, {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "./SiriusElement.js";
+import SiriusElement, {
+    SIRIUS_ELEMENT_ATTRIBUTES,
+    SIRIUS_ELEMENT_PROPERTIES,
+    SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES
+} from "./SiriusElement.js";
 import SiriusCheckbox, {SIRIUS_CHECKBOX_ATTRIBUTES} from "./SiriusCheckbox.js";
 import SiriusLabel, {SIRIUS_LABEL_ATTRIBUTES} from "./SiriusLabel.js";
 
@@ -62,10 +66,10 @@ export default class SiriusListBoxV1 extends SiriusElement {
      * @param {object} properties - Element properties
      */
     constructor(properties) {
-        super(properties, SIRIUS_LIST_BOX.NAME);
+        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]: SIRIUS_LIST_BOX.NAME});
 
         // Build the SiriusListBox
-        this.#build().then();
+        this.#build(properties).then();
 
     }
 
@@ -76,11 +80,13 @@ export default class SiriusListBoxV1 extends SiriusElement {
         return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_LIST_BOX_ATTRIBUTES)];
     }
 
-    /** Build the SiriusListBox */
-    async #build() {
+    /** Build the SiriusListBox
+     * @param {object} properties - Element properties
+     * */
+    async #build(properties) {
         // Load SiriusListBox HTML attributes
         this._loadAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_LIST_BOX_ATTRIBUTES,
             defaultAttributes: SIRIUS_LIST_BOX_ATTRIBUTES_DEFAULT
         });
@@ -91,15 +97,13 @@ export default class SiriusListBoxV1 extends SiriusElement {
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
 
-        // Create the HTML template
-        this._createTemplate(innerHTML);
-
         // Get the container element
-        this.#listBoxContainerElement = this._containerElement = this._templateContent.firstChild;
+        const container = await this._createContainerElementTemplate(innerHTML);
+        this.#listBoxContainerElement = this._containerElement = container
         this.#headContainerElement = this.#listBoxContainerElement.firstElementChild;
         this.#itemsListContainerElement = this.#listBoxContainerElement.lastElementChild;
 
-        // Add ListBox to the shadow DOM
+        // Add the container element to the shadow DOM
         this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event

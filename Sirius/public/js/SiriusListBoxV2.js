@@ -125,22 +125,19 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
 
-        // Create the HTML template
-        this._createTemplate(innerHTML);
-
-        // Add ListBox to the shadow DOM
-        this.#listBoxContainerElement = this._containerElement = this._templateContent.firstChild;
+        // Create the list box container element
+        const container = this._createContainerElementTemplate(innerHTML);
+        this.#listBoxContainerElement = this._containerElement = container
         this.#headContainerElement = this.#listBoxContainerElement.firstElementChild;
         this._linkedParentSlotElement = this.headContainerElement.firstElementChild;
         this.#itemsContainerElement = this.#listBoxContainerElement.lastElementChild;
         this._linkedChildrenSlotElement = this.itemsContainerElement.firstElementChild;
+
+        // Add the container element to the shadow DOM
         this.shadowRoot.appendChild(this.containerElement);
 
-        // Set up the linked parent observer
-        this._setLinkedParentObserver();
-
-        // Set up the linked children observer
-        this._setLinkedChildrenObserver();
+        // Set up the element observer
+        this._setElementObserver();
 
         // Set the properties
         this.linkedParent = this._linkedParent;

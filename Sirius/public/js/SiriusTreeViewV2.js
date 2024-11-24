@@ -27,6 +27,7 @@ export const SIRIUS_TREE_VIEW = deepFreeze({
     CLASSES: {
         TREE_VIEW_CONTAINER: 'container-element',
         PARENT_CONTAINER: 'parent-container',
+        ROOT: 'root',
         HAS_PARENT: 'has-parent',
         ICON_CONTAINER: 'icon-container',
         PARENT: 'parent',
@@ -148,26 +149,23 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
 
-        // Create the HTML template
-        await this._createTemplate(innerHTML);
-
         // Add label to the shadow DOM
-        this.#treeViewContainerElement = this._containerElement = this._templateContent.firstChild;
+        const container =await this._createContainerElementTemplate(innerHTML);
+        this.#treeViewContainerElement = this._containerElement = container
         this.#parentContainerElement = this.treeViewContainerElement.firstElementChild;
         this.#iconContainerElement = this.parentContainerElement.firstElementChild;
         this._linkedParentSlotElement = this.parentContainerElement.lastElementChild;
         this.#childrenContainerElement = this.treeViewContainerElement.lastElementChild;
         this._linkedChildrenSlotElement = this.childrenContainerElement.firstElementChild;
-        this.shadowRoot.appendChild(this.containerElement);
 
         // Add icon to the icon container
         this.iconContainerElement.appendChild(this.iconElement);
 
-        // Set up the linked parent observer
-        this._setLinkedParentObserver();
+        // Add the container element to the shadow DOM
+        this.shadowRoot.appendChild(this.containerElement);
 
-        // Set up the linked children observer
-        this._setLinkedChildrenObserver();
+        // Set up the element observer
+        this._setElementObserver();
 
         // Set the properties
         this.linkedParent = this._linkedParent
@@ -440,10 +438,14 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
             super._setParentId(parentId)
 
             // Set the has parent class
-            if (parentId)
+            if (parentId) {
                 this.classList.add(SIRIUS_TREE_VIEW.CLASSES.HAS_PARENT);
-            else
+                this.classList.remove(SIRIUS_TREE_VIEW.CLASSES.ROOT);
+            }
+            else {
                 this.classList.remove(SIRIUS_TREE_VIEW.CLASSES.HAS_PARENT);
+                this.classList.add(SIRIUS_TREE_VIEW.CLASSES.ROOT);
+            }
         }
     }
 
@@ -545,6 +547,27 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
             this.mode = SIRIUS_TREE_VIEW_MODES.CLOSE;
         else
             this.mode = SIRIUS_TREE_VIEW_MODES.OPEN;
+    }
+
+    /** Add linked child element
+     * @param {SiriusControlElement} element - Linked child element
+     */
+    _addLinkedChild(element) {
+        super._addLinkedChild(element);
+
+        // Add the has parent class
+        if (element instanceof SiriusTreeView)
+            element.classList.add(SIRIUS_TREE_VIEW.CLASSES.HAS_PARENT);
+    }
+
+    /** Remove linked child element
+     * @param {SiriusControlElement} element - Linked child element
+     */
+    _removeLinkedChild(element) {
+        super._removeLinkedChild(element);
+
+        // Remove the has parent class
+        element.classList.remove(SIRIUS_TREE_VIEW.CLASSES.HAS_PARENT);
     }
 
     /** Private method to handle attribute changes

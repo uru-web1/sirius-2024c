@@ -169,18 +169,18 @@ export default class SiriusCheckbox extends SiriusControlElement {
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
 
-        // Create the HTML template
-        await this._createTemplate(innerHTML);
-
-        // Add checkbox to the shadow DOM
-        this.#checkboxContainerElement = this._containerElement = this._templateContent.firstChild;
+        // Create the list box container element
+        const container=await this._createContainerElementTemplate(innerHTML);
+        this.#checkboxContainerElement = this._containerElement =  container
         this.#iconContainerElement = this.#checkboxContainerElement.firstElementChild;
         this.#labelContainerElement = this.#checkboxContainerElement.lastElementChild;
         this.#labelSlotElement = this.#labelContainerElement.firstElementChild
-        this.shadowRoot.appendChild(this.containerElement);
 
         // Add icon and label to the checkbox container
         this.#iconContainerElement.appendChild(this.iconElement);
+
+        // Add the container element to the shadow DOM
+        this.shadowRoot.appendChild(this.containerElement);
 
         // Set properties
         this.events = this._events

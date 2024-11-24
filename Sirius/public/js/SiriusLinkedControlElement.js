@@ -33,8 +33,7 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
     #linkedChildrenFlag = false;
 
     // Observers
-    _linkedParentSlotObserver = null;
-    _linkedChildrenSlotObserver = null;
+    _elementObserver = null;
 
     /**
      * Create a SiriusLinkedControlElement
@@ -176,63 +175,55 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
         return true
     }
 
-    /** Set the linked parent observer */
-    _setLinkedParentObserver() {
-        if (!this._checkLinkedParentSlotElement())
+    /** Set the element observer */
+    _setElementObserver() {
+        // Check if the linked parent slot element is set
+        if(!this._checkLinkedParentSlotElement())
             return
 
-        // Set up MutationObserver to detect linked parent slot changes
-        this._linkedParentSlotObserver = new MutationObserver((mutationsList) => {
+        // Check if the linked children slot element is set
+        if (!this._checkLinkedChildrenSlotElement())
+            return
+
+        // Set up MutationObserver to detect element slot changes
+        this._elementObserver = new MutationObserver((mutationsList) => {
             for (const mutation of mutationsList)
                 if (mutation.type === 'childList') {
                     mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE)
-                            this._onAddLinkedParent(node)
+                        if (node.nodeType === Node.ELEMENT_NODE && node.slot) {
+                            // Check if the node is a linked parent or child element
+                            if (node.slot === this._linkedParentSlotElement.name)
+                                this._onAddLinkedParent(node)
+
+                            if (node.slot === this._linkedChildrenSlotElement.name)
+                                this._onAddLinkedChild(node)
+                        }
                     });
                     mutation.removedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE)
-                            this._onRemoveLinkedParent()
+                        if (node.nodeType === Node.ELEMENT_NODE && node.slot) {
+                            // Check if the node is a linked parent or child element
+                            if (node.slot === this._linkedParentSlotElement.name)
+                                this._onRemoveLinkedParent()
+
+                            if (node.slot === this._linkedChildrenSlotElement.name)
+                                this._onRemoveLinkedChild(node)
+                        }
                     })
-                }
+            }
         });
 
-        // Start observing the linked parent slot element
-        this._linkedParentSlotObserver.observe(this.linkedParentSlotElement, {childList: true});
+        // Start observing the element
+        this._elementObserver.observe(this, {childList: true});
 
-        // Manually call linked parent slot observer to add existing parent
+        // Manually call the element observer to add existing parent
         this.linkedParentSlotElement.assignedElements().forEach(node => {
             this.#onAddLinkedParent(node);
         });
 
-    }
-
-    /** Set the linked children observer */
-    _setLinkedChildrenObserver() {
-        if (!this._checkLinkedChildrenSlotElement())
-            return
-
-        // Set up MutationObserver to detect linked children slot changes
-        this._linkedChildrenSlotObserver = new MutationObserver((mutationsList) => {
-            for (const mutation of mutationsList)
-                if (mutation.type === 'childList') {
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE)
-                            this._onAddLinkedChild(node)
-                    });
-                    mutation.removedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE)
-                            this._onRemoveLinkedChild(node)
-                    })
-                }
-        });
-
-        // Start observing the linked children slot element
-        this._linkedChildrenSlotObserver.observe(this.linkedChildrenSlotElement, {childList: true});
-
-        // Manually call linked children slot observer to add existing children
+        // Manually call the element observer to add existing children
         this.linkedChildrenSlotElement.assignedElements().forEach(node => {
             this.#onAddLinkedChild(node);
-        })
+        });
     }
 
     /** Check if an element is a valid linked parent element
@@ -260,9 +251,8 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
             // Remove the linked children elements from the parent element
             parent.children = [];
 
-            // Set the linked parent status, slot name and parent ID
+            // Set the linked parent status and parent ID
             this._linkedParent = parent
-            parent.slot = this._linkedParentSlotElement.name
             parent.status = this.status
             parent.parentId = this.id
 
@@ -294,8 +284,10 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
                 return
 
             // Add the linked parent element to the linked parent slot element
-            if (!this._linkedParentSlotElement.contains(element))
-                this._linkedParentSlotElement.appendChild(element);
+            if (!this._linkedParentSlotElement.contains(element)) {
+                element.setAttribute('slot', this._linkedParentSlotElement.name);
+                this.appendChild(element);
+            }
         }
     }
 
@@ -351,9 +343,6 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
             // Add to the linked children elements list
             this.linkedChildren.push(child);
 
-            // Set the slot name
-            child.slot = this._linkedChildrenSlotElement.name
-
             // Set the parent ID
             if (this.linkedParent)
                 child.parentId = this.linkedParent.id;
@@ -383,8 +372,10 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
                 return
 
             // Add the linked child element to the linked children slot element
-            if (!this._linkedChildrenSlotElement.contains(element))
-                this._linkedChildrenSlotElement.appendChild(element);
+            if (!this._linkedChildrenSlotElement.contains(element)) {
+                element.setAttribute('slot', this._linkedChildrenSlotElement.name);
+                this.appendChild(element);
+            }
         }
     }
 

@@ -114,11 +114,11 @@ export default class SiriusIcon extends SiriusElement {
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
 
-        // Create the HTML template
-        await this._createTemplate(innerHTML);
+        // Create the icon container element
+        const container = await this._createContainerElementTemplate(innerHTML);
+        this.#iconContainerElement = this._containerElement = container
 
-        // Add icon to the shadow DOM
-        this.#iconContainerElement = this._containerElement = this._templateContent.firstChild;
+        // Add the container element to the shadow DOM
         this.shadowRoot.appendChild(this.containerElement);
 
         // Add the SVG element to the icon container

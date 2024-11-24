@@ -195,10 +195,10 @@ export default class SiriusExchangeList extends SiriusElement {
         // })
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
-        // Create the HTML template
-        await this._createTemplate(innerHTML);
 
-        this.#exchangeListContainerElement = this._containerElement = this._templateContent.firstChild;
+        // Create the container element
+        const container= this._createContainerElementTemplate(innerHTML)
+        this.#exchangeListContainerElement = this._containerElement =container
         this.#listboxContainerElement1 = this.#exchangeListContainerElement.firstElementChild;
         this.#listboxContainerElement2 = this.#exchangeListContainerElement.lastElementChild;
         this.#buttomContainerElement = this.listboxContainerElement1.nextElementSibling;

@@ -51,6 +51,7 @@ export default class SiriusElement extends HTMLElement {
 
     // Shadow DOM
     _template = null
+    _templateContent = null
     _styleSheets = {}
     _elementStyleSheetRules = new Map()
 
@@ -735,21 +736,47 @@ export default class SiriusElement extends HTMLElement {
     /**
      * Create a template from the inner HTML
      * @param {string} innerHTML - Inner HTML
+     * @returns {{template: HTMLTemplateElement|null, templateContent: Node|null}} - HTML template and template content
      */
     _createTemplate(innerHTML) {
         // Check if the inner HTML is empty
         if (!innerHTML) {
             this.logger.error('Failed to create template');
-            return;
+            return {template: null, templateContent: null};
         }
 
         // Create HTML template
-        this._template = document.createElement("template");
-        this._template.innerHTML = innerHTML;
+        const template = document.createElement("template");
+        template.innerHTML = innerHTML;
 
-        // Clone the template
-        this._templateContent = this._template.content.cloneNode(true);
+        // Clone the template content
+        const templateContent = template.content.cloneNode(true);
+
+        return {template, templateContent};
     }
+
+    /** Create the container element template
+     * @param {string} innerHTML - Inner HTML
+     * @returns {Node|null} - Template content
+     */
+    _createContainerElementTemplate(innerHTML) {
+        // Create the template
+        const {template, templateContent} = this._createTemplate(innerHTML);
+
+        // Check if the template is not set
+        if (!template || !templateContent) {
+            this.logger.error('Failed to create element template');
+            return null;
+        }
+
+        // Set the template and the template content
+        this._template = template;
+        this._templateContent = templateContent;
+
+        return templateContent.firstChild;
+    }
+
+    /**
 
     /** Get derived element ID attribute
      * @returns {string} aliases - Derived element alias

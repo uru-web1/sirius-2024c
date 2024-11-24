@@ -67,42 +67,74 @@
     const childrenKey = SIRIUS_CONTROL_ELEMENT_PROPERTIES.CHILDREN
 
     sirius.onLoaded = () => {
-
         // Create SiriusTreeView
-        const siriusTreeView2 = new SiriusTreeView({
-            [idKey]: 'tree-view',
+        const siriusTreeView5 = new SiriusTreeView({
+            [idKey]: 'tree-view-5',
             [parentKey]: new SiriusCheckbox({
-                [idKey]: 'checkbox-parent',
+                [idKey]: 'checkbox-child-11',
                 [labelKey]: new SiriusLabel({
-                    [idKey]: 'checkbox-parent__label',
+                    [idKey]: 'checkbox-child-11__label',
                     [captionKey]: 'Parent',
                 })
             }),
             [childrenKey]: [
                 new SiriusCheckbox({
-                    [idKey]: 'checkbox-child1',
+                    [idKey]: 'checkbox-child-12',
                     [labelKey]: new SiriusLabel({
-                        [idKey]: 'checkbox-child1__label',
+                        [idKey]: 'checkbox-child-12__label',
                         [captionKey]: 'Child 1',
                     })
                 }),
                 new SiriusCheckbox({
-                    [idKey]: 'checkbox-child2',
+                    [idKey]: 'checkbox-child-13',
                     [labelKey]: new SiriusLabel({
-                        [idKey]: 'checkbox-child2__label',
+                        [idKey]: 'checkbox-child-13__label',
                         [captionKey]: 'Child 2',
                     })
                 }),
                 new SiriusCheckbox({
-                    [idKey]: 'checkbox-child3',
+                    [idKey]: 'checkbox-child-14',
                     [labelKey]: new SiriusLabel({
-                        [idKey]: 'checkbox-child3__label',
+                        [idKey]: 'checkbox-child-14__label',
                         [captionKey]: 'Child 3',
                     })
-                })
+                }),
+                new SiriusTreeView({
+                    [idKey]: 'tree-view-6',
+                    [parentKey]: new SiriusCheckbox({
+                        [idKey]: 'checkbox-child-15',
+                        [labelKey]: new SiriusLabel({
+                            [idKey]: 'checkbox-child-15__label',
+                            [captionKey]: 'Child 4',
+                        })
+                    }),
+                    [childrenKey]: [
+                        new SiriusCheckbox({
+                            [idKey]: 'checkbox-child-16',
+                            [labelKey]: new SiriusLabel({
+                                [idKey]: 'checkbox-child-16__label',
+                                [captionKey]: 'Grandchild 1',
+                            })
+                        }),
+                        new SiriusCheckbox({
+                            [idKey]: 'checkbox-child-17',
+                            [labelKey]: new SiriusLabel({
+                                [idKey]: 'checkbox-child-17__label',
+                                [captionKey]: 'Grandchild 2',
+                            })
+                        }),
+                        new SiriusCheckbox({
+                            [idKey]: 'checkbox-child-18',
+                            [labelKey]: new SiriusLabel({
+                                [idKey]: 'checkbox-child-18__label',
+                                [captionKey]: 'Grandchild 3',
+                            })
+                        })
+                    ]
+                }),
             ],
         });
-        siriusTreeView2.addToBody()
+        siriusTreeView5.addToBody()
     }
 </script>
 </body>

@@ -92,12 +92,12 @@ export default class SiriusLabel extends SiriusElement {
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
 
-        // Create the HTML template
-        await this._createTemplate(innerHTML);
-
-        // Add label to the shadow DOM
-        this.#labelContainerElement = this._containerElement = this._templateContent.firstChild;
+        // Create the label container element
+        const container = await this._createContainerElementTemplate(innerHTML);
+        this.#labelContainerElement = this._containerElement = container
         this.#captionContainerElement = this.labelContainerElement.firstElementChild;
+
+        // Add the container element to the shadow DOM
         this.shadowRoot.appendChild(this.containerElement);
 
         // Set properties

@@ -1,4 +1,4 @@
-import SiriusElement from "./SiriusElement.js";
+import SiriusElement, {SIRIUS_ELEMENT_PROPERTIES} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 // Define constants for the SiriusTreeViewV1 component
@@ -14,7 +14,7 @@ export const SIRIUS_TREEVIEW = deepFreeze({
 // Define the SiriusTreeView class
 export default class SiriusTreeView extends SiriusElement {
     constructor(properties) {
-        super(properties, SIRIUS_TREEVIEW.NAME);
+        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]:SIRIUS_TREEVIEW.NAME});
 
         // Build the SiriusTreeView
         this.#build().then();

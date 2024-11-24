@@ -1,4 +1,9 @@
-import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement,} from "../js/SiriusElement.js";
+import {
+    SIRIUS_ELEMENT_ATTRIBUTES,
+    SIRIUS_ELEMENT_PROPERTIES,
+    SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
+    SiriusElement,
+} from "../js/SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 /** Sirius Edit constants */
@@ -56,8 +61,8 @@ export class SiriusEdit extends SiriusElement {
     #editContainerElement = null;
 
     constructor(properties) {
-        super(properties, SIRIUS_EDIT.NAME);
-        this.#build().then;
+        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]: SIRIUS_EDIT.NAME});
+        this.#build(properties).then();
         this.lol()
     }
 
@@ -277,11 +282,11 @@ export class SiriusEdit extends SiriusElement {
         }
     }
 
-    async #build() {
+    async #build(properties) {
 
         // Load Sirius checkbox HTML attributes
         this._loadAttributes({
-            instanceProperties: this._properties,
+            instanceProperties: properties,
             attributes: SIRIUS_EDIT_ATTRIBUTES,
             //attributesDefault: SIRIUS_EDIT_ATTRIBUTES_DEFAULT
         });
@@ -292,11 +297,11 @@ export class SiriusEdit extends SiriusElement {
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
 
-        // Create the HTML template
-        await this._createTemplate(innerHTML);
+        // Create the edit container element
+        const container= await this._createContainerElementTemplate(innerHTML);
+        this.#editContainerElement = this._containerElement = container
 
-        // Add Edit to the shadow DOM
-        this.#editContainerElement = this._containerElement = this._templateContent.firstChild;
+        // Add the container element to the shadow DOM
         this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event

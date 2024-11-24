@@ -18,8 +18,8 @@
 <body>
 
 <sirius-list-box id="list-box-1" background-color='lightblue'>
-    <sirius-checkbox slot="head" id="head">
-        <sirius-label slot="label" id="head__label" caption="Head"></sirius-label>
+    <sirius-checkbox slot="head" id="head-1">
+        <sirius-label slot="label" id="head-1__label" caption="Head"></sirius-label>
     </sirius-checkbox>
     <sirius-checkbox slot="items" id="item-1">
         <sirius-label slot="label" id="item-1__label" caption="Item 1"></sirius-label>
@@ -56,27 +56,27 @@
             [checkboxColorKey]: 'black',
             [styleKey]: 'margin: 40px',
             [headKey]: new SiriusCheckbox({
-                [idKey]: 'head',
+                [idKey]: 'head-2',
                 [styleKey]: 'background-color: yellow',
                 label: new SiriusLabel({
-                    [idKey]: 'head__label',
+                    [idKey]: 'head-2__label',
                     caption: 'Head'
                 })
             }),
             [itemsKey]: [
                 new SiriusCheckbox({
-                    [idKey]: 'item-1',
+                    [idKey]: 'item-3',
                     [styleKey]: 'background-color: lightgreen',
                     label: new SiriusLabel({
-                        [idKey]: 'item-1__label',
+                        [idKey]: 'item-3__label',
                         caption: 'Item 1'
                     })
                 }),
                 new SiriusCheckbox({
-                    [idKey]: 'item-2',
+                    [idKey]: 'item-4',
                     [styleKey]: 'background-color: lightgreen',
                     label: new SiriusLabel({
-                        [idKey]: 'item-2__label',
+                        [idKey]: 'item-4__label',
                         caption: 'Item 2'
                     })
                 })

@@ -213,14 +213,12 @@ export default class SiriusSvg extends SiriusElement {
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
 
-        // Create the HTML template
-        await this._createTemplate(innerHTML);
-
-        // Add SVG to the shadow DOM
-        this.#svgContainerElement = this._containerElement = this._templateContent.firstChild;
+        // Create the SVG container element
+        const container = await this._createContainerElementTemplate(innerHTML);
+        this.#svgContainerElement = this._containerElement = container;
         this.#svgElement = this.svgContainerElement.firstElementChild;
 
-        // Add the
+        // Add the container element to the shadow DOM
         this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event
