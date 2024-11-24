@@ -8,7 +8,12 @@
     --sirius-edit--labeline-color-border: #1acbcb;
     --sirius-edit--labeline-color-font-onfocus: #66ff00;
     --sirius-edit--labeline-color-border-onfocus: #66ff00;
+    --sirius-edit--labeline-y: 60px;
+    --sirius-edit--z-index: 1111;
 
+    --sirius-edit--container-whidth: 680px;
+    --sirius-edit--container-height: 40px;
+    
 }
 
 * {
@@ -18,13 +23,13 @@
 }
 
 .edit-container {
-    width: 680px;
+    width: var(--sirius-edit--container-whidth);
 }
 
 .edit-area {
     position: relative;
     height: 80px;
-    line-height: 80px;
+    line-height: var(--sirius-edit--labeline-y);
 }
 
 input {
@@ -33,12 +38,12 @@ input {
     outline: none;
     font-size: var(--sirius-edit--input-font-size);
     padding: 0 30px;
-    line-height: 80px;
+    line-height: var(--sirius-edit--container-height);
     border-radius: 10px;
     border: 2px solid var(--sirius-edit--labeline-color-border);
     background: var(--sirius-edit--input-background);
     transition: 0.1s ease;
-    z-index: 1111;
+    z-index: var(--sirius-edit--z-index);
     color: var(--sirius-edit--input-color-font);
 }
 
@@ -65,7 +70,7 @@ input:valid + .labelline {
     line-height: 30px;
     padding: 0 12px;
     transform: translate(-15px, -16px) scale(0.88);
-    z-index: 1111;
+    z-index: var(--sirius-edit--z-index);
 }
 
 /* Cuando pierde el foco y tiene un valor */
@@ -80,4 +85,18 @@ input:not(:focus):placeholder-shown + .labelline {
     line-height: 80px;
     padding: 0 25px;
     transform: translate(0, 0) scale(1);
+}
+
+/* Ocultar controles de número */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Ocultar icono predeterminado de contraseña */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-clear-button {
+    display: none;
 }
