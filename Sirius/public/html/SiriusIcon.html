@@ -18,7 +18,7 @@
 
         .icon-container {
             display: grid;
-            grid-auto-columns: 1fr;
+            grid-auto-columns: max-content;
             grid-template-rows: 1fr;
             place-items: center;
             gap: 1rem;
@@ -36,21 +36,28 @@
 
 <div class="icon-container">
     <sirius-icon hide="true" icon="check-mark" fill="red" height="25px" width="25px" id="icon-1"
-        show-animation="0% { transform: scale(0); fill: red; } 100% { transform: scale(1); fill: blue; }"
+                 show-animation="0% { transform: scale(0); fill: red; } 100% { transform: scale(1); fill: blue; }"
                  hiding-animation="0% { transform: scale(1); fill: blue; } 100% { transform: scale(0); fill: red; }"
-        styles="background-color: lightblue" styles-on-hover="background-color: lightcoral" styles-on-active="background-color: lightgreen"></sirius-icon>
+                 styles="background-color: lightblue" styles-on-hover="background-color: lightcoral"
+                 styles-on-active="background-color: lightgreen"></sirius-icon>
 
     <sirius-icon icon="eye-closed" fill="whitesmoke" height="48px" width="48px" id="icon-2"
-                 styles="background-color: purple" styles-on-hover="scale: 1.5; transform: rotate(-15deg)" styles-on-active="background-color: darkgreen"></sirius-icon>
+                 styles="background-color: purple" styles-on-hover="scale: 1.5; transform: rotate(-15deg)"
+                 styles-on-active="background-color: darkgreen"></sirius-icon>
 
     <sirius-icon icon="double-arrow--left" fill="red" height="50px" width="24px"
-                 id="icon-3" styles="background-color: lightgreen" styles-on-hover="background-color: lightblue" styles-on-active="background-color: lightcoral"></sirius-icon>
+                 id="icon-3" styles="background-color: lightgreen" styles-on-hover="background-color: lightblue"
+                 styles-on-active="background-color: lightcoral"></sirius-icon>
 </div>
 
 <script type="module">
     import sirius from '../js/Sirius.js'
     import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES} from "../js/SiriusIcon.js";
-    import {SIRIUS_ELEMENT_PROPERTIES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
+    import {
+        SIRIUS_ELEMENT_PROPERTIES,
+        SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
+        SIRIUS_ELEMENT_ATTRIBUTES
+    } from "../js/SiriusElement.js";
     import {SIRIUS_SVG_ICONS} from "../js/SiriusSvg.js";
 
     // Get the attributes keys

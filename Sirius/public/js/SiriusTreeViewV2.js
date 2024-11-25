@@ -6,10 +6,9 @@ import {
     SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES
 } from "./SiriusElement.js";
 import {SIRIUS_CONTROL_ELEMENT_ATTRIBUTES} from "./SiriusControlElement.js";
-import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES, SIRIUS_ICON_ATTRIBUTES_DEFAULT} from "./SiriusIcon.js";
+import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES} from "./SiriusIcon.js";
 import SiriusLinkedControlElement from "./SiriusLinkedControlElement.js";
 import {SIRIUS_SVG_ICONS} from "./SiriusSvg.js";
-import sirius from "./Sirius.js";
 
 /** SiriusTreeView constants */
 export const SIRIUS_TREE_VIEW = deepFreeze({
@@ -642,7 +641,7 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
                 break;
 
             case SIRIUS_ELEMENT_ATTRIBUTES.STYLES:
-                this._setStyle(newValue);
+                this._setStyles(newValue);
                 break;
 
             case SIRIUS_ELEMENT_ATTRIBUTES.STYLES_ON_HOVER:

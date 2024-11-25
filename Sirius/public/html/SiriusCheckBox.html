@@ -9,19 +9,48 @@
     <script defer src="../js/Sirius.js" type="module"></script>
 
     <style>
-        .checkboxes-container {
+        body {
             display: flex;
-            flex-direction: column;
-            margin-left: 1rem;
+            justify-content: center;
+            align-items: center;
+            padding: 5rem;
+            margin: 0;
+        }
+
+        .checkboxes-container {
+            display: grid;
+            grid-auto-rows: max-content;
+            grid-template-columns: 1fr;
+            place-items: center;
             gap: 1rem;
+        }
+
+        .checkboxes-container > * {
+            grid-column: 1/-1;
+            border: 1px solid black;
+            padding: 1rem;
+        }
+
+        .grandparent {
+            background-color: darkgreen;
+        }
+
+        .parent {
+            background-color: green;
+        }
+
+        .child {
+            background-color: lightblue;
         }
     </style>
 </head>
 <body>
-<sirius-checkbox id="checkbox-1" icon-height="10px" icon-width="10px">
-    <sirius-label slot="label" id="checkbox-1__label" caption="The last of us"></sirius-label>
+
+<div class="checkboxes-container">
+<sirius-checkbox id="checkbox-1" icon-height="0.5rem" icon-width="0.5rem" styles="gap: 0.5rem" checkbox-order="1">
+    <sirius-label slot="label" id="checkbox-1__label" caption="Look how I check the one below!"></sirius-label>
 </sirius-checkbox>
-<div class="checkboxes-container"></div>
+</div>
 
 <script type="module">
     import sirius from '../js/Sirius.js';
@@ -29,9 +58,6 @@
     import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
     import SiriusLabel, {SIRIUS_LABEL_ATTRIBUTES} from "../js/SiriusLabel.js";
     import {SIRIUS_CONTROL_ELEMENT_ATTRIBUTES, SIRIUS_CONTROL_ELEMENT_PROPERTIES} from "../js/SiriusControlElement.js";
-
-    // Get the checkboxes container
-    const checkboxesContainer = document.querySelector('.checkboxes-container');
 
     // Get the attribute keys
     const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
@@ -42,8 +68,6 @@
     const iconWidthKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_WIDTH;
     const iconHeightKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_HEIGHT;
     const iconFillKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_FILL;
-
-    // Get the properties keys
     const iconStylesKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_STYLES
     const iconStylesOnHoverKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_STYLES_ON_HOVER
     const iconStylesOnActiveKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_STYLES_ON_ACTIVE
@@ -52,6 +76,10 @@
     const labelKey = SIRIUS_CHECKBOX_PROPERTIES.LABEL
     const childrenKey = SIRIUS_CONTROL_ELEMENT_PROPERTIES.CHILDREN
 
+    // Get the container
+    const checkboxesContainer = document.querySelector('.checkboxes-container');
+
+    // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
         // Create the checkbox with a label
         const siriusCheckbox2 = new SiriusCheckbox({
@@ -153,6 +181,7 @@
 
         // Add children to the checkbox
         siriusCheckbox8.parentId = siriusCheckbox7.id
+        siriusCheckbox8.onBuilt = ()=>siriusCheckbox8.label.caption = 'Grand child 1';
     };
 
 </script>

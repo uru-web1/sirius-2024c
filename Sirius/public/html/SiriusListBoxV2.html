@@ -20,7 +20,7 @@
 
         .list-box-container {
             display: grid;
-            grid-auto-columns: 1fr;
+            grid-auto-columns: max-content;
             grid-template-rows: 1fr;
             place-items: center;
             gap: 1rem;
@@ -36,18 +36,18 @@
 <body>
 
 <div class="list-box-container">
-<sirius-list-box id="list-box-1" styles='lightblue'>
-    <sirius-checkbox slot="head" id="head-1">
-        <sirius-label slot="label" id="head-1__label" caption="Head"></sirius-label>
-    </sirius-checkbox>
-    <sirius-checkbox slot="items" id="item-1">
-        <sirius-label slot="label" id="item-1__label" caption="Item 1"></sirius-label>
-    </sirius-checkbox>
-    <sirius-checkbox slot="items" id="item-2">
-        <sirius-label slot="label" id="item-2__label" caption="Item 2"></sirius-label>
-    </sirius-checkbox>
-</sirius-list-box>
-    </div>
+    <sirius-list-box id="list-box-1" styles='lightblue'>
+        <sirius-checkbox slot="head" id="head-1">
+            <sirius-label slot="label" id="head-1__label" caption="Head"></sirius-label>
+        </sirius-checkbox>
+        <sirius-checkbox slot="items" id="item-1">
+            <sirius-label slot="label" id="item-1__label" caption="Item 1"></sirius-label>
+        </sirius-checkbox>
+        <sirius-checkbox slot="items" id="item-2">
+            <sirius-label slot="label" id="item-2__label" caption="Item 2"></sirius-label>
+        </sirius-checkbox>
+    </sirius-list-box>
+</div>
 
 <script type="module">
     import sirius from '../js/Sirius.js';
@@ -84,14 +84,16 @@
                 background-color: #e6e6fa;
                 border-radius: 10px;
                 gap: 0.25rem;
-                padding: 20px`,
+                padding: 20px
+                `,
             [headKey]: new SiriusCheckbox({
                 [idKey]: 'head-2',
                 [iconFillKey]: 'white',
                 [gapKey]: '1rem',
                 [stylesKey]: `
                     background-color: #4b0082;
-                    border-color: #4b0082;`,
+                    border-color: #4b0082;
+                    `,
                 [labelKey]: new SiriusLabel({
                     [idKey]: 'head-2__label',
                     [captionKey]: 'Head',
@@ -99,7 +101,8 @@
                         color: black;
                         font-family: Open Sans;
                         font-size: 1.3rem;
-                        font-weight: 400`,
+                        font-weight: 400;
+                        `,
                 }),
             }),
             [itemsKey]: [
@@ -108,7 +111,8 @@
                     [iconFillKey]: 'white',
                     [stylesKey]: `
                         background-color: #9370db;
-                        border-color: #9370db;`,
+                        border-color: #9370db;
+                        `,
                     [gapKey]: '1rem',
                     [labelKey]: new SiriusLabel({
                         [idKey]: 'item-3__label',
@@ -116,7 +120,8 @@
                         [stylesKey]: `
                             color: black;
                             font-family: Open Sans;
-                            font-size: 1rem;`,
+                            font-size: 1rem;
+                            `,
                     })
                 }),
                 new SiriusCheckbox({
@@ -124,7 +129,8 @@
                     [iconFillKey]: 'white',
                     [stylesKey]: `
                         background-color: #9370db;
-                        border-color: #9370db;`,
+                        border-color: #9370db;
+                        `,
                     [gapKey]: '1rem',
                     [labelKey]: new SiriusLabel({
                         [idKey]: 'item-4__label',
@@ -132,7 +138,8 @@
                         [stylesKey]: `
                             color: black;
                             font-family: Open Sans;
-                            font-size: 1rem;`,
+                            font-size: 1rem;
+                            `,
                     })
                 })
             ]

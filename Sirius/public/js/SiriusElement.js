@@ -427,7 +427,7 @@ export default class SiriusElement extends HTMLElement {
     _formatCSSRules(rules) {
         return rules.split(';')
             .map(rule =>
-                rule.split(':').map(keyValue=>keyValue.trim()).join(':'))
+                rule.split(':').map(keyValue => keyValue.trim()).join(':'))
             .join(';');
     }
 
@@ -517,7 +517,7 @@ export default class SiriusElement extends HTMLElement {
      * @param {string} pseudoSelector - Pseudo selector
      * @param {string} parentSelectors - Parent selector. Used to increase CSS rule specificity
      */
-    _setMainElementClassRuleStyles(styleSheetName, rules, pseudoSelector,...parentSelectors) {
+    _setMainElementClassRuleStyles(styleSheetName, rules, pseudoSelector, ...parentSelectors) {
         // Get the formatted parent selectors
         const formattedParentSelectors = parentSelectors.map(selector => selector.trim()).join(' ');
 
@@ -530,7 +530,7 @@ export default class SiriusElement extends HTMLElement {
         let selector = `${formattedParentSelectors} .${mainElement}`;
 
         // Set the element class rule styles
-        this._setSelectorRuleStyles(styleSheetName,selector, rules);
+        this._setSelectorRuleStyles(styleSheetName, selector, rules);
     }
 
     /** Format CSS variables
@@ -850,7 +850,7 @@ export default class SiriusElement extends HTMLElement {
         // Create the CSS style sheets and add them to the shadow DOM
         await this.#loadStyles(cssFilename);
         this.#adoptStyles();
-        
+
         // Dispatch loaded styles event
         this._dispatchLoadedStylesEvent()
     }
@@ -968,6 +968,7 @@ export default class SiriusElement extends HTMLElement {
             this.logger.log('Element shown');
         }
     }
+
     /** Private method to set element ID attribute
      * @param {string} id - Element ID
      */
@@ -995,7 +996,7 @@ export default class SiriusElement extends HTMLElement {
      * @param {string} parentSelectors - Parent selectors
      */
     _setStyles(rules, ...parentSelectors) {
-        this._setMainElementClassRuleStyles(SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT,rules, "",...parentSelectors);
+        this._setMainElementClassRuleStyles(SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT, rules, "", ...parentSelectors);
     }
 
     /** Get class name with pseudo selector
@@ -1012,16 +1013,16 @@ export default class SiriusElement extends HTMLElement {
      */
     _setStylesOnHover(rules, ...parentSelectors) {
         if (rules)
-            this._setMainElementClassRuleStyles(SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT,rules, "hover",...parentSelectors);
+            this._setMainElementClassRuleStyles(SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT, rules, "hover", ...parentSelectors);
     }
 
     /** Protected method to set the caption styles on active attribute
      * @param {string} rules - Styles rules
      * @param {string} parentSelectors - Parent selectors
      */
-    _setStylesOnActive(rules,...parentSelectors) {
+    _setStylesOnActive(rules, ...parentSelectors) {
         if (rules)
-            this._setMainElementClassRuleStyles(SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT,rules, "active",...parentSelectors);
+            this._setMainElementClassRuleStyles(SIRIUS_ELEMENT.STYLE_SHEETS.ELEMENT, rules, "active", ...parentSelectors);
     }
 
     /** Protected method to set the transition duration attribute

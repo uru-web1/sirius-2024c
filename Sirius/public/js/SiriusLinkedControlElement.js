@@ -351,7 +351,7 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
 
             // Set the parent ID
             if (this.linkedParent)
-                this.linkedParent.onBuilt=()=>child.parentId = this.linkedParent.id;
+                this.linkedParent.onBuilt = () => child.parentId = this.linkedParent.id;
         }
     }
 

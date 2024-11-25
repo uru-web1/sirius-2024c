@@ -83,7 +83,7 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
      */
     #getTemplate() {
         // Get the ListBox classes
-        const listBoxContainerClasses = [SIRIUS_ELEMENT.CLASSES.MAIN_ELEMENT,SIRIUS_LIST_BOX.CLASSES.LIST_BOX_CONTAINER];
+        const listBoxContainerClasses = [SIRIUS_ELEMENT.CLASSES.MAIN_ELEMENT, SIRIUS_LIST_BOX.CLASSES.LIST_BOX_CONTAINER];
         const headContainerClasses = [SIRIUS_LIST_BOX.CLASSES.HEAD_CONTAINER];
         const headClasses = [SIRIUS_LIST_BOX.CLASSES.HEAD];
         const separatorClasses = [SIRIUS_LIST_BOX.CLASSES.SEPARATOR];

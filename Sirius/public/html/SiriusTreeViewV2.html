@@ -9,53 +9,80 @@
     <script defer src="../js/SiriusTreeViewV2.js" type="module"></script>
     <script defer src="../js/SiriusCheckbox.js" type="module"></script>
     <script defer src="../js/SiriusLabel.js" type="module"></script>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5rem;
+            margin: 0;
+        }
+
+        .tree-view-container {
+            display: grid;
+            grid-template-rows: 1fr;
+            grid-auto-columns: max-content;
+            place-items: center;
+            gap: 1rem;
+        }
+
+        .tree-view-container > * {
+            grid-row: 1/-1;
+            border: 1px solid black;
+            padding: 1rem;
+        }
+    </style>
 </head>
 <body>
-<sirius-tree-view id="tree-view-1" icon-fill="red">
-    <sirius-checkbox slot="parent" id="checkbox-1">
-        <sirius-label slot="label" id="checkbox-1__label" caption="Grandfather"></sirius-label>
-    </sirius-checkbox>
-    <sirius-tree-view slot="children" id="tree-view-2" icon-fill="blue">
-        <sirius-checkbox slot="parent" id="checkbox-2">
-            <sirius-label slot="label" id="checkbox-2__label" caption="Child 1"></sirius-label>
+
+<div class="tree-view-container">
+    <sirius-tree-view id="tree-view-1" icon-fill="red">
+        <sirius-checkbox slot="parent" id="checkbox-1">
+            <sirius-label slot="label" id="checkbox-1__label" caption="Grandfather"></sirius-label>
         </sirius-checkbox>
-        <sirius-checkbox slot="children" id="checkbox-3">
-            <sirius-label slot="label" id="checkbox-3__label" caption="Grandchild 1"></sirius-label>
-        </sirius-checkbox>
-        <sirius-checkbox slot="children" id="checkbox-4">
-            <sirius-label slot="label" id="checkbox-4__label" caption="Grandchild 2"></sirius-label>
-        </sirius-checkbox>
-        <sirius-checkbox slot="children" id="checkbox-5">
-            <sirius-label slot="label" id="checkbox-5__label" caption="Grandchild 3"></sirius-label>
-        </sirius-checkbox>
-    </sirius-tree-view>
-    <sirius-tree-view slot="children" id="tree-view-3" icon-fill="purple">
-        <sirius-checkbox slot="parent" id="checkbox-6">
-            <sirius-label slot="label" id="checkbox-6__label" caption="Child 2"></sirius-label>
-        </sirius-checkbox>
-        <sirius-checkbox slot="children" id="checkbox-7">
-            <sirius-label slot="label" id="checkbox-7__label" caption="Grandchild 4"></sirius-label>
-        </sirius-checkbox>
-        <sirius-tree-view slot="children" id="tree-view-4" icon-fill="green">
-            <sirius-checkbox slot="parent" id="checkbox-8">
-                <sirius-label slot="label" id="checkbox-8__label" caption="Grandchild 5"></sirius-label>
+        <sirius-tree-view slot="children" id="tree-view-2" icon-fill="blue">
+            <sirius-checkbox slot="parent" id="checkbox-2">
+                <sirius-label slot="label" id="checkbox-2__label" caption="Child 1"></sirius-label>
             </sirius-checkbox>
-            <sirius-checkbox slot="children" id="checkbox-9">
-                <sirius-label slot="label" id="checkbox-9__label" caption="Grand grandchild 1"></sirius-label>
+            <sirius-checkbox slot="children" id="checkbox-3">
+                <sirius-label slot="label" id="checkbox-3__label" caption="Grandchild 1"></sirius-label>
+            </sirius-checkbox>
+            <sirius-checkbox slot="children" id="checkbox-4">
+                <sirius-label slot="label" id="checkbox-4__label" caption="Grandchild 2"></sirius-label>
+            </sirius-checkbox>
+            <sirius-checkbox slot="children" id="checkbox-5">
+                <sirius-label slot="label" id="checkbox-5__label" caption="Grandchild 3"></sirius-label>
             </sirius-checkbox>
         </sirius-tree-view>
+        <sirius-tree-view slot="children" id="tree-view-3" icon-fill="purple">
+            <sirius-checkbox slot="parent" id="checkbox-6">
+                <sirius-label slot="label" id="checkbox-6__label" caption="Child 2"></sirius-label>
+            </sirius-checkbox>
+            <sirius-checkbox slot="children" id="checkbox-7">
+                <sirius-label slot="label" id="checkbox-7__label" caption="Grandchild 4"></sirius-label>
+            </sirius-checkbox>
+            <sirius-tree-view slot="children" id="tree-view-4" icon-fill="green">
+                <sirius-checkbox slot="parent" id="checkbox-8">
+                    <sirius-label slot="label" id="checkbox-8__label" caption="Grandchild 5"></sirius-label>
+                </sirius-checkbox>
+                <sirius-checkbox slot="children" id="checkbox-9">
+                    <sirius-label slot="label" id="checkbox-9__label" caption="Great grandchild 1"></sirius-label>
+                </sirius-checkbox>
+            </sirius-tree-view>
+        </sirius-tree-view>
+        <sirius-checkbox slot="children" id="checkbox-10">
+            <sirius-label slot="label" id="checkbox-10__label" caption="Child 3"></sirius-label>
+        </sirius-checkbox>
     </sirius-tree-view>
-    <sirius-checkbox slot="children" id="checkbox-10">
-        <sirius-label slot="label" id="checkbox-10__label" caption="Child 3"></sirius-label>
-    </sirius-checkbox>
-</sirius-tree-view>
+</div>
 
 <script type="module">
     import SiriusTreeView, {SIRIUS_TREE_VIEW_ATTRIBUTES} from "../js/SiriusTreeViewV2.js";
     import sirius from "../js/Sirius.js"
     import SiriusCheckbox, {SIRIUS_CHECKBOX_PROPERTIES} from "../js/SiriusCheckbox.js";
     import SiriusLabel, {SIRIUS_LABEL_ATTRIBUTES} from "../js/SiriusLabel.js";
-    import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES} from "../js/SiriusElement.js";
+    import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
     import {SIRIUS_CONTROL_ELEMENT_PROPERTIES} from "../js/SiriusControlElement.js";
     import {SIRIUS_LINKED_CONTROL_ELEMENT_PROPERTIES} from "../js/SiriusLinkedControlElement.js";
 
@@ -63,21 +90,42 @@
     const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
     const captionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION
     const labelKey = SIRIUS_CHECKBOX_PROPERTIES.LABEL
-    const parentKey = SIRIUS_LINKED_CONTROL_ELEMENT_PROPERTIES.PARENT
-    const childrenKey = SIRIUS_CONTROL_ELEMENT_PROPERTIES.CHILDREN
+    const stylesKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLES
+    const iconFillKey = SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_FILL
+    const iconStylesKey = SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_STYLES
     const iconStylesOnHoverKey = SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_STYLES_ON_HOVER
 
+    // Get the properties keys
+    const childrenKey = SIRIUS_CONTROL_ELEMENT_PROPERTIES.CHILDREN
+    const parentKey = SIRIUS_LINKED_CONTROL_ELEMENT_PROPERTIES.PARENT
+
+    // Get the container element
+    const treeViewContainer = document.querySelector('.tree-view-container');
+
+    // Wait for the DOM to be fully loaded
     sirius.onLoaded = () => {
         // Create SiriusTreeView
         const siriusTreeView5 = new SiriusTreeView({
             [idKey]: 'tree-view-5',
-            [iconStylesOnHoverKey]: `
-                background-color: yellow;
-                border: 1px solid black;
-                padding: 1rem;
+            [stylesKey]: `
+                background-color: lightcoral;
+                border-radius: 5px;
+                padding: 2rem;
             `,
+            [iconStylesKey]: `
+                background-color: darkred;
+                border-radius: 50%;
+            `,
+            [iconStylesOnHoverKey]: `
+                background-color: black;
+            `,
+            [iconFillKey]: 'white',
             [parentKey]: new SiriusCheckbox({
                 [idKey]: 'checkbox-child-11',
+                [iconFillKey]: 'black',
+                [stylesKey]: `
+                    background-color: white;
+                `,
                 [labelKey]: new SiriusLabel({
                     [idKey]: 'checkbox-child-11__label',
                     [captionKey]: 'Parent',
@@ -86,6 +134,10 @@
             [childrenKey]: [
                 new SiriusCheckbox({
                     [idKey]: 'checkbox-child-12',
+                    [iconFillKey]: 'black',
+                    [stylesKey]: `
+                        background-color: white;
+                    `,
                     [labelKey]: new SiriusLabel({
                         [idKey]: 'checkbox-child-12__label',
                         [captionKey]: 'Child 1',
@@ -93,6 +145,10 @@
                 }),
                 new SiriusCheckbox({
                     [idKey]: 'checkbox-child-13',
+                    [iconFillKey]: 'black',
+                    [stylesKey]: `
+                        background-color: white;
+                    `,
                     [labelKey]: new SiriusLabel({
                         [idKey]: 'checkbox-child-13__label',
                         [captionKey]: 'Child 2',
@@ -100,6 +156,10 @@
                 }),
                 new SiriusCheckbox({
                     [idKey]: 'checkbox-child-14',
+                    [iconFillKey]: 'black',
+                    [stylesKey]: `
+                        background-color: white;
+                    `,
                     [labelKey]: new SiriusLabel({
                         [idKey]: 'checkbox-child-14__label',
                         [captionKey]: 'Child 3',
@@ -107,8 +167,25 @@
                 }),
                 new SiriusTreeView({
                     [idKey]: 'tree-view-6',
+                    [stylesKey]: `
+                        background-color: orange;
+                        border-radius: 5px;
+                        padding: 1rem;
+                    `,
+                    [iconStylesKey]: `
+                        background-color: brown;
+                        border-radius: 50%;
+                    `,
+                    [iconStylesOnHoverKey]: `
+                        background-color: black;
+                    `,
+                    [iconFillKey]: 'white',
                     [parentKey]: new SiriusCheckbox({
                         [idKey]: 'checkbox-child-15',
+                        [stylesKey]: `
+                            background-color: white;
+                        `,
+                        [iconFillKey]: 'black',
                         [labelKey]: new SiriusLabel({
                             [idKey]: 'checkbox-child-15__label',
                             [captionKey]: 'Child 4',
@@ -117,6 +194,10 @@
                     [childrenKey]: [
                         new SiriusCheckbox({
                             [idKey]: 'checkbox-child-16',
+                            [stylesKey]: `
+                                background-color: white;
+                            `,
+                            [iconFillKey]: 'black',
                             [labelKey]: new SiriusLabel({
                                 [idKey]: 'checkbox-child-16__label',
                                 [captionKey]: 'Grandchild 1',
@@ -124,6 +205,10 @@
                         }),
                         new SiriusCheckbox({
                             [idKey]: 'checkbox-child-17',
+                            [stylesKey]: `
+                                background-color: white;
+                            `,
+                            [iconFillKey]: 'black',
                             [labelKey]: new SiriusLabel({
                                 [idKey]: 'checkbox-child-17__label',
                                 [captionKey]: 'Grandchild 2',
@@ -131,16 +216,82 @@
                         }),
                         new SiriusCheckbox({
                             [idKey]: 'checkbox-child-18',
+                            [stylesKey]: `
+                                background-color: white;
+                            `,
+                            [iconFillKey]: 'black',
                             [labelKey]: new SiriusLabel({
                                 [idKey]: 'checkbox-child-18__label',
                                 [captionKey]: 'Grandchild 3',
                             })
-                        })
+                        }),
+                        new SiriusTreeView({
+                            [idKey]: 'tree-view-7',
+                            [stylesKey]: `
+                                background-color: yellow;
+                                border-radius: 5px;
+                                padding: 1rem;
+                            `,
+                            [iconStylesKey]: `
+                                background-color: darkorange;
+                                border-radius: 50%;
+                            `,
+                            [iconStylesOnHoverKey]: `
+                                background-color: black;
+                            `,
+                            [iconFillKey]: 'white',
+                            [parentKey]: new SiriusCheckbox({
+                                [idKey]: 'checkbox-child-19',
+                                [stylesKey]: `
+                                    background-color: white;
+                                `,
+                                [iconFillKey]: 'black',
+                                [labelKey]: new SiriusLabel({
+                                    [idKey]: 'checkbox-child-19__label',
+                                    [captionKey]: 'Grandchild 4',
+                                })
+                            }),
+                            [childrenKey]: [
+                                new SiriusCheckbox({
+                                    [idKey]: 'checkbox-child-20',
+                                    [stylesKey]: `
+                                        background-color: white;
+                                    `,
+                                    [iconFillKey]: 'black',
+                                    [labelKey]: new SiriusLabel({
+                                        [idKey]: 'checkbox-child-20__label',
+                                        [captionKey]: 'Great grandchild 1',
+                                    })
+                                }),
+                                new SiriusCheckbox({
+                                    [idKey]: 'checkbox-child-21',
+                                    [stylesKey]: `
+                                        background-color: white;
+                                    `,
+                                    [iconFillKey]: 'black',
+                                    [labelKey]: new SiriusLabel({
+                                        [idKey]: 'checkbox-child-21__label',
+                                        [captionKey]: 'Great grandchild 2',
+                                    })
+                                }),
+                                new SiriusCheckbox({
+                                    [idKey]: 'checkbox-child-22',
+                                    [stylesKey]: `
+                                        background-color: white;
+                                    `,
+                                    [iconFillKey]: 'black',
+                                    [labelKey]: new SiriusLabel({
+                                        [idKey]: 'checkbox-child-22__label',
+                                        [captionKey]: 'Great grandchild 3',
+                                    })
+                                }),
+                            ]
+                        }),
                     ]
                 }),
             ],
         });
-        siriusTreeView5.addToBody()
+        treeViewContainer.appendChild(siriusTreeView5);
     }
 </script>
 </body>
