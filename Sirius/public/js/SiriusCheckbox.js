@@ -104,7 +104,7 @@ export default class SiriusCheckbox extends SiriusControlElement {
     #getTemplate() {
         // Get the checkbox classes
         const checkboxContainerClasses = [SIRIUS_CHECKBOX.CLASSES.CHECKBOX_CONTAINER];
-        const iconContainerClasses = [SIRIUS_ELEMENT.CLASSES.MAIN_ELEMENT,SIRIUS_CHECKBOX.CLASSES.ICON_CONTAINER];
+        const iconContainerClasses = [SIRIUS_ELEMENT.CLASSES.MAIN_ELEMENT, SIRIUS_CHECKBOX.CLASSES.ICON_CONTAINER];
         const labelContainerClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL_CONTAINER]
         const labelClasses = [SIRIUS_CHECKBOX.CLASSES.LABEL]
 
@@ -624,7 +624,7 @@ export default class SiriusCheckbox extends SiriusControlElement {
                 this.#setIconUncheckedAnimation(newValue);
                 break;
 
-                case SIRIUS_CHECKBOX_ATTRIBUTES.ICON_STYLES:
+            case SIRIUS_CHECKBOX_ATTRIBUTES.ICON_STYLES:
                 this.#setIconStyles(newValue);
                 break;
 

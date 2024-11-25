@@ -27,20 +27,18 @@
 
         .checkboxes-container > * {
             grid-column: 1/-1;
-            border: 1px solid black;
+            outline: 1px solid black;
             padding: 1rem;
         }
 
-        .grandparent {
-            background-color: darkgreen;
-        }
-
-        .parent {
-            background-color: green;
-        }
-
-        .child {
-            background-color: lightblue;
+        .parent-container {
+            display: grid;
+            grid-auto-rows: max-content;
+            grid-template-columns: 1fr;
+            place-items: center;
+            padding: 1rem;
+            gap: 1rem;
+            grid-column: 1/-1;
         }
     </style>
 </head>
@@ -118,66 +116,81 @@
 
         // Create the checkbox without a label
         const siriusCheckbox3 = new SiriusCheckbox({
-            [idKey]: 'checkbox-3'
+            [idKey]: 'checkbox-3',
+            [iconFillKey]: 'black',
         });
         checkboxesContainer.appendChild(siriusCheckbox3);
 
         // Create the first parent container
         const parentContainer1 = document.createElement('div');
-        parentContainer1.classList.add('checkboxes-container');
+        parentContainer1.classList.add('parent-container');
+        parentContainer1.style.backgroundColor = 'darkred';
         checkboxesContainer.appendChild(parentContainer1);
 
         const siriusCheckbox5 = new SiriusCheckbox({
             [idKey]: 'checkbox-5',
+            [iconFillKey]: 'black',
             [labelKey]: new SiriusLabel({
                 [idKey]: 'checkbox-5__label',
                 [captionKey]: 'Child 1 (Parent 1)',
             })
         });
-        parentContainer1.appendChild(siriusCheckbox5);
+
+        // Create the second parent container
+        const parentContainer2 = document.createElement('div');
+        parentContainer2.classList.add('parent-container');
+        parentContainer2.style.backgroundColor = 'coral';
+        parentContainer1.appendChild(parentContainer2);
+        parentContainer2.appendChild(siriusCheckbox5);
 
         const siriusCheckbox6 = new SiriusCheckbox({
             [idKey]: 'checkbox-6',
+            [iconFillKey]: 'black',
             [labelKey]: new SiriusLabel({
                 [idKey]: 'checkbox-6__label',
                 [captionKey]: 'Child 2 (Parent 1)',
             })
         });
-        parentContainer1.appendChild(siriusCheckbox6);
+        parentContainer2.appendChild(siriusCheckbox6);
 
         const siriusCheckbox7 = new SiriusCheckbox({
             [idKey]: 'checkbox-7',
+            [iconFillKey]: 'black',
             [labelKey]: new SiriusLabel({
                 [idKey]: 'checkbox-7__label',
                 [captionKey]: 'Child 3 (Parent 2)',
             })
         });
-        parentContainer1.appendChild(siriusCheckbox7);
+        parentContainer2.appendChild(siriusCheckbox7);
 
         // Create the parent checkbox
         const siriusCheckbox4 = new SiriusCheckbox({
             [idKey]: 'checkbox-4',
+            [iconFillKey]: 'black',
             [labelKey]: new SiriusLabel({
                 [idKey]: 'checkbox-4__label',
                 [captionKey]: 'Parent 1',
             }),
             [childrenKey]: [siriusCheckbox5, siriusCheckbox6, siriusCheckbox7]
         });
-        checkboxesContainer.appendChild(siriusCheckbox4);
+        parentContainer1.appendChild(siriusCheckbox4);
+        siriusCheckbox4.style.order = "-1";
 
-        // Create the second parent container
-        const parentContainer2 = document.createElement('div');
-        parentContainer2.classList.add('checkboxes-container');
-        parentContainer1.appendChild(parentContainer2);
+        // Create the third parent container
+        const parentContainer3 = document.createElement('div');
+        parentContainer3.classList.add('parent-container');
+        parentContainer3.style.backgroundColor = 'yellow';
+        parentContainer2.appendChild(parentContainer3);
 
         const siriusCheckbox8 = new SiriusCheckbox({
             [idKey]: 'checkbox-8',
+            [iconFillKey]: 'black',
         });
         siriusCheckbox8.label = new SiriusLabel({
             [idKey]: 'checkbox-8__label',
             [captionKey]: 'Child 4 (Parent 2)',
         });
-        parentContainer2.appendChild(siriusCheckbox8);
+        parentContainer3.appendChild(siriusCheckbox8);
 
         // Add children to the checkbox
         siriusCheckbox8.parentId = siriusCheckbox7.id
