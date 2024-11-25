@@ -2,14 +2,13 @@ import SiriusElement, {
     SIRIUS_ELEMENT_ATTRIBUTES,
     SIRIUS_ELEMENT_PROPERTIES,
     SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
-
 } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
 import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES} from "./SiriusIcon.js";
 
 /** Sirius Edit constants */
 export const SIRIUS_EDIT = deepFreeze({
-    NAME: "SiriusEdit",
+    NAME: "SiriusEditV2",
     TAG: "sirius-edit",
     CSS_VARIABLES: {
         INPUT_BACKGROUND: '--sirius-edit--input-background',
@@ -26,11 +25,15 @@ export const SIRIUS_EDIT = deepFreeze({
         WIDTH: '--sirius-edit--container-whidth',
         HEIGHT: '--sirius-edit--container-height',
     },
+    SLOTS: {
+        LABEL: "label",
+    },
     CLASSES: {
         EDIT_CONTAINER: "edit-container",
-        EDIT_AREA: "edit-area",
-        EDIT_LABEL:"labelline",
-        EDIT_REQUIRED: "required",
+        INPUT_CONTAINER: "input-container",
+        INPUT: "input",
+        LABEL_CONTAINER: "label-container",
+        LABEL: "label",
     }
 })
 
@@ -52,88 +55,176 @@ export const SIRIUS_EDIT_ATTRIBUTES = deepFreeze({
     LABEL_Y_POSITION: "label-y-position",
 
     ICON_EYE: "icon-eye",
-    ICON_EYE_CLOSE: "icon-eye-close",
+    ICON_EYE_CLOSED: "icon-eye-close",
     ICON_ARROW_UP: "icon-arrow-up",
     ICON_ARROW_DOWN: "icon-arrow-down",
     ICON_POSITION_RIGHT: "icon-position-right",
     ICON_POSITION_TOP: "icon-position-top",
+    REQUIRED: "required",
 })
 
-export class SiriusEdit extends SiriusElement {
-    siriusIcon = null;
-    #editContainerElement = null;
+/** SiriusEdit default values */
+export const SIRIUS_EDIT_ATTRIBUTES_DEFAULT = deepFreeze({
+    [SIRIUS_EDIT_ATTRIBUTES.INPUT_TYPE]: "text",
+    [SIRIUS_EDIT_ATTRIBUTES.REQUIRED]: "",
+})
 
+/** SiriusEdit properties */
+export const SIRIUS_EDIT_PROPERTIES = deepFreeze({
+    LABEL: 'label',
+})
+
+/** Sirius class that represents an edit component */
+export class SiriusEdit extends SiriusElement {
+    // Container elements
+    #editContainerElement = null;
+    #inputContainerElement = null
+    #labelContainerElement = null
+
+    // Main elements
+    #inputElement = null
+
+    // Element properties
+    #label = null
+
+    /**
+     * Create a SiriusEdit element
+     * @param {Object} properties - SiriusEdit properties
+     */
     constructor(properties) {
         super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]: SIRIUS_EDIT.NAME});
+
+        // Check if the properties contains the label
+        const label = properties?.[SIRIUS_EDIT_PROPERTIES.LABEL];
+        if (label) this.#label = label;
+
+        // Build the SiriusEdit
         this.#build(properties).then();
     }
 
-    #getTemplate() {
-        const labelCaption = this.labelCaption || 'Touch Me'
-        const inputType = this.inputType || 'text';
+    /** Define observed attributes
+     * @returns {string[]} - Observed attributes
+     * */
+    static get observedAttributes() {
+        return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_EDIT_ATTRIBUTES)]
+    }
 
-        return `<div class=${SIRIUS_EDIT.CLASSES.EDIT_CONTAINER}>
-                    <div class="${SIRIUS_EDIT.CLASSES.EDIT_AREA}">
-                        <input type="${inputType}" ${SIRIUS_EDIT.CLASSES.EDIT_REQUIRED}>
-                        
-                        <div class="${SIRIUS_EDIT.CLASSES.EDIT_LABEL}">${labelCaption}</div>
+    /** Get the template for the SiriusEdit
+     * @returns {string} - Template
+     */
+    #getTemplate() {
+        // Get the SiriusEdit classes
+        const editContainerClasses = [SIRIUS_EDIT.CLASSES.EDIT_CONTAINER];
+        const inputContainerClasses = [SIRIUS_EDIT.CLASSES.INPUT_CONTAINER];
+        const labelContainerClasses = [SIRIUS_EDIT.CLASSES.LABEL_CONTAINER];
+        const inputClasses = [SIRIUS_EDIT.CLASSES.INPUT];
+        const labelClasses = [SIRIUS_EDIT.CLASSES.LABEL];
+
+        return `<div class="${editContainerClasses.join(' ')}">
+                    <div class="${inputContainerClasses.join(' ')}">
+                        <input type="${this.inputType}" class="${inputClasses.join(' ')}" ${this.editRequired}>
+                    </div>
+                    <div class="${labelContainerClasses.join(' ')}">
+                        <slot name="${SIRIUS_EDIT.SLOTS.LABEL}" class="${labelClasses.join(' ')}">
+                        </slot>
                     </div>
                 </div>`;
     }
 
-        // Getter and setter for ICON_EYE
-        get iconEye() {
-            return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_EYE) || 'eye';
-        }
+    /** Build the SiriusEdit
+     * @param {Object} properties - SiriusEdit properties
+     * @returns {Promise<void>} - Promise that resolves when the SiriusEdit is built
+     * */
+    async #build(properties) {
+        // Load Sirius checkbox HTML attributes
+        this._loadAttributes({
+            instanceProperties: properties,
+            attributes: SIRIUS_EDIT_ATTRIBUTES,
+            attributesDefault: SIRIUS_EDIT_ATTRIBUTES_DEFAULT,
+        });
 
-        set iconEye(value) {
-            this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_EYE, value);
-        }
+        // Load the CSS style sheets and add them to the shadow DOM
+        await this._loadAndAdoptStyles();
 
-        // Getter and setter for ICON_EYE_CLOSE
-        get iconEyeClose() {
-            return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_EYE_CLOSE) || 'eye-close';
-        }
+        // Get HTML inner content
+        const innerHTML = this.#getTemplate();
 
-        set iconEyeClose(value) {
-            this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_EYE_CLOSE, value);
-        }
+        // Create the edit container element
+        const container = await this._createContainerElementTemplate(innerHTML);
+        this.#editContainerElement = this._containerElement = container
+        this.#inputContainerElement = this.editContainerElement.firstElementChild;
+        this.#inputElement = this.inputContainerElement.firstElementChild;
+        this.#labelContainerElement = this.editContainerElement.lastElementChild;
 
-        // Getter and setter for ICON_ARROW_UP
-        get iconArrowUp() {
-            return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_ARROW_UP) || 'arrow--up';
-        }
+        // Add the container element to the shadow DOM
+        this.shadowRoot.appendChild(this.containerElement);
 
-        set iconArrowUp(value) {
-            this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_ARROW_UP, value);
-        }
+        // Set properties
+        this.label = this.#label
 
-        // Getter and setter for ICON_ARROW_DOWN
-        get iconArrowDown() {
-            return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_ARROW_DOWN) || 'arrow--down';
-        }
+        // Dispatch the built event
+        this._dispatchBuiltEvent();
+    }
 
-        set iconArrowDown(value) {
-            this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_ARROW_DOWN, value);
-        }
+    // Getter and setter for ICON_EYE
 
-        // Getter and setter for ICON_POSITION_RIGHT
-        get iconPositionRight() {
-            return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_RIGHT) || '10px';
-        }
+    get iconEye() {
+        return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_EYE) || 'eye';
+    }
 
-        set iconPositionRight(value) {
-            this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_RIGHT, value);
-        }
+    set iconEye(value) {
+        this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_EYE, value);
+    }
 
-        // Getter and setter for ICON_POSITION_TOP
-        get iconPositionTop() {
-            return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_TOP) || '20px';
-        }
+    // Getter and setter for ICON_EYE_CLOSED
 
-        set iconPositionTop(value) {
-            this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_TOP, value);
-        }
+    get iconEyeClose() {
+        return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_EYE_CLOSED) || 'eye-closed';
+    }
+
+    set iconEyeClose(value) {
+        this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_EYE_CLOSED, value);
+    }
+
+    // Getter and setter for ICON_ARROW_UP
+
+    get iconArrowUp() {
+        return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_ARROW_UP) || 'arrow--up';
+    }
+
+    set iconArrowUp(value) {
+        this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_ARROW_UP, value);
+    }
+
+    // Getter and setter for ICON_ARROW_DOWN
+
+    get iconArrowDown() {
+        return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_ARROW_DOWN) || 'arrow--down';
+    }
+
+    set iconArrowDown(value) {
+        this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_ARROW_DOWN, value);
+    }
+
+    // Getter and setter for ICON_POSITION_RIGHT
+
+    get iconPositionRight() {
+        return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_RIGHT) || '10px';
+    }
+
+    set iconPositionRight(value) {
+        this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_RIGHT, value);
+    }
+
+    // Getter and setter for ICON_POSITION_TOP
+
+    get iconPositionTop() {
+        return this.getAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_TOP) || '20px';
+    }
+
+    set iconPositionTop(value) {
+        this.setAttribute(SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_TOP, value);
+    }
 
     /** Get icon width attribute
      * @returns {string} - Icon width attribute
@@ -282,15 +373,8 @@ export class SiriusEdit extends SiriusElement {
         return this.#editContainerElement;
     }
 
-    /** Define observed attributes
-     * @returns {string[]} - Observed attributes
-     * */
-    static get observedAttributes() {
-        return [...SiriusElement.observedAttributes, ...Object.values(SIRIUS_EDIT_ATTRIBUTES)]
-    }
-
     #setYPosition(position) {
-        if(position){
+        if (position) {
             this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_Y_POSITION, position);
         }
     }
@@ -305,8 +389,8 @@ export class SiriusEdit extends SiriusElement {
             this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.HEIGHT, height);
     }
 
-    #setInputBackgroundColor(color){
-        if(color)
+    #setInputBackgroundColor(color) {
+        if (color)
             this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.INPUT_BACKGROUND, color);
     }
 
@@ -336,16 +420,19 @@ export class SiriusEdit extends SiriusElement {
     }
 
     // Private method to update the label font color on focus
+
     #updateLabelFontColorOnFocus(value) {
         this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_FONT_COLOR_ONFOCUS, value);
     }
 
     // Private method to update the label border color on focus
+
     #updateLabelBorderColorOnFocus(value) {
         this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_BORDER_COLOR_ONFOCUS, value);
     }
 
     // Private method to update the label caption
+
     #updateLabelCaption(value) {
         const label = this.shadowRoot.querySelector('.labelline');
         if (label) {
@@ -354,6 +441,7 @@ export class SiriusEdit extends SiriusElement {
     }
 
     // Private method to update the input type
+
     #updateInputType(value) {
         const input = this.shadowRoot.querySelector('input');
         if (input) {
@@ -376,6 +464,7 @@ export class SiriusEdit extends SiriusElement {
     }
 
     // Private method to handle password type input
+
     #handlePasswordType(input) {
         const div = this.shadowRoot.querySelector('.edit-area');
         if (!this.siriusIcon) {
@@ -402,6 +491,7 @@ export class SiriusEdit extends SiriusElement {
     }
 
     // Private method to update icons
+
     #updateIcons() {
         const inputType = this.inputType;
         if (inputType === 'password') {
@@ -412,6 +502,7 @@ export class SiriusEdit extends SiriusElement {
     }
 
     // Private method to handle number type input
+
     #handleNumberType(input) {
         const div = this.shadowRoot.querySelector('.edit-area');
         if (!this.siriusIcon) {
@@ -444,33 +535,10 @@ export class SiriusEdit extends SiriusElement {
     }
 
     // Private method to remove icons
+
     #removeIcons() {
         const icons = this.shadowRoot.querySelectorAll('sirius-icon');
         icons.forEach(icon => icon.remove());
-    }
-
-    async #build(properties) {
-        // Load Sirius checkbox HTML attributes
-        this._loadAttributes({
-            instanceProperties: properties,
-            attributes: SIRIUS_EDIT_ATTRIBUTES,
-        });
-
-        // Load the CSS style sheets and add them to the shadow DOM
-        await this._loadAndAdoptStyles();
-
-        // Get HTML inner content
-        const innerHTML = this.#getTemplate();
-
-        // Create the edit container element
-        const container= await this._createContainerElementTemplate(innerHTML);
-        this.#editContainerElement = this._containerElement = container
-
-        // Add the container element to the shadow DOM
-        this.shadowRoot.appendChild(this.containerElement);
-
-        // Dispatch the built event
-        this.dispatchBuiltEvent();
     }
 
     /** Private method to set the checkbox container style
@@ -552,7 +620,7 @@ export class SiriusEdit extends SiriusElement {
             case SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_RIGHT:
             case SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_TOP:
             case SIRIUS_EDIT_ATTRIBUTES.ICON_EYE:
-            case SIRIUS_EDIT_ATTRIBUTES.ICON_EYE_CLOSE:
+            case SIRIUS_EDIT_ATTRIBUTES.ICON_EYE_CLOSED:
             case SIRIUS_EDIT_ATTRIBUTES.ICON_ARROW_UP:
             case SIRIUS_EDIT_ATTRIBUTES.ICON_ARROW_DOWN:
                 this.#updateIcons();

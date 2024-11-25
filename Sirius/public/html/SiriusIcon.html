@@ -8,43 +8,44 @@
     <script defer src="../js/SiriusIcon.js" type="module"></script>
 
     <style>
-        .svg-container {
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .icon-container {
             display: grid;
+            grid-auto-columns: 1fr;
+            grid-template-rows: 1fr;
             place-items: center;
-            width: 100px;
-            height: 100px;
-            overflow: hidden;
+            gap: 1rem;
         }
 
-        div {
-            background-color: black;
-        }
-
-        button {
-            width: 100px;
-            height: 100px;
+        .icon-container > * {
+            grid-column: 1/-1;
+            border: 1px solid black;
+            padding: 1rem;
         }
 
     </style>
 </head>
 <body>
 
-<div class="svg-container">
-    <sirius-icon hide="true" icon="check-mark" fill="red" height="50px" width="24px" id="icon-1"></sirius-icon>
-</div>
+<div class="icon-container">
+    <sirius-icon hide="true" icon="check-mark" fill="red" height="25px" width="25px" id="icon-1"
+        show-animation="0% { transform: scale(0); fill: red; } 100% { transform: scale(1); fill: blue; }"
+                 hiding-animation="0% { transform: scale(1); fill: blue; } 100% { transform: scale(0); fill: red; }"
+        styles="background-color: lightblue" styles-on-hover="background-color: lightcoral" styles-on-active="background-color: lightgreen"></sirius-icon>
 
-<div class="svg-container">
-    <sirius-icon icon="check-mark" fill="blue" height="48px" width="48px" id="icon-2"
-                 style="background-color: chocolate"></sirius-icon>
-</div>
+    <sirius-icon icon="eye-closed" fill="whitesmoke" height="48px" width="48px" id="icon-2"
+                 styles="background-color: purple" styles-on-hover="scale: 1.5; transform: rotate(-15deg)" styles-on-active="background-color: darkgreen"></sirius-icon>
 
-<div class="svg-container">
     <sirius-icon icon="double-arrow--left" fill="red" height="50px" width="24px"
-                 id="icon-3"></sirius-icon>
+                 id="icon-3" styles="background-color: lightgreen" styles-on-hover="background-color: lightblue" styles-on-active="background-color: lightcoral"></sirius-icon>
 </div>
-
-<button class="button" id="animateButton" title="Animar">
-</button>
 
 <script type="module">
     import sirius from '../js/Sirius.js'
@@ -60,6 +61,9 @@
 
     // Get the properties keys
     const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
+
+    // Get the container element
+    const iconContainer = document.querySelector('.icon-container');
 
     // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
@@ -80,26 +84,24 @@
                 'mouseout': () => siriusIcon4.logger.log('mouseout')
             }
         })
-
-        // Add the icon to the DOM
-        siriusIcon4.addToBody()
+        iconContainer.appendChild(siriusIcon4);
 
         // Change the icon
         siriusIcon4.icon = SIRIUS_SVG_ICONS.HOME;
 
-        // Link the button to the icon and center it
-        const icon4 = document.getElementById('icon-4');
-        icon4.centerScreen();
+        // Add an event listener to the icon
+        const siriusIcon1 = document.querySelector('#icon-1');
+        siriusIcon1.addEventListener("click", () => {
+            siriusIcon1.toggleHide()
 
-        // Add an event listener to the button
-        const click = document.getElementById('animateButton');
-
-        click.addEventListener("click", () => {
-            if (!icon4)
-                return
-
-            icon4.toggleHide();
+            // Change the icon size
+            siriusIcon1.width = siriusIcon1.width.replace('px', '') * 1.5 + 'px';
+            siriusIcon1.height = siriusIcon1.height.replace('px', '') * 1.5 + 'px';
         });
+        siriusIcon4.addEventListener("click", () => {
+            siriusIcon4.toggleHide()
+        });
+
     }
 </script>
 </body>
