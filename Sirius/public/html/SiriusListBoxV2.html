@@ -10,7 +10,7 @@
     <script defer src="../js/SiriusListBoxV2.js" type="module"></script>
 
     <style>
-        body{
+        body {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -20,13 +20,15 @@
 
         .list-box-container {
             display: grid;
-            grid-auto-columns: max-content;
+            grid-auto-columns: 1fr;
             grid-template-rows: 1fr;
             place-items: center;
             gap: 1rem;
+            overflow-x: visible;
         }
 
         .list-box-container > * {
+            grid-column: 1/-1;
             border: 1px solid black;
             padding: 1rem;
         }
@@ -55,19 +57,21 @@
         SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES,
         SIRIUS_ELEMENT_ATTRIBUTES
     } from "../js/SiriusElement.js";
-    import SiriusLabel from "../js/SiriusLabel.js";
-    import SiriusCheckbox, {SIRIUS_CHECKBOX_PROPERTIES} from "../js/SiriusCheckbox.js";
+    import SiriusLabel, {SIRIUS_LABEL_ATTRIBUTES} from "../js/SiriusLabel.js";
+    import SiriusCheckbox, {SIRIUS_CHECKBOX_PROPERTIES, SIRIUS_CHECKBOX_ATTRIBUTES} from "../js/SiriusCheckbox.js";
 
     // Get the attributes keys
     const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
-    const backgroundKey = SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR;
     const stylesKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLES;
+    const backgroundKey = SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR;
+    const iconFillKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_FILL;
+    const gapKey = SIRIUS_CHECKBOX_ATTRIBUTES.GAP;
+    const captionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION;
 
     // Get the properties keys
     const headKey = SIRIUS_LIST_BOX_PROPERTIES.HEAD;
     const itemsKey = SIRIUS_LIST_BOX_PROPERTIES.ITEMS;
     const labelKey = SIRIUS_CHECKBOX_PROPERTIES.LABEL;
-    const iconFillKey = SIRIUS_CHECKBOX_PROPERTIES.ICON_FILL;
 
     // Get the container
     const listContainer = document.querySelector('.list-box-container');
@@ -77,32 +81,58 @@
         const siriusListBox2 = new SiriusListBox({
             [idKey]: 'list-box-2',
             [stylesKey]: `
-                background-image: linear-gradient(180deg, rgba(173, 216, 230, 0) 0%, rgba(0, 0, 139, 0.3) 100%);
-                padding: 40px`,
+                background-color: #e6e6fa;
+                border-radius: 10px;
+                gap: 0.25rem;
+                padding: 20px`,
             [headKey]: new SiriusCheckbox({
                 [idKey]: 'head-2',
                 [iconFillKey]: 'white',
-                [stylesKey]: 'background-color: darkgreen',
+                [gapKey]: '1rem',
+                [stylesKey]: `
+                    background-color: #4b0082;
+                    border-color: #4b0082;`,
                 [labelKey]: new SiriusLabel({
                     [idKey]: 'head-2__label',
-                    caption: 'Head'
-                })
+                    [captionKey]: 'Head',
+                    [stylesKey]: `
+                        color: black;
+                        font-family: Open Sans;
+                        font-size: 1.3rem;
+                        font-weight: 400`,
+                }),
             }),
             [itemsKey]: [
                 new SiriusCheckbox({
                     [idKey]: 'item-3',
-                    [stylesKey]: 'background-color: lightgreen',
+                    [iconFillKey]: 'white',
+                    [stylesKey]: `
+                        background-color: #9370db;
+                        border-color: #9370db;`,
+                    [gapKey]: '1rem',
                     [labelKey]: new SiriusLabel({
                         [idKey]: 'item-3__label',
-                        caption: 'Item 1'
+                        [captionKey]: 'Item 1',
+                        [stylesKey]: `
+                            color: black;
+                            font-family: Open Sans;
+                            font-size: 1rem;`,
                     })
                 }),
                 new SiriusCheckbox({
                     [idKey]: 'item-4',
-                    [stylesKey]: 'background-color: lightgreen',
+                    [iconFillKey]: 'white',
+                    [stylesKey]: `
+                        background-color: #9370db;
+                        border-color: #9370db;`,
+                    [gapKey]: '1rem',
                     [labelKey]: new SiriusLabel({
                         [idKey]: 'item-4__label',
-                        caption: 'Item 2'
+                        [captionKey]: 'Item 2',
+                        [stylesKey]: `
+                            color: black;
+                            font-family: Open Sans;
+                            font-size: 1rem;`,
                     })
                 })
             ]

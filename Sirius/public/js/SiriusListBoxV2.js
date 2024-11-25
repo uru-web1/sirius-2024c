@@ -14,7 +14,8 @@ export const SIRIUS_LIST_BOX = deepFreeze({
     TAG: "sirius-list-box",
     CSS_VARS: {
         HEAD_CONTAINER_PADDING: "--sirius-list-box--head-container--padding",
-        HEAD_CONTAINER_BORDER_BOTTOM: "--sirius-list-box--head-container--border-bottom",
+        SEPARATOR_BORDER: "--sirius-list-box--separator--border",
+        SEPARATOR_BORDER_RADIUS: "--sirius-list-box--separator--border-radius",
         ITEMS_CONTAINER_GAP: "--sirius-list-box--items-container--gap",
         ITEMS_CONTAINER_PADDING: "--sirius-list-box--items-container--padding",
     },
@@ -26,6 +27,7 @@ export const SIRIUS_LIST_BOX = deepFreeze({
         LIST_BOX_CONTAINER: 'list-box-container',
         HEAD_CONTAINER: 'head-container',
         HEAD: 'head',
+        SEPARATOR: 'separator',
         ITEMS_CONTAINER: 'items-container',
         ITEMS: 'items',
     }
@@ -34,7 +36,8 @@ export const SIRIUS_LIST_BOX = deepFreeze({
 /** SiriusListBox attributes */
 export const SIRIUS_LIST_BOX_ATTRIBUTES = deepFreeze({
     HEAD_CONTAINER_PADDING: "head-container-padding",
-    HEAD_CONTAINER_BORDER_BOTTOM: "head-container-border-bottom",
+    SEPARATOR_BORDER: "separator-border",
+    SEPARATOR_BORDER_RADIUS: "separator-border-radius",
     ITEMS_CONTAINER_GAP: "items-container-gap",
     ITEMS_CONTAINER_PADDING: "items-container-padding",
 })
@@ -83,12 +86,15 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
         const listBoxContainerClasses = [SIRIUS_ELEMENT.CLASSES.MAIN_ELEMENT,SIRIUS_LIST_BOX.CLASSES.LIST_BOX_CONTAINER];
         const headContainerClasses = [SIRIUS_LIST_BOX.CLASSES.HEAD_CONTAINER];
         const headClasses = [SIRIUS_LIST_BOX.CLASSES.HEAD];
+        const separatorClasses = [SIRIUS_LIST_BOX.CLASSES.SEPARATOR];
         const itemsListContainerClasses = [SIRIUS_LIST_BOX.CLASSES.ITEMS_CONTAINER];
         const itemsClasses = [SIRIUS_LIST_BOX.CLASSES.ITEMS];
 
         return `<div class="${listBoxContainerClasses.join(' ')}">
                     <div class="${headContainerClasses.join(' ')}">
                         <slot name="${SIRIUS_LIST_BOX.SLOTS.HEAD}" class="${headClasses.join(' ')}"></slot>
+                    </div>
+                    <div class="${separatorClasses.join(' ')}">
                     </div>
                     <div class="${itemsListContainerClasses.join(' ')}">
                         <slot name="${SIRIUS_LIST_BOX.SLOTS.ITEMS}" class="${itemsClasses.join(' ')}"></slot>
@@ -207,18 +213,32 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
         this.setAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.HEAD_CONTAINER_PADDING, value);
     }
 
-    /** Get head container border bottom attribute
-     * @returns {string} - Head container border bottom attribute
+    /** Get separator border attribute
+     * @returns {string} - Separator border attribute
      */
-    get headContainerBorderBottom() {
-        return this.getAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.HEAD_CONTAINER_BORDER_BOTTOM);
+    get separatorBorder() {
+        return this.getAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.SEPARATOR_BORDER);
     }
 
-    /** Set head container border bottom attribute
-     * @param {string} value - Head container border bottom attribute
+    /** Set separator border attribute
+     * @param {string} value - Separator border attribute
      */
-    set headContainerBorderBottom(value) {
-        this.setAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.HEAD_CONTAINER_BORDER_BOTTOM, value);
+    set separatorBorder(value) {
+        this.setAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.SEPARATOR_BORDER, value);
+    }
+
+    /** Get separator border radius attribute
+     * @returns {string} - Separator border radius attribute
+     */
+    get separatorBorderRadius() {
+        return this.getAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.SEPARATOR_BORDER_RADIUS);
+    }
+
+    /** Set separator border radius attribute
+     * @param {string} value - Separator border radius attribute
+     */
+    set separatorBorderRadius(value) {
+        this.setAttribute(SIRIUS_LIST_BOX_ATTRIBUTES.SEPARATOR_BORDER_RADIUS, value);
     }
 
     /** Get items container gap attribute
@@ -283,12 +303,20 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
             this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.HEAD_CONTAINER_PADDING, headContainerPadding);
     }
 
-    /** Private method to set the head container border bottom attribute
-     * @param {string} headContainerBorderBottom - Head container border bottom attribute value
+    /** Private method to set the separator border attribute
+     * @param {string} separatorBorder - Separator border attribute value
      */
-    #setHeadContainerBorderBottom(headContainerBorderBottom) {
-        if (headContainerBorderBottom)
-            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.HEAD_CONTAINER_BORDER_BOTTOM, headContainerBorderBottom);
+    #setSeparatorBorder(separatorBorder) {
+        if (separatorBorder)
+            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.SEPARATOR_BORDER, separatorBorder);
+    }
+
+    /** Private method to set the separator border radius attribute
+     * @param {string} separatorBorderRadius - Separator border radius attribute value
+     */
+    #setSeparatorBorderRadius(separatorBorderRadius) {
+        if (separatorBorderRadius)
+            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.SEPARATOR_BORDER_RADIUS, separatorBorderRadius);
     }
 
     /** Private method to set the items container gap attribute
@@ -357,8 +385,12 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
                 this.#setHeadContainerPadding(newValue);
                 break;
 
-            case SIRIUS_LIST_BOX_ATTRIBUTES.HEAD_CONTAINER_BORDER_BOTTOM:
-                this.#setHeadContainerBorderBottom(newValue);
+            case SIRIUS_LIST_BOX_ATTRIBUTES.SEPARATOR_BORDER:
+                this.#setSeparatorBorder(newValue);
+                break;
+
+            case SIRIUS_LIST_BOX_ATTRIBUTES.SEPARATOR_BORDER_RADIUS:
+                this.#setSeparatorBorderRadius(newValue);
                 break;
 
             case SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS_CONTAINER_GAP:
