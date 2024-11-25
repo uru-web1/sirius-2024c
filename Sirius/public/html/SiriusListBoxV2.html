@@ -73,9 +73,10 @@
     const itemsKey = SIRIUS_LIST_BOX_PROPERTIES.ITEMS;
     const labelKey = SIRIUS_CHECKBOX_PROPERTIES.LABEL;
 
-    // Get the container
+    // Get the container element
     const listContainer = document.querySelector('.list-box-container');
 
+    // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
         // Create a new list box
         const siriusListBox2 = new SiriusListBox({

@@ -6,11 +6,44 @@
     <title>SiriusLabel Examples</title>
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusLabel.js" type="module"></script>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .label-container {
+            display: grid;
+            grid-auto-columns: 1fr;
+            grid-template-rows: 1fr;
+            place-items: center;
+            gap: 1rem;
+            overflow-x: visible;
+        }
+
+        .label-container > * {
+            grid-column: 1/-1;
+            border: 1px solid black;
+            padding: 1rem;
+        }
+    </style>
 </head>
 <body>
 
-<sirius-label caption="Hello world HTML" id="label-2"
-              styles="color: red; font-family: monospace; font-size: 2rem; text-align: center; padding: 2px; border: 1px solid green; width: 100px;" styles-on-hover="color: green"></sirius-label>
+<div class="label-container">
+    <sirius-label caption="Hi, I'm @Ange1020" id="label-1"
+                  styles="color: darkred; font-family: Open Sans; font-size: 1.3rem; text-align: center; padding: 2px; border: 1px solid red; background-color: lightcoral; width: 20rem;" styles-on-hover="color: white" styles-on-active="scale: 1.5"></sirius-label>
+
+    <sirius-label caption="Hi, I'm @NEOULT" id="label-2"
+                  styles="color: darkblue; background-color: lightblue; font-family: Open Sans; font-size: 1.3rem; font-weight: 400; text-align: center; padding: 2px; border: 2px solid darkblue; border-radius: 2px; width: 20rem;" styles-on-hover="color: darkorange; border-color: darkorange; background-color: whitesmoke" styles-on-active="transform: translateX(-50%)"></sirius-label>
+
+    <sirius-label caption="Hi, I'm @YEGLIMAR" id="label-3"
+                    styles="color: purple; background-color: pink; font-family: Open Sans; font-size: 1.3rem; font-weight: 700; text-align: center; padding: 2px; width: 20rem;" styles-on-hover="color: pink; background-color: purple" styles-on-active="transform: translate(100%, 75%); scale: 1.25"></sirius-label>
+</div>
 
 <script type="module">
     import sirius from '../js/Sirius.js';
@@ -32,35 +65,37 @@
     // Get the properties keys
     const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
 
+    // Get the container element
+    const labelContainer = document.querySelector('.label-container');
+
     // Wait for the DOM to be fully loaded
     sirius.onLoaded = async () => {
         // Create the label
-        const siriusLabel2 = new SiriusLabel({
-            [idKey]: 'label-1',
-            [captionKey]: 'Hello world con JS',
+        const siriusLabel4 = new SiriusLabel({
+            [idKey]: 'label-4',
+            [captionKey]: "Hi, I'm @ralvarezdev",
             [stylesKey]: `
-                text-align: right;
-                color: blue;
-                font-family: fantasy;
-                border: 1px solid red;
-                padding: 20px`,
+                color: darkgreen;
+                background-color: whitesmoke;
+                text-align: center;
+                font-family: Open Sans;
+                font-weight: 400;
+                width: 20rem`,
             [eventsKey]: {
-                'click': () => siriusLabel2.logger.log('click'),
-                'mouseover': () => siriusLabel2.logger.log('mouseover'),
-                'mouseout': () => siriusLabel2.logger.log('mouseout')
+                'click': () => siriusLabel4.logger.log('click'),
+                'mouseover': () => siriusLabel4.logger.log('mouseover'),
+                'mouseout': () => siriusLabel4.logger.log('mouseout')
             },
             [stylesOnHoverKey]: `
-                border: 5px solid blue;
-                color: black;
-                padding: 20px`,
+                color: whitesmoke;
+                background-color: darkgreen;
+                padding: 10px`,
             [stylesOnActiveKey]: `
-                border: 5px solid green;
-                padding: 100px`,
+                padding: 40px;
+                transform: rotate(-5deg)`,
             [transitionDurationKey]: '1s'
         });
-
-        // Add the label to the DOM
-        siriusLabel2.addToBody()
+        labelContainer.appendChild(siriusLabel4)
     }
 </script>
 </body>
