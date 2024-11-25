@@ -1,4 +1,5 @@
 import SiriusElement, {
+    SIRIUS_ELEMENT,
     SIRIUS_ELEMENT_ATTRIBUTES,
     SIRIUS_ELEMENT_PROPERTIES,
     SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES
@@ -11,7 +12,6 @@ export const SIRIUS_ICON = deepFreeze({
     NAME: "SiriusIcon",
     TAG: "sirius-icon",
     CSS_VARIABLES: {
-        PADDING: "--sirius-icon--padding",
         WIDTH: '--sirius-icon--width',
         HEIGHT: '--sirius-icon--height',
         ANIMATION_DURATION: '--sirius-icon--animation-duration',
@@ -32,9 +32,7 @@ export const SIRIUS_ICON_ATTRIBUTES = deepFreeze({
     SHOW_ANIMATION: 'show-animation',
     HIDING_ANIMATION: 'hiding-animation',
     ROTATION: "rotation",
-    TRANSITION_DURATION: "transition-duration",
     ANIMATION_DURATION: 'animation-duration',
-    PADDING: 'padding',
 })
 
 /** SiriusIcon attributes default values
@@ -76,7 +74,7 @@ export default class SiriusIcon extends SiriusElement {
      * */
     #getTemplate() {
         // Get the icon classes
-        const iconContainerClasses = [SIRIUS_ICON.CLASSES.ICON_CONTAINER];
+        const iconContainerClasses = [SIRIUS_ELEMENT.CLASSES.MAIN_ELEMENT, SIRIUS_ICON.CLASSES.ICON_CONTAINER];
 
         return `<div class="${iconContainerClasses.join(' ')}">
                 </div>`;
@@ -128,7 +126,7 @@ export default class SiriusIcon extends SiriusElement {
         this.events = this._events;
 
         // Dispatch the built event
-        this.dispatchBuiltEvent();
+        this._dispatchBuiltEvent();
     }
 
     /** Get icon container element
@@ -215,20 +213,6 @@ export default class SiriusIcon extends SiriusElement {
         this.setAttribute(SIRIUS_ICON_ATTRIBUTES.FILL, fill);
     }
 
-    /** Get the transition duration
-     * @returns {string} - Transition duration
-     */
-    get transitionDuration() {
-        return this.getAttribute(SIRIUS_ICON_ATTRIBUTES.TRANSITION_DURATION);
-    }
-
-    /** Set the transition duration
-     * @param {string} duration - Transition duration
-     */
-    set transitionDuration(duration) {
-        this.setAttribute(SIRIUS_ICON_ATTRIBUTES.TRANSITION_DURATION, duration);
-    }
-
     /** Get the icon animation duration
      * @returns {string} - Icon animation duration
      */
@@ -271,20 +255,6 @@ export default class SiriusIcon extends SiriusElement {
         this.setAttribute(SIRIUS_ICON_ATTRIBUTES.HIDING_ANIMATION, rules);
     }
 
-    /** Get the icon padding
-     * @returns {string} - Icon padding
-     */
-    get padding() {
-        return this.getAttribute(SIRIUS_ICON_ATTRIBUTES.PADDING);
-    }
-
-    /** Set the icon padding
-     * @param {string} padding - Icon padding
-     */
-    set padding(padding) {
-        this.setAttribute(SIRIUS_ICON_ATTRIBUTES.PADDING, padding);
-    }
-
     /** Private method to set the icon name
      * @param {string} name - Icon name with/without rotation
      */
@@ -306,7 +276,7 @@ export default class SiriusIcon extends SiriusElement {
      */
     #setWidth(width) {
         if (width) {
-            this._setCSSVariable(SIRIUS_ICON.CSS_VARIABLES.WIDTH, width);
+            this._setElementCSSVariable(SIRIUS_ICON.CSS_VARIABLES.WIDTH, width);
             this.onBuilt = () => this.svgElement.width = width;
         }
     }
@@ -316,7 +286,7 @@ export default class SiriusIcon extends SiriusElement {
      */
     #setHeight(height) {
         if (height) {
-            this._setCSSVariable(SIRIUS_ICON.CSS_VARIABLES.HEIGHT, height);
+            this._setElementCSSVariable(SIRIUS_ICON.CSS_VARIABLES.HEIGHT, height);
             this.onBuilt = () => this.svgElement.height = height;
         }
     }
@@ -326,14 +296,6 @@ export default class SiriusIcon extends SiriusElement {
      */
     #setFill(fill) {
         if (fill) this.onBuilt = () => this.svgElement.fill = fill;
-    }
-
-    /** Private method to set the icon transition duration
-     * @param {string} duration - Transition duration
-     */
-    #setTransitionDuration(duration) {
-        if (duration)
-            this.onBuilt = () => this.svgElement.transitionDuration = duration;
     }
 
     /** Private method to set the icon animation duration
@@ -358,22 +320,6 @@ export default class SiriusIcon extends SiriusElement {
     #setHidingAnimation(rules) {
         if (rules)
             this.onBuilt = () => this.svgElement.hidingAnimation = rules;
-    }
-
-    /** Private method to set the icon padding
-     * @param {string} padding - Icon padding
-     */
-    #setPadding(padding) {
-        if (padding)
-            this._setCSSVariable(SIRIUS_ICON.CSS_VARIABLES.PADDING, padding);
-    }
-
-    /** Private method to set the SVG container element style attribute
-     * @param {string} style - Style attribute value
-     */
-    #setStyle(style) {
-        if (style)
-            this._setStyle = () => this._setStyleAttributes(style, this.iconContainerElement);
     }
 
     /** Private method to set the element hidden state
@@ -412,16 +358,28 @@ export default class SiriusIcon extends SiriusElement {
                 this._setId(newValue);
                 break;
 
-            case SIRIUS_ELEMENT_ATTRIBUTES.STYLE:
-                this.#setStyle(newValue);
-                break;
-
             case SIRIUS_ELEMENT_ATTRIBUTES.HIDE:
                 this.#setHide(newValue);
                 break;
 
             case SIRIUS_ELEMENT_ATTRIBUTES.DISABLED:
                 this.#setDisabled(newValue);
+                break;
+
+            case SIRIUS_ELEMENT_ATTRIBUTES.TRANSITION_DURATION:
+                this._setTransitionDuration(newValue);
+                break;
+
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLES:
+                this._setStyles(newValue);
+                break;
+
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLES_ON_HOVER:
+                this._setStylesOnHover(newValue);
+                break;
+
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLES_ON_ACTIVE:
+                this._setStylesOnActive(newValue);
                 break;
 
             case SIRIUS_ICON_ATTRIBUTES.ICON:
@@ -456,16 +414,8 @@ export default class SiriusIcon extends SiriusElement {
                 this.#setHidingAnimation(newValue);
                 break;
 
-            case SIRIUS_ICON_ATTRIBUTES.TRANSITION_DURATION:
-                this.#setTransitionDuration(newValue);
-                break;
-
             case SIRIUS_ICON_ATTRIBUTES.ANIMATION_DURATION:
                 this.#setAnimationDuration(newValue);
-                break;
-
-            case SIRIUS_ICON_ATTRIBUTES.PADDING:
-                this.#setPadding(newValue);
                 break;
 
             default:

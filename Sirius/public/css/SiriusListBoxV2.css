@@ -1,12 +1,6 @@
 :host {
     display: inline-block;
 
-    --sirius-list-box--gap: 5px;
-    --sirius-list-box--padding: 10px;
-    --sirius-list-box--margin: 40px;
-    --sirius-list-box--max-width: 300px;
-    --sirius-list-box--background-color: white;
-    --sirius-list-box--box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     --sirius-list-box--head-container--padding: 5px;
     --sirius-list-box--head-container--border-bottom: 1px solid rgb(48, 48, 48);
     --sirius-list-box--items-container--padding: 5px;
@@ -19,13 +13,15 @@
     flex-direction: column;
     align-items: flex-start;
     overflow-y: auto;
-    padding: var(--sirius-list-box--padding);
-    background-color: var(--sirius-list-box--background-color);
-    margin: var(--sirius-list-box--margin);
-    box-shadow: var(--sirius-list-box--box-shadow);
-    max-width: var(--sirius-list-box--max-width);
 }
 
+.main-container {
+    gap: 5px;
+    padding: 10px;
+    background-color: white;
+    margin: 40px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
 .head-container {
     border-bottom: var(--sirius-list-box--head-container--border-bottom);

@@ -107,7 +107,7 @@ export default class SiriusListBoxV1 extends SiriusElement {
         this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event
-        this.dispatchBuiltEvent();
+        this._dispatchBuiltEvent();
     }
 
     /** Get the head attribute

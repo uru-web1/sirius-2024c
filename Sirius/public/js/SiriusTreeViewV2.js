@@ -9,6 +9,7 @@ import {SIRIUS_CONTROL_ELEMENT_ATTRIBUTES} from "./SiriusControlElement.js";
 import SiriusIcon, {SIRIUS_ICON_ATTRIBUTES, SIRIUS_ICON_ATTRIBUTES_DEFAULT} from "./SiriusIcon.js";
 import SiriusLinkedControlElement from "./SiriusLinkedControlElement.js";
 import {SIRIUS_SVG_ICONS} from "./SiriusSvg.js";
+import sirius from "./Sirius.js";
 
 /** SiriusTreeView constants */
 export const SIRIUS_TREE_VIEW = deepFreeze({
@@ -44,10 +45,13 @@ export const SIRIUS_TREE_VIEW_ATTRIBUTES = deepFreeze({
     ICON_HEIGHT: "icon-height",
     ICON_FILL: "icon-fill",
     ICON_TRANSITION_DURATION: "icon-transition-duration",
-    SHOW_ANIMATION: "show-animation",
-    HIDING_ANIMATION: "hiding-animation",
+    ICON_STYLES: "icon-styles",
+    ICON_STYLES_ON_HOVER: "icon-styles-on-hover",
+    ICON_STYLES_ON_CLICK: "icon-styles-on-click",
     CHILDREN_GAP: "children-gap",
     CHILDREN_MARGIN_LEFT: "children-margin-left",
+    SHOW_ANIMATION: "show-animation",
+    HIDING_ANIMATION: "hiding-animation",
 })
 
 /** SiriusTreeView modes */
@@ -58,9 +62,7 @@ export const SIRIUS_TREE_VIEW_MODES = deepFreeze({
 
 /** SiriusTreeView attributes default values */
 export const SIRIUS_TREE_VIEW_ATTRIBUTES_DEFAULT = deepFreeze({
-    [SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_WIDTH]: SIRIUS_ICON_ATTRIBUTES_DEFAULT.WIDTH,
-    [SIRIUS_TREE_VIEW_ATTRIBUTES.MODE]: SIRIUS_TREE_VIEW_MODES.OPEN,
-    [SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_TRANSITION_DURATION]: "300ms"
+    [SIRIUS_TREE_VIEW_ATTRIBUTES.MODE]: SIRIUS_TREE_VIEW_MODES.OPEN
 })
 
 /** Sirius class that represents a Tree View component */
@@ -95,7 +97,7 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
      * */
     #getTemplate() {
         // Get the Tree View classes
-        const treeViewContainerClasses = [SIRIUS_TREE_VIEW.CLASSES.TREE_VIEW_CONTAINER];
+        const treeViewContainerClasses = [SIRIUS_ELEMENT.CLASSES.MAIN_ELEMENT, SIRIUS_TREE_VIEW.CLASSES.TREE_VIEW_CONTAINER];
         const parentContainerClasses = [SIRIUS_TREE_VIEW.CLASSES.PARENT_CONTAINER];
         const iconContainerClasses = [SIRIUS_TREE_VIEW.CLASSES.ICON_CONTAINER];
         const parentClasses = [SIRIUS_TREE_VIEW.CLASSES.PARENT];
@@ -135,22 +137,18 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
         // Get the required keys
         const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID
         const iconKey = SIRIUS_ICON_ATTRIBUTES.ICON
-        const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
 
         // Create SiriusIcon element
         this.#iconElement = new SiriusIcon({
             [idKey]: iconId,
             [iconKey]: SIRIUS_SVG_ICONS.ARROW,
-            [eventsKey]: {
-                "click": () => this.toggleMode()
-            }
         })
 
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
 
         // Add label to the shadow DOM
-        const container =await this._createContainerElementTemplate(innerHTML);
+        const container = await this._createContainerElementTemplate(innerHTML);
         this.#treeViewContainerElement = this._containerElement = container
         this.#parentContainerElement = this.treeViewContainerElement.firstElementChild;
         this.#iconContainerElement = this.parentContainerElement.firstElementChild;
@@ -160,6 +158,9 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
 
         // Add icon to the icon container
         this.iconContainerElement.appendChild(this.iconElement);
+
+        // Add event listener to the icon container element
+        this.iconContainerElement.addEventListener("click", () => this.toggleMode());
 
         // Add the container element to the shadow DOM
         this.shadowRoot.appendChild(this.containerElement);
@@ -172,7 +173,7 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
         this.linkedChildren = this._linkedChildren
 
         // Dispatch the built event
-        this.dispatchBuiltEvent();
+        this._dispatchBuiltEvent();
     }
 
     /** Get the Tree View container element
@@ -336,6 +337,48 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
         this.setAttribute(SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_TRANSITION_DURATION, value);
     }
 
+    /** Get the icon styles attribute
+     * @returns {string} - Icon styles attribute
+     */
+    get iconStyles() {
+        return this.getAttribute(SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_STYLES);
+    }
+
+    /** Set the icon styles attribute
+     * @param {string} value - Icon styles attribute
+     */
+    set iconStyles(value) {
+        this.setAttribute(SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_STYLES, value);
+    }
+
+    /** Get the icon styles on hover attribute
+     * @returns {string} - Icon styles on hover attribute
+     */
+    get iconStylesOnHover() {
+        return this.getAttribute(SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_STYLES_ON_HOVER);
+    }
+
+    /** Set the icon styles on hover attribute
+     * @param {string} value - Icon styles on hover attribute
+     */
+    set iconStylesOnHover(value) {
+        this.setAttribute(SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_STYLES_ON_HOVER, value);
+    }
+
+    /** Get the icon styles on active attribute
+     * @returns {string} - Icon styles on active attribute
+     */
+    get iconStylesOnClick() {
+        return this.getAttribute(SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_STYLES_ON_CLICK);
+    }
+
+    /** Set the icon styles on active attribute
+     * @param {string} value - Icon styles on active attribute
+     */
+    set iconStylesOnClick(value) {
+        this.setAttribute(SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_STYLES_ON_CLICK, value);
+    }
+
     /** Set the show animation attribute
      * @returns {string} - Show animation attribute
      */
@@ -418,17 +461,6 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
         this.onBuilt = () => this._removeLinkedChildren(elements);
     }
 
-    /** Private method to set the SiriusTreeView container element style attribute
-     * @param {string} style - Style attribute value
-     */
-    #setStyle(style) {
-        if (!style)
-            return
-
-        // Add the style attribute to the element when built
-        this._setStyle = () => this._setStyleAttributes(style, this.treeViewContainerElement);
-    }
-
     /** Set parent control element ID
      * @param {string} parentId - Parent control element ID
      */
@@ -441,8 +473,7 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
             if (parentId) {
                 this.classList.add(SIRIUS_TREE_VIEW.CLASSES.HAS_PARENT);
                 this.classList.remove(SIRIUS_TREE_VIEW.CLASSES.ROOT);
-            }
-            else {
+            } else {
                 this.classList.remove(SIRIUS_TREE_VIEW.CLASSES.HAS_PARENT);
                 this.classList.add(SIRIUS_TREE_VIEW.CLASSES.ROOT);
             }
@@ -501,12 +532,36 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
             this.onBuilt = () => this.iconElement.transitionDuration = duration;
     }
 
+    /** Private method to set the icon styles
+     * @param {string} styles - Icon styles
+     */
+    #setIconStyles(styles) {
+        if (styles)
+            this.onBuilt = () => this.iconElement.styles = styles;
+    }
+
+    /** Private method to set the icon styles on hover
+     * @param {string} styles - Icon styles on hover
+     */
+    #setIconStylesOnHover(styles) {
+        if (styles)
+            this.onBuilt = () => this.iconElement.stylesOnHover = styles;
+    }
+
+    /** Private method to set the icon styles on active
+     * @param {string} styles - Icon styles on active
+     */
+    #setIconStylesOnActive(styles) {
+        if (styles)
+            this.onBuilt = () => this.iconElement.stylesOnActive = styles;
+    }
+
     /** Private method to set the children gap
      * @param {string} gap - Children gap
      */
     #setChildrenGap(gap) {
         if (gap)
-            this.onBuilt = () => this._setCSSVariable(SIRIUS_TREE_VIEW.CSS_VARIABLES.CHILDREN_GAP, gap);
+            this.onBuilt = () => this._setElementCSSVariable(SIRIUS_TREE_VIEW.CSS_VARIABLES.CHILDREN_GAP, gap);
     }
 
     /** Private method to set the children margin left
@@ -514,7 +569,7 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
      */
     #setChildrenMarginLeft(marginLeft) {
         if (marginLeft)
-            this.onBuilt = () => this._setCSSVariable(SIRIUS_TREE_VIEW.CSS_VARIABLES.CHILDREN_MARGIN_LEFT, marginLeft);
+            this.onBuilt = () => this._setElementCSSVariable(SIRIUS_TREE_VIEW.CSS_VARIABLES.CHILDREN_MARGIN_LEFT, marginLeft);
     }
 
     /** Private method to set the gap
@@ -522,7 +577,7 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
      */
     #setGap(gap) {
         if (gap)
-            this.onBuilt = () => this._setCSSVariable(SIRIUS_TREE_VIEW.CSS_VARIABLES.GAP, gap);
+            this.onBuilt = () => this._setElementCSSVariable(SIRIUS_TREE_VIEW.CSS_VARIABLES.GAP, gap);
     }
 
     /** Private method to set the show animation
@@ -530,7 +585,8 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
      */
     #setShowAnimation(rules) {
         if (rules)
-            this.onBuilt = () => this._setKeyframeRules(SIRIUS_TREE_VIEW.CSS_VARIABLES.ANIMATION_DURATION, rules);
+            this.onBuilt = () => this._setElementKeyframeRules(
+                SIRIUS_TREE_VIEW.CSS_VARIABLES.ANIMATION_DURATION, rules);
     }
 
     /** Private method to set the hiding animation
@@ -538,7 +594,7 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
      */
     #setHidingAnimation(rules) {
         if (rules)
-            this.onBuilt = () => this._setKeyframeRules(SIRIUS_TREE_VIEW.CSS_VARIABLES.ANIMATION_DURATION, rules);
+            this.onBuilt = () => this._setElementKeyframeRules(SIRIUS_TREE_VIEW.CSS_VARIABLES.ANIMATION_DURATION, rules);
     }
 
     /** Toggle mode */
@@ -581,8 +637,20 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
                 this._setId(newValue)
                 break;
 
-            case SIRIUS_ELEMENT_ATTRIBUTES.STYLE:
-                this.#setStyle(newValue);
+            case SIRIUS_ELEMENT_ATTRIBUTES.TRANSITION_DURATION:
+                this._setTransitionDuration(newValue);
+                break;
+
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLES:
+                this._setStyle(newValue);
+                break;
+
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLES_ON_HOVER:
+                this._setStylesOnHover(newValue);
+                break;
+
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLES_ON_ACTIVE:
+                this._setStylesOnActive(newValue);
                 break;
 
             case SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.STATUS:
@@ -617,12 +685,16 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
                 this.#setIconTransitionDuration(newValue);
                 break;
 
-            case SIRIUS_TREE_VIEW_ATTRIBUTES.SHOW_ANIMATION:
-                this.#setShowAnimation(newValue);
+            case SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_STYLES:
+                this.#setIconStyles(newValue);
                 break;
 
-            case SIRIUS_TREE_VIEW_ATTRIBUTES.HIDING_ANIMATION:
-                this.#setHidingAnimation(newValue);
+            case SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_STYLES_ON_HOVER:
+                this.#setIconStylesOnHover(newValue);
+                break;
+
+            case SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_STYLES_ON_CLICK:
+                this.#setIconStylesOnActive(newValue);
                 break;
 
             case SIRIUS_TREE_VIEW_ATTRIBUTES.CHILDREN_GAP:
@@ -631,6 +703,14 @@ export default class SiriusTreeView extends SiriusLinkedControlElement {
 
             case SIRIUS_TREE_VIEW_ATTRIBUTES.CHILDREN_MARGIN_LEFT:
                 this.#setChildrenMarginLeft(newValue);
+                break;
+
+            case SIRIUS_TREE_VIEW_ATTRIBUTES.SHOW_ANIMATION:
+                this.#setShowAnimation(newValue);
+                break;
+
+            case SIRIUS_TREE_VIEW_ATTRIBUTES.HIDING_ANIMATION:
+                this.#setHidingAnimation(newValue);
                 break;
 
             default:

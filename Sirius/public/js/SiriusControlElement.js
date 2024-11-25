@@ -223,7 +223,7 @@ export default class SiriusControlElement extends SiriusElement {
     _addParent(parent) {
         this.onBuilt = () => {
             this._parent = parent;
-            parent.children.push(this);
+            parent.onBuilt = () => parent.children.push(this);
         }
     }
 

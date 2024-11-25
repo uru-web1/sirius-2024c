@@ -6,8 +6,7 @@
     --sirius-svg--height: 24px;
     --sirius-svg--fill: grey;
     --sirius-svg--rotation: 0deg;
-    --sirius-svg--transition-duration: 0ms;
-    --sirius-svg--animation-duration: 500ms;
+    --sirius-svg--animation-duration: 400ms;
 }
 
 .svg-container {
@@ -17,7 +16,7 @@
     height: var(--sirius-svg--height);
     fill: var(--sirius-svg--fill);
     transform: rotate(var(--sirius-svg--rotation));
-    transition: transform var(--sirius-svg--transition-duration) ease-in-out;
+    transition: all var(--sirius-element--transition-duration) ease-in-out;
 }
 
 .svg-container:not(.hidden,.hiding) > svg {

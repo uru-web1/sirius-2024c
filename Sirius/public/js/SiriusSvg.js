@@ -1,5 +1,10 @@
 import deepFreeze from "./utils/deep-freeze.js";
-import SiriusElement, {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_PROPERTIES} from "./SiriusElement.js";
+import SiriusElement, {
+    SIRIUS_ELEMENT,
+    SIRIUS_ELEMENT_ATTRIBUTES,
+    SIRIUS_ELEMENT_PROPERTIES,
+    SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES
+} from "./SiriusElement.js";
 
 /** SiriusSVG constants */
 export const SIRIUS_SVG = deepFreeze({
@@ -10,8 +15,6 @@ export const SIRIUS_SVG = deepFreeze({
         HEIGHT: '--sirius-svg--height',
         FILL: '--sirius-svg--fill',
         ROTATION: '--sirius-svg--rotation',
-        TRANSITION_DURATION: '--sirius-svg--transition-duration',
-        ANIMATION_DURATION: '--sirius-svg--animation-duration',
     },
     CLASSES: {
         SVG_CONTAINER: 'svg-container',
@@ -39,7 +42,7 @@ export const SIRIUS_SVG_ICONS = {
     RADIO_CHECKED: 'radio-checked',
     RADIO_UNCHECKED: 'radio-unchecked',
     EYE: 'eye',
-    EYE_CLOSE: 'eye-close'
+    EYE_CLOSED: 'eye-closed'
 }
 
 /** SiriusSVG icons inner HTML */
@@ -121,9 +124,9 @@ export const SIRIUS_SVG_ICONS_INNER_HTML = {
         `<path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/>`,
 
     // Eye-close icon
-    [SIRIUS_SVG_ICONS.EYE_CLOSE]:
+    [SIRIUS_SVG_ICONS.EYE_CLOSED]:
         `<path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z"/>`,
-}   
+}
 
 /** SiriusSVG attributes */
 export const SIRIUS_SVG_ATTRIBUTES = deepFreeze({
@@ -132,7 +135,6 @@ export const SIRIUS_SVG_ATTRIBUTES = deepFreeze({
     HEIGHT: 'height',
     FILL: 'fill',
     ROTATION: 'rotation',
-    TRANSITION_DURATION: 'transition-duration',
     ANIMATION_DURATION: 'animation-duration',
     SHOW_ANIMATION: 'show-animation',
     HIDING_ANIMATION: 'hiding-animation',
@@ -193,7 +195,7 @@ export default class SiriusSvg extends SiriusElement {
      */
     #getTemplate() {
         // Get the SVG container element classes
-        const svgContainerClasses = [SIRIUS_SVG.CLASSES.SVG_CONTAINER];
+        const svgContainerClasses = [SIRIUS_ELEMENT.CLASSES.MAIN_ELEMENT, SIRIUS_SVG.CLASSES.SVG_CONTAINER];
 
         // Get the icon
         const icon = this.icon || SIRIUS_SVG_ATTRIBUTES_DEFAULT[SIRIUS_SVG_ATTRIBUTES.ICON];
@@ -232,7 +234,7 @@ export default class SiriusSvg extends SiriusElement {
         this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event
-        this.dispatchBuiltEvent();
+        this._dispatchBuiltEvent();
     }
 
     /** Get the SVG container element
@@ -319,20 +321,6 @@ export default class SiriusSvg extends SiriusElement {
         this.setAttribute(SIRIUS_SVG_ATTRIBUTES.ROTATION, value === null ? "" : value);
     }
 
-    /** Get the transition duration
-     * @returns {string} - Transition duration
-     */
-    get transitionDuration() {
-        return this.getAttribute(SIRIUS_SVG_ATTRIBUTES.TRANSITION_DURATION);
-    }
-
-    /** Set the transition duration
-     * @param {string} value - Transition duration
-     */
-    set transitionDuration(value) {
-        this.setAttribute(SIRIUS_SVG_ATTRIBUTES.TRANSITION_DURATION, value);
-    }
-
     /** Get the animation duration
      * @returns {string} - Animation duration
      */
@@ -408,7 +396,7 @@ export default class SiriusSvg extends SiriusElement {
      */
     #setWidth(width) {
         if (width)
-            this._setCSSVariable(SIRIUS_SVG.CSS_VARIABLES.WIDTH, width);
+            this._setElementCSSVariable(SIRIUS_SVG.CSS_VARIABLES.WIDTH, width);
     }
 
     /** Private method to set the SVG height
@@ -416,7 +404,7 @@ export default class SiriusSvg extends SiriusElement {
      */
     #setHeight(height) {
         if (height)
-            this._setCSSVariable(SIRIUS_SVG.CSS_VARIABLES.HEIGHT, height);
+            this._setElementCSSVariable(SIRIUS_SVG.CSS_VARIABLES.HEIGHT, height);
     }
 
     /** Private method to set the SVG fill color
@@ -424,7 +412,7 @@ export default class SiriusSvg extends SiriusElement {
      */
     #setFill(fill) {
         if (fill)
-            this._setCSSVariable(SIRIUS_SVG.CSS_VARIABLES.FILL, fill);
+            this._setElementCSSVariable(SIRIUS_SVG.CSS_VARIABLES.FILL, fill);
     }
 
     /** Get rotation degrees
@@ -458,15 +446,7 @@ export default class SiriusSvg extends SiriusElement {
         this.logger.log(`Setting rotation to ${degrees} degrees`)
 
         // Set the icon rotation
-        this._setCSSVariable(SIRIUS_SVG.CSS_VARIABLES.ROTATION, `${degrees}deg`)
-    }
-
-    /** Private method to set the transition duration
-     * @param {string} duration - Transition duration
-     */
-    #setTransitionDuration(duration) {
-        if (duration)
-            this._setCSSVariable(SIRIUS_SVG.CSS_VARIABLES.TRANSITION_DURATION, duration);
+        this._setElementCSSVariable(SIRIUS_SVG.CSS_VARIABLES.ROTATION, `${degrees}deg`)
     }
 
     /** Private method to set the animation duration
@@ -474,7 +454,7 @@ export default class SiriusSvg extends SiriusElement {
      */
     #setAnimationDuration(duration) {
         if (duration)
-            this._setCSSVariable(SIRIUS_SVG.CSS_VARIABLES.ANIMATION_DURATION, duration);
+            this._setElementCSSVariable(SIRIUS_SVG.CSS_VARIABLES.ANIMATION_DURATION, duration);
     }
 
     /** Private method to set the show animation rules
@@ -482,7 +462,7 @@ export default class SiriusSvg extends SiriusElement {
      */
     #setShowAnimation(rules) {
         if (rules)
-            this._setKeyframeRules(SIRIUS_SVG_ATTRIBUTES.SHOW_ANIMATION, rules);
+            this._setElementKeyframeRules(SIRIUS_SVG_ATTRIBUTES.SHOW_ANIMATION, rules);
     }
 
     /** Private method to set the hiding animation rules
@@ -490,7 +470,7 @@ export default class SiriusSvg extends SiriusElement {
      */
     #setHidingAnimation(rules) {
         if (rules)
-            this._setKeyframeRules(SIRIUS_SVG_ATTRIBUTES.HIDING_ANIMATION, rules);
+            this._setElementKeyframeRules(SIRIUS_SVG_ATTRIBUTES.HIDING_ANIMATION, rules);
     }
 
     /** Private method to set the element hidden state
@@ -504,7 +484,7 @@ export default class SiriusSvg extends SiriusElement {
     }
 
     /** Get SVG element inner HTML
-     * @param {string} icon - Icon name
+     * @param {string|null} icon - Icon name
      */
     #getSvgInnerHtml(icon) {
         return SIRIUS_SVG_ICONS_INNER_HTML[icon] || SIRIUS_SVG_ICONS_INNER_HTML[SIRIUS_SVG_ATTRIBUTES_DEFAULT[SIRIUS_SVG_ATTRIBUTES.ICON]]
@@ -517,33 +497,58 @@ export default class SiriusSvg extends SiriusElement {
      */
     #attributeChangeHandler(name, oldValue, newValue) {
         switch (name) {
+            case SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID:
+                this._setId(newValue);
+                break;
+
+            case SIRIUS_ELEMENT_ATTRIBUTES.TRANSITION_DURATION:
+                this._setTransitionDuration(newValue);
+                break;
+
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLES:
+                this._setStyles(newValue);
+                break;
+
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLES_ON_HOVER:
+                this._setStylesOnHover(newValue);
+                break;
+
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLES_ON_ACTIVE:
+                this._setStylesOnActive(newValue);
+                break;
+
             case SIRIUS_SVG_ATTRIBUTES.ICON:
                 this.#setIcon(newValue);
                 break;
+
             case SIRIUS_SVG_ATTRIBUTES.WIDTH:
                 this.#setWidth(newValue);
                 break;
+
             case SIRIUS_SVG_ATTRIBUTES.HEIGHT:
                 this.#setHeight(newValue);
                 break;
+
             case SIRIUS_SVG_ATTRIBUTES.FILL:
                 this.#setFill(newValue);
                 break;
+
             case SIRIUS_SVG_ATTRIBUTES.ROTATION:
                 this.#setRotation(newValue);
                 break;
-            case SIRIUS_SVG_ATTRIBUTES.TRANSITION_DURATION:
-                this.#setTransitionDuration(newValue);
-                break;
+
             case SIRIUS_SVG_ATTRIBUTES.ANIMATION_DURATION:
                 this.#setAnimationDuration(newValue);
                 break;
+
             case SIRIUS_SVG_ATTRIBUTES.SHOW_ANIMATION:
                 this.#setShowAnimation(newValue);
                 break;
+
             case SIRIUS_SVG_ATTRIBUTES.HIDING_ANIMATION:
                 this.#setHidingAnimation(newValue);
                 break;
+
             case SIRIUS_ELEMENT_ATTRIBUTES.HIDE:
                 this.#setHide(newValue);
                 break;

@@ -108,20 +108,22 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
     set linkedParent(element) {
         if (!element) return;
 
-        // Check if the linked parent element is the same
-        if (!this.#linkedParentFlag && this.linkedParent === element) return;
+        this.onBuilt = () => {
+            // Check if the linked parent element is the same
+            if (!this.#linkedParentFlag && this.linkedParent === element) return;
 
-        // Remove the current parent element
-        if (!this.#linkedParentFlag) {
-            if (this.linkedParent)
-                this._removeLinkedParent();
-        } else {
-            this.#linkedParentFlag = false;
-            this._linkedParent = null;
+            // Remove the current parent element
+            if (!this.#linkedParentFlag) {
+                if (this.linkedParent)
+                    this._removeLinkedParent();
+            } else {
+                this.#linkedParentFlag = false;
+                this._linkedParent = null;
+            }
+
+            // Add the parent element
+            this._addLinkedParent(element);
         }
-
-        // Add the parent element
-        this._addLinkedParent(element);
     }
 
     /** Get the linked children elements
@@ -137,20 +139,22 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
     set linkedChildren(elements) {
         if (!elements) return;
 
-        // Check if the linked children elements are the same
-        if (!this.#linkedChildrenFlag && this.linkedChildren === elements) return;
+        this.onBuilt = () => {
+            // Check if the linked children elements are the same
+            if (!this.#linkedChildrenFlag && this.linkedChildren === elements) return;
 
-        // Remove the current children elements
-        if (!this.#linkedChildrenFlag) {
-            if (this.linkedChildren)
-                this._removeAllLinkedChildren();
-        } else {
-            this.#linkedChildrenFlag = false;
-            this._linkedChildren = [];
+            // Remove the current children elements
+            if (!this.#linkedChildrenFlag) {
+                if (this.linkedChildren)
+                    this._removeAllLinkedChildren();
+            } else {
+                this.#linkedChildrenFlag = false;
+                this._linkedChildren = [];
+            }
+
+            // Set the children elements
+            this._addLinkedChildren(elements);
         }
-
-        // Set the children elements
-        this._addLinkedChildren(elements);
     }
 
     /** Check the linked parent slot element
@@ -178,7 +182,7 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
     /** Set the element observer */
     _setElementObserver() {
         // Check if the linked parent slot element is set
-        if(!this._checkLinkedParentSlotElement())
+        if (!this._checkLinkedParentSlotElement())
             return
 
         // Check if the linked children slot element is set
@@ -209,7 +213,7 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
                                 this._onRemoveLinkedChild(node)
                         }
                     })
-            }
+                }
         });
 
         // Start observing the element
@@ -248,16 +252,18 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
             // Remove the current linked parent element
             this._removeLinkedParent()
 
-            // Remove the linked children elements from the parent element
-            parent.children = [];
+            parent.onBuilt = () => {
+                // Remove the linked children elements from the parent element
+                parent.children = [];
 
-            // Set the linked parent status and parent ID
-            this._linkedParent = parent
-            parent.status = this.status
-            parent.parentId = this.id
+                // Set the linked parent status and parent ID
+                this._linkedParent = parent
+                parent.status = this.status
+                parent.parentId = this.id
 
-            // Set the parent ID for the linked children elements
-            this.linkedChildren.forEach(child => child.parentId = parent.id);
+                // Set the parent ID for the linked children elements
+                this.linkedChildren.forEach(child => child.parentId = parent.id);
+            }
         }
     }
 
@@ -345,7 +351,7 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
 
             // Set the parent ID
             if (this.linkedParent)
-                child.parentId = this.linkedParent.id;
+                this.linkedParent.onBuilt=()=>child.parentId = this.linkedParent.id;
         }
     }
 

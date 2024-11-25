@@ -197,8 +197,8 @@ export default class SiriusExchangeList extends SiriusElement {
         const innerHTML = this.#getTemplate();
 
         // Create the container element
-        const container= this._createContainerElementTemplate(innerHTML)
-        this.#exchangeListContainerElement = this._containerElement =container
+        const container = this._createContainerElementTemplate(innerHTML)
+        this.#exchangeListContainerElement = this._containerElement = container
         this.#listboxContainerElement1 = this.#exchangeListContainerElement.firstElementChild;
         this.#listboxContainerElement2 = this.#exchangeListContainerElement.lastElementChild;
         this.#buttomContainerElement = this.listboxContainerElement1.nextElementSibling;
@@ -212,7 +212,7 @@ export default class SiriusExchangeList extends SiriusElement {
         this.shadowRoot.appendChild(this.containerElement);
 
         // Dispatch the built event
-        this.dispatchBuiltEvent();
+        this._dispatchBuiltEvent();
     }
 
     get checkedItems() {

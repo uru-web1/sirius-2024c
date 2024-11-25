@@ -14,7 +14,7 @@ export const SIRIUS_TREEVIEW = deepFreeze({
 // Define the SiriusTreeView class
 export default class SiriusTreeView extends SiriusElement {
     constructor(properties) {
-        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]:SIRIUS_TREEVIEW.NAME});
+        super({...properties, [SIRIUS_ELEMENT_PROPERTIES.NAME]: SIRIUS_TREEVIEW.NAME});
 
         // Build the SiriusTreeView
         this.#build().then();
@@ -28,7 +28,7 @@ export default class SiriusTreeView extends SiriusElement {
         const treeTemplate = this.#getTemplate();  // This is now a <ul> element, not an HTML string
         this.shadowRoot.appendChild(treeTemplate);  // Add the complete <ul> to the Shadow DOM
 
-        this.dispatchBuiltEvent(); // Dispatch a built event
+        this._dispatchBuiltEvent(); // Dispatch a built event
     }
 
     // Wrap non-list elements inside <li> elements and create a nested <ul> structure for <tree-item> elements

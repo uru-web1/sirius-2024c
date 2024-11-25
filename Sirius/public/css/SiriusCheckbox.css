@@ -6,11 +6,6 @@
     --sirius-checkbox--container-gap: 5px;
     --sirius-checkbox--container-background-color: transparent;
     --sirius-checkbox--order: -1;
-    --sirius-checkbox--background-color: transparent;
-    --sirius-checkbox--border-color: black;
-    --sirius-checkbox--border-line-style: solid;
-    --sirius-checkbox--border-radius: 4px;
-    --sirius-checkbox--border-width: 2px;
 }
 
 .checkbox-container {
@@ -27,9 +22,12 @@
     display: grid;
     place-items: center;
     order: var(--sirius-checkbox--order);
-    background-color: var(--sirius-checkbox--background-color);
-    border: var(--sirius-checkbox--border-width) var(--sirius-checkbox--border-line-style) var(--sirius-checkbox--border-color);
-    border-radius: var(--sirius-checkbox--border-radius);
+}
+
+.main-element {
+    background-color: transparent;
+    border: 2px solid black;
+    border-radius: 4px;
     cursor: pointer;
 }
 
@@ -43,4 +41,8 @@
     grid-template-rows: 1fr;
     align-items: center;
     justify-items: start;
+}
+
+.main-element:hover {
+    cursor: pointer;
 }

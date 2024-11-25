@@ -33,14 +33,20 @@
     // Get the checkboxes container
     const checkboxesContainer = document.querySelector('.checkboxes-container');
 
-    // Get the attributes keys
+    // Get the attribute keys
     const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
-    const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+    const stylesKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLES;
+    const stylesOnHoverKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLES_ON_HOVER;
     const parentIdKey = SIRIUS_CONTROL_ELEMENT_ATTRIBUTES.PARENT_ID;
     const captionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION;
     const iconWidthKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_WIDTH;
     const iconHeightKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_HEIGHT;
     const iconFillKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_FILL;
+
+    // Get the properties keys
+    const iconStylesKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_STYLES
+    const iconStylesOnHoverKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_STYLES_ON_HOVER
+    const iconStylesOnActiveKey = SIRIUS_CHECKBOX_ATTRIBUTES.ICON_STYLES_ON_ACTIVE
 
     // Get the properties keys
     const labelKey = SIRIUS_CHECKBOX_PROPERTIES.LABEL
@@ -52,12 +58,32 @@
             [idKey]: 'checkbox-2',
             [parentIdKey]: "checkbox-1",
             [iconFillKey]: 'blue',
-            [styleKey]: 'background-color: yellow',
             [iconWidthKey]: '50px',
             [iconHeightKey]: '50px',
+            [stylesKey]: `
+                background-color: yellow;
+                border: 1px dashed red;
+                padding: 1rem;
+            `,
+            [stylesOnHoverKey]: `
+                background-color: red;
+                border: 5px solid black;
+                width: 200%;
+            `,
+            [iconStylesKey]: `
+                background-color: yellow;
+                border: 1px solid black;
+                padding: 1rem;
+            `,
+            [iconStylesOnHoverKey]: `
+                background-color: red;
+            `,
+            [iconStylesOnActiveKey]: `
+                background-color: green;
+            `,
             [labelKey]: new SiriusLabel({
                 [idKey]: 'checkbox-2__label',
-                [captionKey]: 'Uncharted',
+                [captionKey]: 'Hover me!',
             }),
         });
         checkboxesContainer.appendChild(siriusCheckbox2);

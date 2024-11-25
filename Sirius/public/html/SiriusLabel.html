@@ -9,9 +9,8 @@
 </head>
 <body>
 
-<sirius-label caption="Hello world HTML" caption-color="red" caption-font-family="monospace"
-              caption-text-align="center" caption-padding="2px" id="label-2"
-              style="border: 1px solid green; width: 100px;"></sirius-label>
+<sirius-label caption="Hello world HTML" id="label-2"
+              styles="color: red; font-family: monospace; font-size: 2rem; text-align: center; padding: 2px; border: 1px solid green; width: 100px;" styles-on-hover="color: green"></sirius-label>
 
 <script type="module">
     import sirius from '../js/Sirius.js';
@@ -24,11 +23,11 @@
 
     // Get the attributes keys
     const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
-    const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+    const stylesKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLES;
+    const stylesOnHoverKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLES_ON_HOVER;
+    const stylesOnActiveKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLES_ON_ACTIVE;
+    const transitionDurationKey = SIRIUS_ELEMENT_ATTRIBUTES.TRANSITION_DURATION;
     const captionKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION;
-    const alignKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_TEXT_ALIGN;
-    const colorKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_COLOR;
-    const fontFamilyKey = SIRIUS_LABEL_ATTRIBUTES.CAPTION_FONT_FAMILY;
 
     // Get the properties keys
     const eventsKey = SIRIUS_ELEMENT_PROPERTIES.EVENTS
@@ -39,15 +38,25 @@
         const siriusLabel2 = new SiriusLabel({
             [idKey]: 'label-1',
             [captionKey]: 'Hello world con JS',
-            [alignKey]: 'right',
-            [colorKey]: 'blue',
-            [fontFamilyKey]: 'fantasy',
-            [styleKey]: "{'border': '1px solid red', 'padding': '20px'}",
+            [stylesKey]: `
+                text-align: right;
+                color: blue;
+                font-family: fantasy;
+                border: 1px solid red;
+                padding: 20px`,
             [eventsKey]: {
                 'click': () => siriusLabel2.logger.log('click'),
                 'mouseover': () => siriusLabel2.logger.log('mouseover'),
                 'mouseout': () => siriusLabel2.logger.log('mouseout')
             },
+            [stylesOnHoverKey]: `
+                border: 5px solid blue;
+                color: black;
+                padding: 20px`,
+            [stylesOnActiveKey]: `
+                border: 5px solid green;
+                padding: 100px`,
+            [transitionDurationKey]: '1s'
         });
 
         // Add the label to the DOM

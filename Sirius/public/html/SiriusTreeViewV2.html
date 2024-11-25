@@ -51,7 +51,7 @@
 </sirius-tree-view>
 
 <script type="module">
-    import SiriusTreeView from "../js/SiriusTreeViewV2.js";
+    import SiriusTreeView, {SIRIUS_TREE_VIEW_ATTRIBUTES} from "../js/SiriusTreeViewV2.js";
     import sirius from "../js/Sirius.js"
     import SiriusCheckbox, {SIRIUS_CHECKBOX_PROPERTIES} from "../js/SiriusCheckbox.js";
     import SiriusLabel, {SIRIUS_LABEL_ATTRIBUTES} from "../js/SiriusLabel.js";
@@ -65,11 +65,17 @@
     const labelKey = SIRIUS_CHECKBOX_PROPERTIES.LABEL
     const parentKey = SIRIUS_LINKED_CONTROL_ELEMENT_PROPERTIES.PARENT
     const childrenKey = SIRIUS_CONTROL_ELEMENT_PROPERTIES.CHILDREN
+    const iconStylesOnHoverKey = SIRIUS_TREE_VIEW_ATTRIBUTES.ICON_STYLES_ON_HOVER
 
     sirius.onLoaded = () => {
         // Create SiriusTreeView
         const siriusTreeView5 = new SiriusTreeView({
             [idKey]: 'tree-view-5',
+            [iconStylesOnHoverKey]: `
+                background-color: yellow;
+                border: 1px solid black;
+                padding: 1rem;
+            `,
             [parentKey]: new SiriusCheckbox({
                 [idKey]: 'checkbox-child-11',
                 [labelKey]: new SiriusLabel({
