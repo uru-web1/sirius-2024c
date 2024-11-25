@@ -1,7 +1,7 @@
 import { SiriusElement } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
+import { SiriusIcon } from "./SiriusIcon.js";
 
-// Constantes para el PopupMenu
 export const POPUP_MENU = deepFreeze({
     NAME: "PopupMenu",
     TAG: "popup-menu",
@@ -19,16 +19,20 @@ export const POPUP_MENU = deepFreeze({
         BACK_BUTTON: "menu-back-button",
         SLIDE_IN: "slide-in",
         SLIDE_OUT: "slide-out",
+        MENU_ICON: "menu-icon",
+        OPTION_CONTAINER: "PopupMenu_Option_Container", // Asegurarse de incluir la clase de contenedor
     },
 });
 
 export class PopupMenu extends SiriusElement {
     #menuContainerElement = null;
-    #currentLevel = 0; // Nivel actual del menú
-    #optionLevels = []; // Arreglo de niveles de opciones
-    #fixedOptions = []; // Opciones fijas al final del menú
-    #animationDuration = 300; // Duración en ms para las animaciones
-    #optionLevelMap = new Map(); // Mapa de niveles con opciones
+    #menuOpen = false;
+    #currentLevel = 0;
+    #optionLevels = [];
+    #fixedOptions = [];
+    #animationDuration = 300;
+    #optionLevelMap = new Map();
+    #clickOutsideHandler = null;
 
     constructor(properties) {
         super(properties, POPUP_MENU.NAME);
@@ -42,9 +46,9 @@ export class PopupMenu extends SiriusElement {
         if (!this.#optionLevelMap.has(option.level)) {
             let listOpt = new Map();
             listOpt.level = option.level;
-            listOpt.priorLevel = option.priorLevel; // Asociar priorLevel con el nivel
+            listOpt.priorLevel = option.priorLevel;
             listOpt.panel = document.createElement("div");
-            listOpt.panel.className = "PopupMenu_Option_Container";
+            listOpt.panel.className = POPUP_MENU.CLASSES.OPTION_CONTAINER; // Usar la clase de contenedor
             listOpt.set(option.id, option);
             this.#optionLevelMap.set(option.level, listOpt);
         } else {
@@ -55,7 +59,13 @@ export class PopupMenu extends SiriusElement {
     }
 
     addFixedOption(option) {
-        this.#fixedOptions.push(option); // Agregar la opción fija al array
+        this.#fixedOptions.push(option);
+    }
+
+    #renderMenuIcon() {
+        return `
+            <sirius-icon class="${POPUP_MENU.CLASSES.MENU_ICON}" icon="menu" fill="black" height="20px" width="24px" id="icon-1"></sirius-icon>
+        `;
     }
 
     #renderOptions() {
@@ -69,7 +79,6 @@ export class PopupMenu extends SiriusElement {
             )
             .join("");
 
-        // Renderizar opciones fijas al final
         const fixedOptionsHTML = this.#fixedOptions
             .map(
                 (option) =>
@@ -83,6 +92,10 @@ export class PopupMenu extends SiriusElement {
     }
 
     #getTemplate() {
+        if (!this.#menuOpen) {
+            return this.#renderMenuIcon();
+        }
+
         const backButton = this.#currentLevel > 0
             ? `<div class="${POPUP_MENU.CLASSES.BACK_BUTTON}">Back</div>`
             : "";
@@ -96,17 +109,46 @@ export class PopupMenu extends SiriusElement {
         `;
     }
 
+    #toggleMenu() {
+        this.#menuOpen = !this.#menuOpen;
+        this.shadowRoot.innerHTML = this.#getTemplate();
+
+        if (this.#menuOpen) {
+            this.#attachClickOutsideHandler();
+        } else {
+            this.#detachClickOutsideHandler();
+        }
+    }
+
+    #attachClickOutsideHandler() {
+        this.#clickOutsideHandler = (event) => {
+            if (!this.contains(event.target)) {
+                this.#menuOpen = false;
+                this.shadowRoot.innerHTML = this.#getTemplate();
+                this.#detachClickOutsideHandler();
+            }
+        };
+        document.addEventListener("click", this.#clickOutsideHandler);
+    }
+
+    #detachClickOutsideHandler() {
+        if (this.#clickOutsideHandler) {
+            document.removeEventListener("click", this.#clickOutsideHandler);
+            this.#clickOutsideHandler = null;
+        }
+    }
+
     #showOptions(level) {
-        this.#currentLevel = level; // Actualizar el nivel actual
+        this.#currentLevel = level;
         this.shadowRoot.innerHTML = this.#getTemplate();
     }
 
     async #onBackClick() {
         const currentOptions = this.#optionLevelMap.get(this.#currentLevel);
         if (currentOptions && currentOptions.priorLevel !== undefined) {
-            this.#showOptions(currentOptions.priorLevel); // Regresar al nivel especificado en priorLevel
+            this.#showOptions(currentOptions.priorLevel);
         } else if (this.#currentLevel > 0) {
-            this.#showOptions(this.#currentLevel - 1); // Comportamiento de respaldo
+            this.#showOptions(this.#currentLevel - 1);
         }
     }
 
@@ -129,14 +171,12 @@ export class PopupMenu extends SiriusElement {
             this.attachShadow({ mode: "open" });
         }
 
-        this.#menuContainerElement = document.createElement("div");
-        this.#menuContainerElement.classList.add(POPUP_MENU.CLASSES.MENU_CONTAINER);
-
-        this.shadowRoot.innerHTML = "";
-        this.shadowRoot.appendChild(this.#menuContainerElement);
+        this.shadowRoot.innerHTML = this.#getTemplate();
 
         this.shadowRoot.addEventListener("click", async (event) => {
-            if (event.target.classList.contains(POPUP_MENU.CLASSES.BACK_BUTTON)) {
+            if (event.target.classList.contains(POPUP_MENU.CLASSES.MENU_ICON)) {
+                this.#toggleMenu();
+            } else if (event.target.classList.contains(POPUP_MENU.CLASSES.BACK_BUTTON)) {
                 await this.#onBackClick();
             } else {
                 this.#onOptionClick(event);
@@ -144,7 +184,6 @@ export class PopupMenu extends SiriusElement {
         });
 
         await this._loadAndAdoptStyles();
-        this.#showOptions(0);
         this.dispatchBuiltEvent();
     }
 }

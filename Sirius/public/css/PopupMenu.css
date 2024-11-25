@@ -1,33 +1,85 @@
 :host {
-    --menu-width: 300px;
+    --menu-width: 30%; /* Ajuste al 30% del ancho de la pantalla */
     --menu-background: #f9f9f9;
     --option-color: #333;
     --option-hover-color: #555;
-    --animation-duration: 0.3s;
+    --animation-duration: 0.5s;
     display: block;
 }
 
 .menu-container {
-    width: var(--menu-width);
+    position: fixed; /* Fija el menú para que ocupe el lado izquierdo de la pantalla */
+    top: 0;
+    left: -30%;
+    height: 100vh; /* Ocupa el 100% de la altura */
+    width: var(--menu-width); /* Ancho dinámico según la variable */
     background: var(--menu-background);
-    overflow: hidden;
-    transition: transform var(--animation-duration);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Sombras para diseño moderno */
+    overflow-y: auto; /* Para manejar contenido largo */
+    transform: translateX(-100%); /* Ocultar el menú inicialmente */
+    animation: slideOut var(--animation-duration) forwards;
+    z-index: 1000; /* Asegura que esté sobre otros elementos */
 }
 
-.menu-option, .menu-fixed-option {
-    padding: 10px;
+.menu-container.slide-in {
+    animation: slideIn var(--animation-duration) forwards; /* Aparece con animación */
+}
+
+.menu-container.slide-out {
+    animation: slideOut var(--animation-duration) forwards; /* Se oculta con animación */
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.menu-option,
+.menu-fixed-option {
+    padding: 15px 20px; /* Espaciado interno para mayor clicabilidad */
     cursor: pointer;
+    font-size: 16px;
     color: var(--option-color);
+    border-bottom: 1px solid #ddd; /* Línea separadora para las opciones */
 }
 
-.menu-option:hover, .menu-fixed-option:hover {
+.menu-option:hover,
+.menu-fixed-option:hover {
     color: var(--option-hover-color);
+    background: rgba(0, 0, 0, 0.05); /* Fondo sutil al pasar el cursor */
 }
 
-.slide-in {
-    transform: translateX(0);
+.menu-back-button {
+    padding: 15px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--option-color);
+    border-bottom: 1px solid #ddd;
 }
 
-.slide-out {
-    transform: translateX(-100%);
+.menu-back-button:hover {
+    color: var(--option-hover-color);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.menu-icon {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001; /* Por encima del menú */
+    cursor: pointer;
 }
