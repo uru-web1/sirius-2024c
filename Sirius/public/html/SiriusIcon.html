@@ -39,7 +39,7 @@
                  show-animation="0% { transform: scale(0); fill: red; } 100% { transform: scale(1); fill: blue; }"
                  hiding-animation="0% { transform: scale(1); fill: blue; } 100% { transform: scale(0); fill: red; }"
                  styles="background-color: lightblue" styles-on-hover="background-color: lightcoral"
-                 styles-on-active="background-color: lightgreen"></sirius-icon>
+                 styles-on-active="background-color: lightgreen" animation-duration="2s"></sirius-icon>
 
     <sirius-icon icon="eye-closed" fill="whitesmoke" height="48px" width="48px" id="icon-2"
                  styles="background-color: purple" styles-on-hover="scale: 1.5; transform: rotate(-15deg)"
@@ -99,11 +99,11 @@
         // Add an event listener to the icon
         const siriusIcon1 = document.querySelector('#icon-1');
         siriusIcon1.addEventListener("click", () => {
-            siriusIcon1.toggleHide()
-
             // Change the icon size
             siriusIcon1.width = siriusIcon1.width.replace('px', '') * 1.5 + 'px';
             siriusIcon1.height = siriusIcon1.height.replace('px', '') * 1.5 + 'px';
+
+            siriusIcon1.toggleHide()
         });
         siriusIcon4.addEventListener("click", () => {
             siriusIcon4.toggleHide()

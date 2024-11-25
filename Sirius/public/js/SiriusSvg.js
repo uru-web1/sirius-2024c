@@ -15,6 +15,7 @@ export const SIRIUS_SVG = deepFreeze({
         HEIGHT: '--sirius-svg--height',
         FILL: '--sirius-svg--fill',
         ROTATION: '--sirius-svg--rotation',
+        ANIMATION_DURATION: '--sirius-svg--animation-duration',
     },
     CLASSES: {
         SVG_CONTAINER: 'svg-container',

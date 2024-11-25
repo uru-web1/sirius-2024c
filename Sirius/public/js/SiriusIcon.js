@@ -14,7 +14,6 @@ export const SIRIUS_ICON = deepFreeze({
     CSS_VARIABLES: {
         WIDTH: '--sirius-icon--width',
         HEIGHT: '--sirius-icon--height',
-        ANIMATION_DURATION: '--sirius-icon--animation-duration',
     },
     CLASSES: {
         ICON_CONTAINER: 'icon-container',

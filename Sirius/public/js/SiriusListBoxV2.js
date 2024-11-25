@@ -12,7 +12,7 @@ import SiriusLinkedControlElement from "./SiriusLinkedControlElement.js";
 export const SIRIUS_LIST_BOX = deepFreeze({
     NAME: "SiriusListBoxV2",
     TAG: "sirius-list-box",
-    CSS_VARS: {
+    CSS_VARIABLES: {
         HEAD_CONTAINER_PADDING: "--sirius-list-box--head-container--padding",
         SEPARATOR_BORDER: "--sirius-list-box--separator--border",
         SEPARATOR_BORDER_RADIUS: "--sirius-list-box--separator--border-radius",
@@ -300,7 +300,7 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
      */
     #setHeadContainerPadding(headContainerPadding) {
         if (headContainerPadding)
-            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.HEAD_CONTAINER_PADDING, headContainerPadding);
+            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARIABLES.HEAD_CONTAINER_PADDING, headContainerPadding);
     }
 
     /** Private method to set the separator border attribute
@@ -308,7 +308,7 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
      */
     #setSeparatorBorder(separatorBorder) {
         if (separatorBorder)
-            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.SEPARATOR_BORDER, separatorBorder);
+            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARIABLES.SEPARATOR_BORDER, separatorBorder);
     }
 
     /** Private method to set the separator border radius attribute
@@ -316,7 +316,7 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
      */
     #setSeparatorBorderRadius(separatorBorderRadius) {
         if (separatorBorderRadius)
-            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.SEPARATOR_BORDER_RADIUS, separatorBorderRadius);
+            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARIABLES.SEPARATOR_BORDER_RADIUS, separatorBorderRadius);
     }
 
     /** Private method to set the items container gap attribute
@@ -324,7 +324,7 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
      */
     #setItemsContainerGap(itemsContainerGap) {
         if (itemsContainerGap)
-            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.ITEMS_CONTAINER_GAP, itemsContainerGap);
+            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARIABLES.ITEMS_CONTAINER_GAP, itemsContainerGap);
     }
 
     /** Private method to set the items container padding attribute
@@ -332,7 +332,7 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
      */
     #setItemsContainerPadding(itemsContainerPadding) {
         if (itemsContainerPadding)
-            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARS.ITEMS_CONTAINER_PADDING, itemsContainerPadding);
+            this._setElementCSSVariable(SIRIUS_LIST_BOX.CSS_VARIABLES.ITEMS_CONTAINER_PADDING, itemsContainerPadding);
     }
 
     /** Set the events property to this
