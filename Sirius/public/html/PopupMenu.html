@@ -16,6 +16,7 @@
     
         document.addEventListener("DOMContentLoaded", () => {
             const menu = document.querySelector("popup-menu");
+            menu.setTitle("Test Menu");
             if (menu instanceof PopupMenu) {
                 menu.addOption({
                     id: 1,
@@ -38,6 +39,22 @@
                     text: 'Sub-option 1',
                     action: 'sub-option-1',
                     nextLevel: 3,
+                    priorLevel: 0,
+                    level: 1
+                });
+                menu.addOption({
+                    id: 7,
+                    text: 'Sub-option 5',
+                    action: 'sub-option-5',
+                    nextLevel: null,
+                    priorLevel: 0,
+                    level: 1
+                });
+                menu.addOption({
+                    id: 8,
+                    text: 'Sub-option 6',
+                    action: 'sub-option-6',
+                    nextLevel: null,
                     priorLevel: 0,
                     level: 1
                 });

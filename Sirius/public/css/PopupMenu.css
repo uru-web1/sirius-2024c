@@ -5,6 +5,7 @@
     --option-hover-color: #555;
     --animation-duration: 0.5s;
     display: block;
+    font-family: 'Arial', sans-serif;
 }
 
 .menu-container {
@@ -19,6 +20,18 @@
     transform: translateX(-100%); /* Ocultar el menú inicialmente */
     animation: slideOut var(--animation-duration) forwards;
     z-index: 1000; /* Asegura que esté sobre otros elementos */
+}
+
+.menu-fondo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh; /* Ocupa el 100% de la altura */
+    width: var(--menu-width); /* Ancho dinámico según la variable */
+    background: var(--menu-background);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Sombras para diseño moderno */
+    overflow-y: auto; /* Para manejar contenido largo */
+    z-index: 999;
 }
 
 .menu-container.slide-in {
@@ -47,19 +60,40 @@
     }
 }
 
-.menu-option,
-.menu-fixed-option {
-    padding: 15px 20px; /* Espaciado interno para mayor clicabilidad */
-    cursor: pointer;
-    font-size: 16px;
-    color: var(--option-color);
-    border-bottom: 1px solid #ddd; /* Línea separadora para las opciones */
+@keyframes overlayIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
 }
 
-.menu-option:hover,
-.menu-fixed-option:hover {
-    color: var(--option-hover-color);
-    background: rgba(0, 0, 0, 0.05); /* Fondo sutil al pasar el cursor */
+@keyframes overlayOut {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.menu-option,
+.menu-fixed-option {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 10px 15px;
+    font-size: 18px;
+    color: var(--option-color);
+    text-align: center;
+    margin: 5px 0; /* Espaciado entre opciones */
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s; /* Animación suave */
+}
+
+.menu-option:hover{
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(1.1); /* Crecimiento suave al hover */
 }
 
 .menu-back-button {
@@ -80,6 +114,60 @@
     position: fixed;
     top: 20px;
     left: 20px;
-    z-index: 1001; /* Por encima del menú */
     cursor: pointer;
+    border-width: 10px;
+    border-color: black;
+}
+
+/* Contenedor de opciones normales */
+.PopupMenu_Option_Container {
+    display: flex;
+    flex-direction: column; /* Opciones en columna */
+    justify-content: center; /* Centrado vertical */
+    align-items: left; /* Centrado horizontal */
+    flex-grow: 1; /* Para que ocupe el espacio disponible */
+    height: 80%; /* Ocupa toda la altura */
+    width: 95%;
+}
+
+/* Contenedor de opciones fijas */
+.menu-fixed-option-container {
+    margin-top: auto; /* Asegura que esté al final del menú */
+    background: rgba(245, 245, 245, 1); /* Fondo diferenciado */
+    border-top: 1px solid #ddd; /* Línea divisoria */
+    padding-top: 10px;
+    height: auto;
+}
+
+/* Opciones fijas */
+.menu-fixed-option {
+    padding: 10px 20px; /* Igual a las normales */
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--option-color);
+    cursor: pointer;
+    text-align: center;
+}
+
+.menu-fixed-option:hover{
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.menu-title {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    background-color: var(--menu-background, #f9f9f9);
+    border-bottom: 1px solid #ddd;
+    color: var(--option-color, #333);
+}
+
+.option-icon {
+    color: var(--option-color, #333); /* Hereda el color del texto de las opciones */
+    transition: transform 0.2s; /* Animación para la flecha */
+}
+
+.option-icon:hover {
+    color: var(--option-hover-color, #555); /* Cambia de color al hover */
 }

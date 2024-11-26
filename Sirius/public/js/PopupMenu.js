@@ -21,6 +21,9 @@ export const POPUP_MENU = deepFreeze({
         SLIDE_OUT: "slide-out",
         MENU_ICON: "menu-icon",
         OPTION_CONTAINER: "PopupMenu_Option_Container", // Asegurarse de incluir la clase de contenedor
+        FONDO: "menu-fondo",
+        TITLE: "menu-title",
+        OPTION_ICON: "option-icon"
     },
 });
 
@@ -33,13 +36,25 @@ export class PopupMenu extends SiriusElement {
     #animationDuration = 300;
     #optionLevelMap = new Map();
     #clickOutsideHandler = null;
+    #optionTrail = [];
+    #menuTitle = "Menu";
 
     constructor(properties) {
         super(properties, POPUP_MENU.NAME);
+        if (properties?.title) {
+            this.#menuTitle = properties.title;
+        }
     }
 
     static get observedAttributes() {
         return [...SiriusElement.observedAttributes];
+    }
+
+    setTitle(title) {
+        this.#menuTitle = title;
+        if (this.#menuOpen) {
+            this.shadowRoot.innerHTML = this.#getTemplate();
+        }
     }
 
     addOption(option) {
@@ -71,14 +86,19 @@ export class PopupMenu extends SiriusElement {
     #renderOptions() {
         const options = this.#optionLevelMap.get(this.#currentLevel)?.values() || [];
         const optionsHTML = [...options]
-            .map(
-                (option) =>
-                    `<div class="${POPUP_MENU.CLASSES.MENU_OPTION}" data-action="${option.action}" data-next-level="${option.nextLevel}" data-prior-level="${option.priorLevel}">
+            .map((option) => {
+                const hasNextLevel = option.nextLevel !== null && !isNaN(option.nextLevel);
+                return `
+                    <div class="${POPUP_MENU.CLASSES.MENU_OPTION}" 
+                        data-action="${option.action}" 
+                        data-next-level="${option.nextLevel}" 
+                        data-prior-level="${option.priorLevel}">
                         ${option.text}
-                    </div>`
-            )
+                        ${hasNextLevel ? `<sirius-icon class="${POPUP_MENU.CLASSES.OPTION_ICON}" icon="arrow" fill="black" height="20px" width="20px" rotation="right" id="option-icon"></sirius-icon>` : `<span class="icon-placeholder"></span>`}
+                    </div>`;
+            })
             .join("");
-
+    
         const fixedOptionsHTML = this.#fixedOptions
             .map(
                 (option) =>
@@ -87,27 +107,42 @@ export class PopupMenu extends SiriusElement {
                     </div>`
             )
             .join("");
-
-        return optionsHTML + fixedOptionsHTML;
+    
+        return `
+            <div class="${POPUP_MENU.CLASSES.OPTION_CONTAINER}">
+                ${optionsHTML}
+            </div>
+            <div class="${POPUP_MENU.CLASSES.FIXED_OPTION}-container">
+                ${fixedOptionsHTML}
+            </div>
+        `;
     }
+    
 
     #getTemplate() {
         if (!this.#menuOpen) {
             return this.#renderMenuIcon();
         }
-
+    
+        const lastOption = this.#optionTrail[this.#optionTrail.length - 1];
+        const backButtonText = lastOption ? lastOption.text : "Back";
+    
         const backButton = this.#currentLevel > 0
-            ? `<div class="${POPUP_MENU.CLASSES.BACK_BUTTON}">Back</div>`
+            ? `<div class="${POPUP_MENU.CLASSES.BACK_BUTTON}">${backButtonText}</div>`
             : "";
-
+    
         const optionsHTML = this.#renderOptions();
+    
         return `
             <div class="${POPUP_MENU.CLASSES.MENU_CONTAINER}">
+                <div class="${POPUP_MENU.CLASSES.TITLE}">${this.#menuTitle}</div>
                 ${backButton}
                 ${optionsHTML}
             </div>
+            <div class="${POPUP_MENU.CLASSES.FONDO}"></div>
         `;
     }
+    
 
     #toggleMenu() {
         this.#menuOpen = !this.#menuOpen;
@@ -144,11 +179,9 @@ export class PopupMenu extends SiriusElement {
     }
 
     async #onBackClick() {
-        const currentOptions = this.#optionLevelMap.get(this.#currentLevel);
-        if (currentOptions && currentOptions.priorLevel !== undefined) {
-            this.#showOptions(currentOptions.priorLevel);
-        } else if (this.#currentLevel > 0) {
-            this.#showOptions(this.#currentLevel - 1);
+        if (this.#optionTrail.length > 0) {
+            const lastOption = this.#optionTrail.pop(); // Obtener la última opción seleccionada
+            this.#showOptions(lastOption.level);
         }
     }
 
@@ -157,8 +190,10 @@ export class PopupMenu extends SiriusElement {
         if (optionElement) {
             const action = optionElement.dataset.action;
             const nextLevel = parseInt(optionElement.dataset.nextLevel, 10);
-
-            if (nextLevel !== null && !isNaN(nextLevel)) {
+    
+            if (!isNaN(nextLevel)) {
+                const selectedText = optionElement.textContent.trim();
+                this.#optionTrail.push({ level: this.#currentLevel, text: selectedText });
                 this.#showOptions(nextLevel);
             } else {
                 this.dispatchEvent(new CustomEvent("option-selected", { detail: { action } }));
