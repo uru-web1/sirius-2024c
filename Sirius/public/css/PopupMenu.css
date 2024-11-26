@@ -9,17 +9,20 @@
 }
 
 .menu-container {
-    position: fixed; /* Fija el menú para que ocupe el lado izquierdo de la pantalla */
+    position: fixed;
     top: 0;
     left: -30%;
-    height: 100vh; /* Ocupa el 100% de la altura */
-    width: var(--menu-width); /* Ancho dinámico según la variable */
+    height: 100vh; /* El menú ocupa toda la pantalla */
+    width: var(--menu-width);
     background: var(--menu-background);
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Sombras para diseño moderno */
-    overflow-y: auto; /* Para manejar contenido largo */
-    transform: translateX(-100%); /* Ocultar el menú inicialmente */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    transform: translateX(-100%);
     animation: slideOut var(--animation-duration) forwards;
-    z-index: 1000; /* Asegura que esté sobre otros elementos */
+    z-index: 1000;
+    display: flex;
+    flex-direction: column; /* Organización vertical */
+    justify-content: space-between; /* Espacio entre dinámicos y fijos */
 }
 
 .menu-fondo {
@@ -78,8 +81,7 @@
     }
 }
 
-.menu-option,
-.menu-fixed-option {
+.menu-option {
     display: flex;
     justify-content: space-evenly;
     padding: 10px 15px;
@@ -88,6 +90,7 @@
     text-align: center;
     margin: 5px 0; /* Espaciado entre opciones */
     cursor: pointer;
+    margin-top: 0;
     transition: transform 0.2s, background 0.3s; /* Animación suave */
 }
 
@@ -97,12 +100,15 @@
 }
 
 .menu-back-button {
+    display: flex;
+    align-items: center; /* Alinear ícono y texto verticalmente */
     padding: 15px 20px;
     cursor: pointer;
     font-size: 16px;
     font-weight: bold;
     color: var(--option-color);
     border-bottom: 1px solid #ddd;
+    gap: 8px; /* Separar el icono del texto */
 }
 
 .menu-back-button:hover {
@@ -123,30 +129,34 @@
 .PopupMenu_Option_Container {
     display: flex;
     flex-direction: column; /* Opciones en columna */
-    justify-content: center; /* Centrado vertical */
+    justify-content: flex-start; /* Centrado vertical */
     align-items: left; /* Centrado horizontal */
     flex-grow: 1; /* Para que ocupe el espacio disponible */
-    height: 80%; /* Ocupa toda la altura */
+    height: 90%; /* Ocupa toda la altura */
     width: 95%;
+    margin-top: 5%;
 }
 
 /* Contenedor de opciones fijas */
 .menu-fixed-option-container {
-    margin-top: auto; /* Asegura que esté al final del menú */
-    background: rgba(245, 245, 245, 1); /* Fondo diferenciado */
-    border-top: 1px solid #ddd; /* Línea divisoria */
-    padding-top: 10px;
-    height: auto;
+    position: absolute;
+    bottom: 0; /* Fijar al fondo del contenedor */
+    left: 0;
+    width: 100%; /* Ocupa el ancho completo del menú */
+    background: var(--menu-background);
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Sombras para separación visual */
 }
 
 /* Opciones fijas */
 .menu-fixed-option {
-    padding: 10px 20px; /* Igual a las normales */
-    font-size: 14px;
-    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    padding: 10px 15px;
+    font-size: 16px;
     color: var(--option-color);
-    cursor: pointer;
     text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
 .menu-fixed-option:hover{
@@ -170,4 +180,9 @@
 
 .option-icon:hover {
     color: var(--option-hover-color, #555); /* Cambia de color al hover */
+}
+
+.menu-option-container {
+    flex-grow: 1; /* Ocupa el espacio disponible */
+    overflow-y: auto; /* Manejo de scroll para opciones dinámicas */
 }
