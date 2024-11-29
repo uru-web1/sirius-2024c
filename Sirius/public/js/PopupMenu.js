@@ -72,7 +72,7 @@ export class PopupMenu extends SiriusElement {
             return `
                 <div class="${POPUP_MENU.CLASSES.BACK_BUTTON}">
                     <sirius-icon class="${POPUP_MENU.CLASSES.BACK_ICON_ICON}" icon="arrow" fill="black" height="20px" width="20px" rotation="left" id="back-icon"></sirius-icon>
-                    <span>${backButtonText}</span>
+                    ${backButtonText}
                 </div>`;
         }
         return ""; // Si no hay niveles anteriores, no muestra el botón
