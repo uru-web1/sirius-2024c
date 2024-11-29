@@ -33,7 +33,7 @@ export const SIRIUS_EDIT = deepFreeze({
     }
 })
 
-/** Sirius Edit attributes */
+/** SiriusEdit attributes */
 export const SIRIUS_EDIT_ATTRIBUTES = deepFreeze({
     WIDTH: "width",
     HEIGHT: "height",
@@ -57,6 +57,9 @@ export const SIRIUS_EDIT_ATTRIBUTES = deepFreeze({
     ICON_POSITION_RIGHT: "icon-position-right",
     ICON_POSITION_TOP: "icon-position-top",
 })
+
+/** SiriusEdit default values */
+export const SIRIUS_EDIT_ATTRIBUTES_DEFAULT = deepFreeze({})
 
 export class SiriusEdit extends SiriusElement {
     siriusIcon = null;
@@ -290,58 +293,58 @@ export class SiriusEdit extends SiriusElement {
 
     #setYPosition(position) {
         if (position) {
-            this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_Y_POSITION, position);
+            this._setElementCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_Y_POSITION, position);
         }
     }
 
     #setWidth(width) {
         if (width)
-            this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.WIDTH, width);
+            this._setElementCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.WIDTH, width);
     }
 
     #setHeight(height) {
         if (height)
-            this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.HEIGHT, height);
+            this._setElementCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.HEIGHT, height);
     }
 
     #setInputBackgroundColor(color) {
         if (color)
-            this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.INPUT_BACKGROUND, color);
+            this._setElementCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.INPUT_BACKGROUND, color);
     }
 
     #setInputFontSize(size) {
         if (size)
-            this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.INPUT_FONT_SIZE, size)
+            this._setElementCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.INPUT_FONT_SIZE, size)
     }
 
     #setInputFontColor(color) {
         if (color)
-            this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.INPUT_FONT_COLOR, color)
+            this._setElementCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.INPUT_FONT_COLOR, color)
     }
 
     #setLabelBackgroundColor(color) {
         if (color)
-            this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_BACKGROUND, color)
+            this._setElementCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_BACKGROUND, color)
     }
 
     #setLabelFontColor(color) {
         if (color)
-            this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_FONT_COLOR, color)
+            this._setElementCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_FONT_COLOR, color)
     }
 
     #setLabelBorderColor(color) {
         if (color)
-            this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_BORDER_COLOR, color)
+            this._setElementCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_BORDER_COLOR, color)
     }
 
     // Private method to update the label font color on focus
     #updateLabelFontColorOnFocus(value) {
-        this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_FONT_COLOR_ONFOCUS, value);
+        this._setElementCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_FONT_COLOR_ONFOCUS, value);
     }
 
     // Private method to update the label border color on focus
     #updateLabelBorderColorOnFocus(value) {
-        this._setCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_BORDER_COLOR_ONFOCUS, value);
+        this._setElementCSSVariable(SIRIUS_EDIT.CSS_VARIABLES.LABEL_BORDER_COLOR_ONFOCUS, value);
     }
 
     // Private method to update the label caption
@@ -381,7 +384,7 @@ export class SiriusEdit extends SiriusElement {
             this.siriusIcon = new SiriusIcon({
                 [SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID]: `${Math.random()}`,
                 [SIRIUS_ICON_ATTRIBUTES.ICON]: this.iconEyeClose,
-                style: `position: absolute; right: ${this.iconPositionRight}; top: ${this.iconPositionTop}; z-index: 12222;`
+                styles: `position: absolute; right: ${this.iconPositionRight}; top: ${this.iconPositionTop}; z-index: 12222;`
             });
         }
 
@@ -417,12 +420,12 @@ export class SiriusEdit extends SiriusElement {
             this.siriusIcon = new SiriusIcon({
                 [SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID]: `${Math.random()}`,
                 [SIRIUS_ICON_ATTRIBUTES.ICON]: this.iconArrowUp,
-                style: `position: absolute; right: ${this.iconPositionRight}; top: ${this.iconPositionTop}; z-index: 12222;`
+                styles: `position: absolute; right: ${this.iconPositionRight}; top: ${this.iconPositionTop}; z-index: 12222;`
             });
             this.siriusIcon2 = new SiriusIcon({
                 [SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID]: `${Math.random()}`,
                 [SIRIUS_ICON_ATTRIBUTES.ICON]: this.iconArrowDown,
-                style: `position: absolute; right: ${this.iconPositionRight}; top: calc(${this.iconPositionTop} + 20px); z-index: 12222;`
+                styles: `position: absolute; right: ${this.iconPositionRight}; top: calc(${this.iconPositionTop} + 20px); z-index: 12222;`
             });
         }
 
@@ -454,6 +457,7 @@ export class SiriusEdit extends SiriusElement {
         this._loadAttributes({
             instanceProperties: properties,
             attributes: SIRIUS_EDIT_ATTRIBUTES,
+            attributesDefault: SIRIUS_EDIT_ATTRIBUTES_DEFAULT,
         });
 
         // Load the CSS style sheets and add them to the shadow DOM
@@ -471,17 +475,6 @@ export class SiriusEdit extends SiriusElement {
         this._dispatchBuiltEvent();
     }
 
-    /** Private method to set the checkbox container style
-     * @param {string} style - Style attribute value
-     */
-    #setStyle(style) {
-        if (!style)
-            return
-
-        // Add the style attribute to the element when built
-        this._setStyle = () => this._setStyleAttributes(style, this.checkboxContainerElement);
-    }
-
     /** Private method to handle attribute changes
      * @param {string} name - Attribute name
      * @param {string} oldValue - Old value
@@ -493,8 +486,8 @@ export class SiriusEdit extends SiriusElement {
                 this._setId(newValue);
                 break;
 
-            case SIRIUS_ELEMENT_ATTRIBUTES.STYLE:
-                this.#setStyle(newValue);
+            case SIRIUS_ELEMENT_ATTRIBUTES.STYLES:
+                this._setElementSelectorRuleStyles(name, newValue);
                 break;
 
             case SIRIUS_EDIT_ATTRIBUTES.INPUT_COLOR:
@@ -550,7 +543,7 @@ export class SiriusEdit extends SiriusElement {
             case SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_RIGHT:
             case SIRIUS_EDIT_ATTRIBUTES.ICON_POSITION_TOP:
             case SIRIUS_EDIT_ATTRIBUTES.ICON_EYE:
-            case SIRIUS_EDIT_ATTRIBUTES.ICON_EYE_CLOSE:
+            case SIRIUS_EDIT_ATTRIBUTES.ICON_EYE_CLOSED:
             case SIRIUS_EDIT_ATTRIBUTES.ICON_ARROW_UP:
             case SIRIUS_EDIT_ATTRIBUTES.ICON_ARROW_DOWN:
                 this.#updateIcons();
