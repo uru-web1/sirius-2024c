@@ -1,5 +1,5 @@
+import { SIRIUS_ELEMENT_ATTRIBUTES, SiriusElement } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
-import {SIRIUS_ELEMENT_ATTRIBUTES, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SiriusElement} from "./SiriusElement.js";
 
 /** Sirius SVG constants */
 export const SIRIUS_SVG = deepFreeze({
@@ -38,6 +38,12 @@ export const SIRIUS_SVG_ICONS = {
     PERSON: 'person',
     RADIO_CHECKED: 'radio-checked',
     RADIO_UNCHECKED: 'radio-unchecked',
+    ADD: 'add',
+    DELETE: 'delete', 
+    ARROW_LEFT: 'arrow-left', 
+    ARROW_RIGHT: 'arrow-right',
+    ARROW_DOUBLE_LEFT: 'arrow-double-left', 
+    ARROW_DOUBLE_RIGHT: 'arrow-double-right', 
 }
 
 /** Sirius icons inner HTML */
@@ -113,6 +119,31 @@ export const SIRIUS_SVG_ICONS_INNER_HTML = {
     // Radio checked icon
     [SIRIUS_SVG_ICONS.RADIO_CHECKED]:
         `<path d="M480-280q83 0 141.5-58.5T680-480q0-83-58.5-141.5T480-680q-83 0-141.5 58.5T280-480q0 83 58.5 141.5T480-280Zm0 200q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>`,
+
+     // Símbolo "+"
+     [SIRIUS_SVG_ICONS.ADD]: `
+     <path d="M480 240v-240h-240v-80h240v-240h80v240h240v80h-240v240h-80z"/>`,
+
+    // Papelera
+    [SIRIUS_SVG_ICONS.DELETE]: `
+     <path d="M360 760q-33 0-56.5-23.5t-23.5-56.5V160h-120v-80h240v-80h160v80h240v80h-120v520q0 33-23.5 56.5T600 760H360zm320-600H280v560q0 13 9.5 22.5T312 760h336q13 0 22.5-9.5T680 728V160z"/>`,
+
+    // Flecha izquierda
+    [SIRIUS_SVG_ICONS.ARROW_LEFT]: `
+     <path d="M600 480H280l160-160-56-56-240 240 240 240 56-56-160-160h320v-80z"/>`,
+
+    // Flecha derecha
+    [SIRIUS_SVG_ICONS.ARROW_RIGHT]: `
+     <path d="M360 480h320l-160 160 56 56 240-240-240-240-56 56 160 160H360v80z"/>`,
+
+    // Flecha doble izquierda
+    [SIRIUS_SVG_ICONS.ARROW_DOUBLE_LEFT]: `
+     <path d="M560 720 320 480l240-240 56 56-184 184 184 184-56 56Zm-240 0L80 480l240-240 56 56-184 184 184 184-56 56Z"/>`,
+
+    // Flecha doble derecha
+    [SIRIUS_SVG_ICONS.ARROW_DOUBLE_RIGHT]: `
+     <path d="m400 720-56-56 184-184-184-184 56-56 240 240-240 240Zm240 0-56-56 184-184-184-184 56-56 240 240-240 240Z"/>`,
+
 }
 
 /** Sirius SVG attributes */
