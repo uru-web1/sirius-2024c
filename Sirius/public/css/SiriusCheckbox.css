@@ -1,44 +1,46 @@
+:host {
+    display: inline-block;
+    box-sizing: border-box;
+
+    --sirius-checkbox--container-padding: 5px 0px;
+    --sirius-checkbox--container-gap: 5px;
+    --sirius-checkbox--container-background-color: transparent;
+    --sirius-checkbox--order: -1;
+    --sirius-checkbox--background-color: transparent;
+    --sirius-checkbox--border-color: black;
+    --sirius-checkbox--border-line-style: solid;
+    --sirius-checkbox--border-radius: 4px;
+    --sirius-checkbox--border-width: 2px;
+}
+
 .checkbox-container {
     display: flex;
     align-items: center;
-    margin: 8px 0;
+    justify-content: space-around;
+    width: fit-content;
+    background-color: var(--sirius-checkbox--container-background-color);
+    padding: var(--sirius-checkbox--container-padding);
+    gap: var(--sirius-checkbox--container-gap);
 }
 
-.checkbox-input {
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #212529;
-    border-radius: 3px;
+.icon-container {
+    display: grid;
+    place-items: center;
+    order: var(--sirius-checkbox--order);
+    background-color: var(--sirius-checkbox--background-color);
+    border: var(--sirius-checkbox--border-width) var(--sirius-checkbox--border-line-style) var(--sirius-checkbox--border-color);
+    border-radius: var(--sirius-checkbox--border-radius);
     cursor: pointer;
-    position: relative;
-    outline: none;
 }
 
-.checkbox-input:checked {
-    background-color: hsl(313, 86%, 30%);
-    border-color: #921baa;
+.label-container {
+    order: 0
 }
 
-.checkbox-input:checked::after {
-    content: '✔';
-    color: #d3d6da;
-    font-size: 12px;
-    position: absolute;
-    top: -2px;
-    left: 2px;
-}
-
-.checkbox-label {
-    margin-left: 8px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    color: #28089c;
-    user-select: none; /* Evita la selección del texto cuando haces clic */
-}
-
-.checkbox-input:disabled {
-    background-color: #f1f3f5;
-    border-color: #ced4da;
-    cursor: not-allowed;
+.label {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    align-items: center;
+    justify-items: start;
 }

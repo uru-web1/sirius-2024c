@@ -1,14 +1,25 @@
-.label-container {
+:host {
     display: inline-block;
-    padding: 5px 10px;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    box-sizing: border-box;
+
+    --sirius-label--text-align: justify;
+    --sirius-label--background-color: transparent;
+    --sirius-label--color: black;
+    --sirius-label--font-family: 'Arial';
+    --sirius-label--font-size: 1rem;
+    --sirius-label--padding: 0;
 }
 
-.caption {
-    font-size: 14px;
-    font-family: 'Arial', sans-serif;
-    color: #333;
+.label-container {
+    height: fit-content;
+    background-color: var(--sirius-label--background-color);
 }
-  
+
+.caption-container {
+    overflow-wrap: break-word;
+    text-align: var(--sirius-label--text-align);
+    padding: var(--sirius-label--padding);
+    font-size: var(--sirius-label--font-size);
+    font-family: var(--sirius-label--font-family), sans-serif;
+    color: var(--sirius-label--color);
+}

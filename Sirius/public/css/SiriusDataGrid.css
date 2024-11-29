@@ -1,0 +1,149 @@
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f5; 
+}
+
+.data-grid-container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    max-width: 90%;
+    margin: 0 auto;
+    width: 800px; 
+}
+
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.button {
+    background-color:  #a9b4c0;
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin-left: 8px;
+}
+
+.button:hover {
+    background-color: #a9b4c0;
+}
+
+/* Estilos de la tabla */
+.data-grid {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-grid th, .data-grid td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e5e5;
+    text-align: left;
+    font-size: 16px;
+    color: #333;
+}
+
+.data-grid th {
+    font-weight: bold;
+    background-color: #f5f5f7;
+}
+
+.data-grid td {
+    background-color: #ffffff;
+}
+
+/* Estilo para las celdas editables */
+.editable-cell {
+    cursor: text;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+
+/* Estilo de los checkboxes */
+.select-all-checkbox, .row-checkbox {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    accent-color: #a9b4c0;
+}
+
+/* Estilo de la paginación */
+.pagination {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+}
+
+/* Estilos para filas seleccionadas */
+.data-grid .data-row-selected {
+    background-color: #e6f0ff;
+}
+
+.data-grid .data-row-selected:hover {
+    background-color: #d4e6ff;
+}
+
+/* Hover en filas de la tabla */
+.data-grid tr:hover td {
+    background-color: #f5f5f7;
+}
+
+/* Responsive: Ajusta la tabla en pantallas pequeñas */
+@media (max-width: 768px) {
+    .data-grid-container {
+        padding: 12px;
+        width: 100%;
+    }
+    
+    .button {
+        width: 32px;
+        height: 32px;
+        padding: 6px;
+        font-size: 14px;
+    }
+    
+    .data-grid th, .data-grid td {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .pagination {
+        font-size: 14px;
+    }
+}
+.pagination {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.pagination-button {
+    background-color:  #a9b4c0;
+    color: white;
+    border: none;
+    padding: 8px;
+    margin: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-button:hover {
+    background-color:  #a9b4c0;
+}
