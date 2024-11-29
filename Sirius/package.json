@@ -9,7 +9,7 @@
   "author": "uru-web1",
   "license": "ISC",
   "dependencies": {
-    "jsdoc": "^4.0.3"
+    "jsdoc": "^4.0.4"
   },
   "type": "module"
 }

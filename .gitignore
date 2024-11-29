@@ -5,3 +5,6 @@
 # IDEs folders
 /**/*/.idea
 /**/*/.vscode
+
+# JSDoc folders
+/**/*/docs
