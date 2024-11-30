@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Grid Example</title>
+    <script type="module" src="../js/SiriusDataGrid.js"></script>
+    <link rel="stylesheet" href="../css/SiriusDataGrid.css">
+</head>
+<body>
+    <sirius-data-grid 
+        columns='[
+            {"label": "Nombre", "field": "name"}, 
+            {"label": "Edad", "field": "age"}, 
+            {"label": "País", "field": "country"}
+        ]'
+        data='[
+            {"name": "Carlos", "age": 22, "country": "Venezuela"},
+            {"name": "Valeria", "age": 20, "country": "Colombia"},
+            {"name": "Juan", "age": 25, "country": "España"},
+            {"name": "Maria", "age": 28, "country": "Argentina"}
+        ]'
+        rows-per-page="5">
+    </sirius-data-grid>
+</body>
+</html>
