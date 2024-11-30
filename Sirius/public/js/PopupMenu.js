@@ -29,6 +29,12 @@ export const POPUP_MENU = deepFreeze({
     },
 });
 
+function generateUniqueId(prefix = "icon") {
+    const timestamp = Date.now();
+    const randomSuffix = Math.floor(Math.random() * 1000);
+    return `${prefix}-${timestamp}-${randomSuffix}`;
+}
+
 // Clase que define el componente PopupMenu
 export class PopupMenu extends SiriusElement {
     // Propiedades privadas del componente
@@ -61,13 +67,17 @@ export class PopupMenu extends SiriusElement {
         if (this.#currentLevel > 0) {
             const lastOption = this.#optionTrail[this.#optionTrail.length - 1]; // Última opción seleccionada
             const backButtonText = lastOption ? lastOption.text : "Back"; // Texto del botón de retroceso
+            const uniqueId = generateUniqueId(`back-icon`);
             return `
                 <div class="${POPUP_MENU.CLASSES.BACK_BUTTON}">
-                    <sirius-icon class="${POPUP_MENU.CLASSES.BACK_ICON_ICON}" icon="arrow" fill="black" height="20px" width="20px" rotation="left" id="back-icon"></sirius-icon>
+                    <sirius-icon class="${POPUP_MENU.CLASSES.BACK_ICON_ICON}" icon="arrow" fill="black" height="20px" width="20px" rotation="left" id="${uniqueId}"></sirius-icon>
                     ${backButtonText}
                 </div>`;
         }
-        return ""; // Si no hay niveles anteriores, no muestra el botón
+        return `
+            <div class="${POPUP_MENU.CLASSES.BACK_BUTTON}">
+                Home
+            </div>`; // Si no hay niveles anteriores, muestra el boton home
     }
 
     // Agrega una opción al mapa de niveles
@@ -94,8 +104,9 @@ export class PopupMenu extends SiriusElement {
 
     // Renderiza el icono del menú (cuando está cerrado)
     #renderMenuIcon() {
+        const uniqueId = generateUniqueId(`menu-icon`);
         return `
-            <sirius-icon class="${POPUP_MENU.CLASSES.MENU_ICON}" icon="menu" fill="black" height="20px" width="24px" id="icon-1"></sirius-icon>
+            <sirius-icon class="${POPUP_MENU.CLASSES.MENU_ICON}" icon="menu" fill="black" height="20px" width="24px" id="${uniqueId}"></sirius-icon>
         `;
     }
 
@@ -105,7 +116,7 @@ export class PopupMenu extends SiriusElement {
         const optionsHTML = [...options]
             .map((option, index) => {
                 const hasNextLevel = option.nextLevel !== null && !isNaN(option.nextLevel); // Verifica si hay un nivel siguiente
-                const uniqueId = `option-icon-${this.#currentLevel}-${index}`; // Genera un ID único para cada opción
+                const uniqueId = generateUniqueId(`option-${this.#currentLevel}-${index}`); // Genera un ID único para cada opción
                 return `
                     <div class="${POPUP_MENU.CLASSES.MENU_OPTION}" 
                         data-action="${option.action}" 
@@ -243,7 +254,7 @@ export class PopupMenu extends SiriusElement {
         this.shadowRoot.addEventListener("click", async (event) => {
             if (event.target.classList.contains(POPUP_MENU.CLASSES.MENU_ICON)) {
                 this.#toggleMenu(); // Abre o cierra el menú
-            } else if (event.target.classList.contains(POPUP_MENU.CLASSES.BACK_BUTTON)) {
+            } else if (event.target.closest(`.${POPUP_MENU.CLASSES.BACK_BUTTON}`)) {
                 await this.#onBackClick(); // Retrocede un nivel
             } else {
                 this.#onOptionClick(event); // Maneja la selección de opciones
