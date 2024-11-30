@@ -1,4 +1,4 @@
-<<<<<<< Updated upstream
+
 body {
     font-family: Arial, sans-serif;
     display: flex;
@@ -8,19 +8,17 @@ body {
     margin: 5px;
     background-color: #f4f4f4;
     padding: 5px;
-=======
+}
 :host {
     display: block;
     font-family: Arial, sans-serif;
     font-size: 14px;
     color: #333;
     background-color: var(--background-color, #f9f9f9);
->>>>>>> Stashed changes
 }
 
 .radio-container {
     display: flex;
-<<<<<<< Updated upstream
     align-items: center; 
     margin: 4px;
     border: 2px solid rgba(0, 0, 0, 0.233);
@@ -60,8 +58,6 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-}
-=======
     flex-direction: column;
     gap: var(--gap, 10px);
     padding: 5px;
@@ -69,6 +65,41 @@ body {
     background-color: var(--background-color, #e0e0e0);
     border-radius: 8px;
     box-sizing: border-box;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+
+
+/* Hover para el contenedor */
+.radio-group-container:hover {
+    background-color: #ececec;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Contenedor de cada radio */
+.radio-container {
+    display: flex;
+    align-items: center;
+    background-color: rgb(235, 214, 217);
+    border: 2px solid rgba(0, 0, 255, 0);
+    border-radius: 8px;
+    padding: 5px 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
+    width: auto; /* El ancho será dinámico, ajustado a los elementos */
+    max-width: 20%; /* Máximo 80% del ancho de la ventana */
+    min-width: 200px; /* Ancho mínimo de 200px */
+    box-sizing: border-box;
+}
+
+/* Hover para el contenedor del radio */
+.radio-container:hover {
+    background-color: rgb(231, 191, 197);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .items-container {
@@ -84,6 +115,15 @@ body {
     padding: 5px;
 }
 
+/* Contenedor individual de cada item */
+.item-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
 .item-container input[type="radio"] {
     appearance: none;
     -webkit-appearance: none;
@@ -95,8 +135,16 @@ body {
     margin-right: 10px;
     position: relative;
     transition: all 0.3s ease;
+    border: 2px solid var(--radio-color, #c565c9); /* Color del radio */
+    margin-right: 10px;
+    position: relative;
+    transition: all 0.3s ease;/* Sombra del radio */
+}
+.item-container input[type="radio"]:checked {
+    box-shadow: 0 0 5px var(--radio-color, #b05bb3); /* Sombra color del radio */
 }
 
+/* Estilo del radio cuando está seleccionado */
 .item-container input[type="radio"]:checked::after {
     content: '';
     position: absolute;
@@ -114,6 +162,19 @@ body {
 }
 
 .item-container input[type="radio"]:focus {
-    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.5);
+    background-color: #c565c9; /* Fondo rosado claro cuando está seleccionado */
+    transform: translate(-50%, -50%);
 }
->>>>>>> Stashed changes
+
+/* Cambiar fondo al pasar el ratón sobre el radio */
+.item-container:hover {
+    background-color: rgb(235, 214, 217); 
+    width: 150px;
+}
+
+
+/* Texto de la etiqueta */
+.radio-label {
+    font-size: 16px;
+    margin-left: 10px;
+}

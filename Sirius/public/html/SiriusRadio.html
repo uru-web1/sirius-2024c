@@ -1,81 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<<<<<<< Updated upstream
-    <title>Sirius Radio Example</title>
-    <script defer src="../js/Sirius.js" type="module"></script>
-<script defer src="../js/SiriusElement.js" type="module"></script>
-<script defer src="../js/SiriusRadio.js" type="module"></script>
-    <link rel="stylesheet" href="../css/SiriusRadio.css">
-</head>
-<body>
-
-<script type="module">
-    import sirius from '../js/Sirius.js';
-    import { SIRIUS_RADIO, SiriusRadio } from '../js/SiriusRadio.js';
-    import { SIRIUS_ELEMENT } from '../js/SiriusElement.js';
-
-    
-        const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
-        const labelKey = SIRIUS_RADIO.ATTRIBUTES.LABEL.NAME;
-        const checkedKey = SIRIUS_RADIO.ATTRIBUTES.CHECKED.NAME;
-        const nameKey = 'grupo1'; 
-
-        sirius.onLoaded = async () => {
-
-            const siriusRadio1 = new SiriusRadio({
-                [idKey]: 'radio-1',
-                [labelKey]: 'Fresa',
-                [checkedKey]: false,
-                name: nameKey
-            });
-
-            const siriusRadio2 = new SiriusRadio({
-                [idKey]: 'radio-2',
-                [labelKey]: 'Mora',
-                [checkedKey]: false,
-                name: nameKey
-            });
-
-            const siriusRadio3 = new SiriusRadio({
-                [idKey]: 'radio-3',
-                [labelKey]: 'Opción 1',
-                [checkedKey]: false,
-                name: nameKey
-            });
-
-            const siriusRadio4 = new SiriusRadio({
-                [idKey]: 'radio-4',
-                [labelKey]: 'Opción 2',
-                [checkedKey]: false,
-                name: nameKey
-            });
-
-            const siriusRadio5 = new SiriusRadio({
-                [idKey]: 'radio-5',
-                [labelKey]: 'Opción 3',
-                [checkedKey]: false,
-                name: nameKey
-            });
-
-            // Agregar los radios al body
-            siriusRadio1.addToBody();
-            siriusRadio2.addToBody();
-            siriusRadio3.addToBody();
-            siriusRadio4.addToBody();
-            siriusRadio5.addToBody();
-            };
-
-            document.addEventListener('DOMContentLoaded', async () => {
-            if (sirius.onLoaded) {
-                await sirius.onLoaded();
-            }
-            });
-            
-            </script>
-=======
     <title>SiriusRadio Example</title>
     <script defer src="../js/Sirius.js" type="module"></script>
     <script defer src="../js/SiriusRadio.js" type="module"></script> 
@@ -84,50 +12,42 @@
 <body>
 
     <script type="module">
-        import sirius from '../js/Sirius.js';
-        import {SiriusRadio, SIRIUS_RADIO_ATTRIBUTES} from '../js/SiriusRadio.js';  
-        import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
+    import sirius from '../js/Sirius.js';
+    import {SiriusRadio, SIRIUS_RADIO_ATTRIBUTES} from '../js/SiriusRadio.js';  
+    import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
 
-        // Función que se ejecutará cuando la página haya cargado
-        sirius.onLoaded = async () => {
-            const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
-            const itemsKey = SIRIUS_RADIO_ATTRIBUTES.ITEMS;
-            const backgroundKey = SIRIUS_RADIO_ATTRIBUTES.BACKGROUND_COLOR;
-            const radioColorKey = SIRIUS_RADIO_ATTRIBUTES.RADIO_COLOR;
-            const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+    // Función que se ejecutará cuando la página haya cargado
+    sirius.onLoaded = async () => {
+        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+        const itemsKey = SIRIUS_RADIO_ATTRIBUTES.ITEMS;
+        const backgroundKey = SIRIUS_RADIO_ATTRIBUTES.BACKGROUND_COLOR;
+        const radioColorKey = SIRIUS_RADIO_ATTRIBUTES.RADIO_COLOR;
+        const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
 
-            // Crear un nuevo RadioButton Group 
-            const radioGroup1 = new SiriusRadio({
-                [idKey]: 'radio-group-1',
-                [itemsKey]: JSON.stringify([
-                    { "id": "radio-1", "label": "Azul" },
-                    { "id": "radio-2", "label": "Amarillo" },
-                    { "id": "radio-3", "label": "Rojo" }
-                ]),
-                [backgroundKey]: 'lightgreen',
-                [radioColorKey]: 'green',
-                [styleKey]: "{'position': 'absolute', 'top': '10px', 'left': '10px'}"
-            });
+        // Crear un nuevo RadioButton Group 
+        const radioGroup1 = new SiriusRadio({
+    [idKey]: 'radio-group-1',
+    [itemsKey]: JSON.stringify([
+        { "id": "radio-1", "label": "Azul" },
+        { "id": "radio-2", "label": "Amarillo" },
+        { "id": "radio-3", "label": "Rojo" }
+    ]),
+});
 
-            // Crear otro grupo de radios con diferentes opciones y estilos
-            const radioGroup2 = new SiriusRadio({
-                [idKey]: 'radio-group-2',
-                [itemsKey]: JSON.stringify([
-                    { "id": "radio-1", "label": "Fresa" },
-                    { "id": "radio-2", "label": "Pera" },
-                    { "id": "radio-3", "label": "Manzana" }
-                ]),
-                [backgroundKey]: 'lightpink',
-                [radioColorKey]: 'purple',
-                [styleKey]: "{'position': 'absolute', 'top': '200px', 'left': '20px'}"
-            });
+const radioGroup2 = new SiriusRadio({
+    [idKey]: 'radio-group-2',
+    [itemsKey]: JSON.stringify([
+        { "id": "radio-1", "label": "Fresa" },
+        { "id": "radio-2", "label": "Pera" },
+        { "id": "radio-3", "label": "Manzana" }
+    ]),
+});
 
-            // Añadir los grupos de radio al cuerpo del documento
-            radioGroup1.addToBody();
-            radioGroup2.addToBody();
-        };
-    </script>
->>>>>>> Stashed changes
+        // Añadir los grupos de radio al cuerpo del documento
+        radioGroup1.addToBody();
+        radioGroup2.addToBody();
+    };
+</script>
 
 </body>
 </html>
