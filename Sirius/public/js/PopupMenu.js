@@ -32,12 +32,9 @@ export const POPUP_MENU = deepFreeze({
 // Clase que define el componente PopupMenu
 export class PopupMenu extends SiriusElement {
     // Propiedades privadas del componente
-    #menuContainerElement = null; // Contenedor del menú
     #menuOpen = false; // Indica si el menú está abierto
     #currentLevel = 0; // Nivel actual del menú (jerarquía)
-    #optionLevels = []; // Niveles de opciones disponibles
     #fixedOptions = []; // Opciones fijas (siempre visibles)
-    #animationDuration = 300; // Duración de las animaciones en milisegundos
     #optionLevelMap = new Map(); // Mapa que relaciona niveles con sus opciones
     #clickOutsideHandler = null; // Manejador para clicks fuera del menú
     #optionTrail = []; // Historial de opciones seleccionadas
@@ -49,11 +46,6 @@ export class PopupMenu extends SiriusElement {
         if (properties?.title) { // Si se proporciona un título al crear el componente
             this.#menuTitle = properties.title;
         }
-    }
-
-    // Atributos del componente que se observan para cambios
-    static get observedAttributes() {
-        return [...SiriusElement.observedAttributes];
     }
 
     // Método para cambiar el título del menú
@@ -111,15 +103,16 @@ export class PopupMenu extends SiriusElement {
     #renderOptions() {
         const options = this.#optionLevelMap.get(this.#currentLevel)?.values() || []; // Obtiene las opciones del nivel actual
         const optionsHTML = [...options]
-            .map((option) => {
+            .map((option, index) => {
                 const hasNextLevel = option.nextLevel !== null && !isNaN(option.nextLevel); // Verifica si hay un nivel siguiente
+                const uniqueId = `option-icon-${this.#currentLevel}-${index}`; // Genera un ID único para cada opción
                 return `
                     <div class="${POPUP_MENU.CLASSES.MENU_OPTION}" 
                         data-action="${option.action}" 
                         data-next-level="${option.nextLevel}" 
                         data-prior-level="${option.priorLevel}">
                         ${option.text}
-                        ${hasNextLevel ? `<sirius-icon class="${POPUP_MENU.CLASSES.OPTION_ICON}" icon="arrow" fill="black" height="20px" width="20px" rotation="right" id="option-icon"></sirius-icon>` : `<span class="icon-placeholder"></span>`}
+                        ${hasNextLevel ? `<sirius-icon class="${POPUP_MENU.CLASSES.OPTION_ICON}" icon="arrow" fill="black" height="20px" width="20px" rotation="right" id="${uniqueId}"></sirius-icon>` : `<span class="icon-placeholder"></span>`}
                     </div>`;
             })
             .join(""); // Une las opciones en un solo string de HTML
@@ -142,6 +135,7 @@ export class PopupMenu extends SiriusElement {
             </div>
         `;
     }
+    
     // Genera la plantilla completa del menú dependiendo de su estado (abierto o cerrado)
     #getTemplate() {
         if (!this.#menuOpen) {
@@ -157,7 +151,7 @@ export class PopupMenu extends SiriusElement {
                 ${backButtonHTML}
                 ${optionsHTML}
             </div>
-            <div class="${POPUP_MENU.CLASSES.FONDO}"></div> <!-- Fondo para cerrar el menú al hacer clic fuera -->
+            
         `;
     }
 
@@ -165,6 +159,7 @@ export class PopupMenu extends SiriusElement {
     #toggleMenu() {
         this.#menuOpen = !this.#menuOpen; // Cambia el estado
         this.shadowRoot.innerHTML = this.#getTemplate(); // Actualiza el contenido
+        this.mainElemnt = this.shadowRoot.firstChild.nextSibling;
     
         if (this.#menuOpen) {
             this.#attachClickOutsideHandler(); // Agrega un manejador para cerrar el menú al hacer clic fuera
@@ -177,13 +172,24 @@ export class PopupMenu extends SiriusElement {
     #attachClickOutsideHandler() {
         this.#clickOutsideHandler = (event) => {
             if (!this.contains(event.target)) { // Si el clic no ocurrió dentro del menú
-                this.#menuOpen = false; // Cierra el menú
-                this.shadowRoot.innerHTML = this.#getTemplate(); // Actualiza el contenido
-                this.#detachClickOutsideHandler(); // Elimina el manejador
+                const menuContainer = this.shadowRoot.querySelector(`.${POPUP_MENU.CLASSES.MENU_CONTAINER}`);
+                if (menuContainer) {
+                    // Agrega la clase de animación 'slide-out'
+                    menuContainer.classList.remove(POPUP_MENU.CLASSES.SLIDE_OUT);
+                    menuContainer.classList.add(POPUP_MENU.CLASSES.SLIDE_IN);
+                    
+                    // Espera a que la animación termine antes de cerrar el menú
+                    menuContainer.addEventListener('animationend', () => {
+                        this.#menuOpen = false; // Actualiza el estado del menú
+                        this.shadowRoot.innerHTML = this.#getTemplate(); // Actualiza el contenido
+                        this.#detachClickOutsideHandler(); // Elimina el manejador
+                    }, { once: true });
+                }
             }
         };
         document.addEventListener("click", this.#clickOutsideHandler); // Escucha eventos de clic en el documento
     }
+
 
     // Elimina el manejador de clics fuera del menú
     #detachClickOutsideHandler() {

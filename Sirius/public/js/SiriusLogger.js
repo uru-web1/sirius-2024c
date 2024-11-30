@@ -55,38 +55,38 @@ export class SiriusLogger {
      * @param {string} padding - Padding
      * @returns {string} - Padded message
      */
-    addPadding(message, maxLength= message.length, padding='') {
-        // Get the filled message
+    addPadding(message, maxLength = message.length, padding = '') {
+        if (typeof message !== 'string') {
+            message = String(message); // Convertir a cadena
+        }
+    
         const filledMessage = message.concat(SIRIUS_LOGGER.PADDING.FILL_CHAR.repeat(maxLength - message.length));
-
-        return [padding, filledMessage,padding].join('')
+        return [padding, filledMessage, padding].join('');
     }
+    
 
     /** String formatting
      * @param {string} message - Message to log
      */
     format(message) {
-        // Get maximum length
+        if (typeof message !== 'string') {
+            message = String(message); // Convertir a cadena si no lo es
+        }
+    
         const maxLength = Math.max(this.#name.length, this.#elementId?.length || 0, message.length);
-
-        // Get padding
         const padding = SIRIUS_LOGGER.PADDING.FILL_CHAR.repeat(SIRIUS_LOGGER.PADDING.WIDTH);
-
-        // Get padded class name
-        const paddedClassName = this.addPadding(this.#name,maxLength, padding);
-
-        // Get padded message
-        const paddedMessage = this.addPadding(message,maxLength, padding);
-
-        // Check if element ID is available
-        if (!this.#elementId)
-            return ['%c', paddedClassName, paddedMessage].join('\n')
-
-        // Get padded element ID
-        const paddedElementId = this.addPadding(this.#elementId,maxLength, padding);
-
-        return ['%c', paddedClassName, paddedElementId, paddedMessage].join('\n')
+    
+        const paddedClassName = this.addPadding(this.#name, maxLength, padding);
+        const paddedMessage = this.addPadding(message, maxLength, padding);
+    
+        if (!this.#elementId) {
+            return ['%c', paddedClassName, paddedMessage].join('\n');
+        }
+    
+        const paddedElementId = this.addPadding(this.#elementId, maxLength, padding);
+        return ['%c', paddedClassName, paddedElementId, paddedMessage].join('\n');
     }
+    
 
     /** Get color CSS
      * @param {string} bgColor - Background color
@@ -102,26 +102,30 @@ export class SiriusLogger {
      */
     log(message) {
         if (!SIRIUS_LOGGER.DEBUG) return;
-
-        // Get the log colors
+    
+        if (typeof message !== 'string') {
+            message = String(message); // Convertir a cadena
+        }
+    
         const cssStyle = this.#getColorCSS({
             bgColor: this.#logBgColor,
             color: this.#logColor
         });
         console.log(this.format(message), cssStyle);
     }
-
-    /** Sirius logger on error
-     * @param {string} message - Message to log
-     */
+    
     error(message) {
         if (!SIRIUS_LOGGER.DEBUG) return;
-
-        // Get the error colors
+    
+        if (typeof message !== 'string') {
+            message = String(message); // Convertir a cadena
+        }
+    
         const cssStyle = this.#getColorCSS({
             bgColor: this.#errorBgColor,
             color: this.#errorColor
         });
         console.error(this.format(message), cssStyle);
     }
+    
 }

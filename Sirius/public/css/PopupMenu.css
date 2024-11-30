@@ -63,23 +63,6 @@
     }
 }
 
-@keyframes overlayIn {
-    from {
-        transform: translateX(100%);
-    }
-    to {
-        transform: translateX(0);
-    }
-}
-
-@keyframes overlayOut {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(-100%);
-    }
-}
 
 .menu-option {
     display: flex;
