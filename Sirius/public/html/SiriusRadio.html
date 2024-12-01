@@ -1,52 +1,72 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>SiriusRadio Example</title>
+    <title>Sirius Radio Example</title>
     <script defer src="../js/Sirius.js" type="module"></script>
-    <script defer src="../js/SiriusRadio.js" type="module"></script> 
-    <script defer src="../js/SiriusElement.js" type="module"></script> 
+    <script defer src="../js/SiriusElement.js" type="module"></script>
+    <script defer src="../js/SiriusRadio.js" type="module"></script>
+    <link rel="stylesheet" href="../css/SiriusRadio.css">
 </head>
 <body>
 
-    <script type="module">
+<script type="module">
     import sirius from '../js/Sirius.js';
-    import {SiriusRadio, SIRIUS_RADIO_ATTRIBUTES} from '../js/SiriusRadio.js';  
-    import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
+    import { SIRIUS_RADIO, SiriusRadio } from '../js/SiriusRadio.js';
+    import { SIRIUS_ELEMENT } from '../js/SiriusElement.js';
 
-    // Función que se ejecutará cuando la página haya cargado
+    const idKey = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
+    const labelKey = SIRIUS_RADIO.ATTRIBUTES.LABEL.NAME;
+    const checkedKey = SIRIUS_RADIO.ATTRIBUTES.CHECKED.NAME;
+
+    // Primer grupo de radios
+    const nameKey1 = 'grupo1';
     sirius.onLoaded = async () => {
-        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
-        const itemsKey = SIRIUS_RADIO_ATTRIBUTES.ITEMS;
-        const backgroundKey = SIRIUS_RADIO_ATTRIBUTES.BACKGROUND_COLOR;
-        const radioColorKey = SIRIUS_RADIO_ATTRIBUTES.RADIO_COLOR;
-        const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+        const siriusRadio1 = new SiriusRadio({
+            [idKey]: 'radio-1',
+            [labelKey]: 'Fresa',
+            [checkedKey]: false,
+            name: nameKey1
+        });
+        const siriusRadio2 = new SiriusRadio({
+            [idKey]: 'radio-2',
+            [labelKey]: 'Mora',
+            [checkedKey]: false,
+            name: nameKey1
+        });
+        const siriusRadio3 = new SiriusRadio({
+            [idKey]: 'radio-3',
+            [labelKey]: 'Uva',
+            [checkedKey]: false,
+            name: nameKey1
+        });
+        const siriusRadio4 = new SiriusRadio({
+            [idKey]: 'radio-4',
+            [labelKey]: 'Manzana',
+            [checkedKey]: false,
+            name: nameKey1
+        });
+        const siriusRadio5 = new SiriusRadio({
+            [idKey]: 'radio-5',
+            [labelKey]: 'Pera',
+            [checkedKey]: false,
+            name: nameKey1
+        });
 
-        // Crear un nuevo RadioButton Group 
-        const radioGroup1 = new SiriusRadio({
-    [idKey]: 'radio-group-1',
-    [itemsKey]: JSON.stringify([
-        { "id": "radio-1", "label": "Azul" },
-        { "id": "radio-2", "label": "Amarillo" },
-        { "id": "radio-3", "label": "Rojo" }
-    ]),
-});
-
-const radioGroup2 = new SiriusRadio({
-    [idKey]: 'radio-group-2',
-    [itemsKey]: JSON.stringify([
-        { "id": "radio-1", "label": "Fresa" },
-        { "id": "radio-2", "label": "Pera" },
-        { "id": "radio-3", "label": "Manzana" }
-    ]),
-});
-
-        // Añadir los grupos de radio al cuerpo del documento
-        radioGroup1.addToBody();
-        radioGroup2.addToBody();
+        // Agregar los radios al body
+        siriusRadio1.addToBody();
+        siriusRadio2.addToBody();
+        siriusRadio3.addToBody();
+        siriusRadio4.addToBody();
+        siriusRadio5.addToBody();
     };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (sirius.onLoaded) {
+            await sirius.onLoaded();
+        }
+    });
 </script>
 
 </body>

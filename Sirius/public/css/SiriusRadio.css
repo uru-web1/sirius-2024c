@@ -18,8 +18,8 @@ body {
 }
 
 .radio-container {
-    display: flex;
-    align-items: center; 
+    display: table-column;
+    align-items: row; 
     margin: 4px;
     border: 2px solid rgba(0, 0, 0, 0.233);
     padding: 3px;
@@ -29,7 +29,7 @@ body {
 }
 
 .radio-svg {
-    display: flex; 
+    display: table-column; 
     align-items: center; 
     margin-right: 0px; 
     cursor: pointer;
@@ -117,54 +117,17 @@ body {
 
 /* Contenedor individual de cada item */
 .item-container {
-    display: flex;
+    display: table-column;
     align-items: center;
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 5px;
 }
 
-.item-container input[type="radio"] {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 2px solid var(--radio-color, #ca85cc);
-    margin-right: 10px;
-    position: relative;
-    transition: all 0.3s ease;
-    border: 2px solid var(--radio-color, #c565c9); /* Color del radio */
-    margin-right: 10px;
-    position: relative;
-    transition: all 0.3s ease;/* Sombra del radio */
-}
-.item-container input[type="radio"]:checked {
-    box-shadow: 0 0 5px var(--radio-color, #b05bb3); /* Sombra color del radio */
-}
-
-/* Estilo del radio cuando está seleccionado */
-.item-container input[type="radio"]:checked::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: var(--radio-color, #b68bc4);
-    transform: translate(-50%, -50%);
-}
-
 .item-container:hover {
     background-color: #ffffff;
 }
 
-.item-container input[type="radio"]:focus {
-    background-color: #c565c9; /* Fondo rosado claro cuando está seleccionado */
-    transform: translate(-50%, -50%);
-}
 
 /* Cambiar fondo al pasar el ratón sobre el radio */
 .item-container:hover {
