@@ -1,0 +1,22 @@
+:host{
+    display: inline-block;
+    --gap: 10px;
+    --padding: 10px;
+    --background-color: rgb(184, 184, 184);
+}
+
+.exchange-list-container {
+    display: flex;
+    gap: var(--gap);
+    padding: var(--padding);
+    background-color: var(--background-color);
+    border-radius: 1em;
+    margin: 40px;
+}
+
+.buttom-container {
+    display: grid;
+    align-items: center;
+    gap: 10px
+}
+

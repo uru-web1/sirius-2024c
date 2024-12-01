@@ -1,0 +1,113 @@
+/* Reset padding, margin, and box-sizing for all elements */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* Container for the tree structure */
+ul.tree {
+    width: 180px;
+    margin: 0 auto;
+    padding-top: 48px;
+}
+
+/* Base styles for list items */
+ul li {
+    position: relative;
+    list-style: none;
+    padding: 4px 0;
+}
+
+/* Line styles for all list items */
+li::before,
+li::after {
+    content: '';
+    position: absolute;
+    background-color: #979797; /* Line color */
+}
+
+/* Horizontal line before each list item */
+li::before {
+    width: 16px;
+    height: 1px;
+    top: 12px;
+    left: -28px;
+}
+
+/* Vertical line after each list item */
+li::after {
+    width: 1px;
+    height: 26px;
+    top: -14px;
+    left: -28px;
+}
+
+/* Styles for parent list items to extend the vertical line */
+li.parent::after {
+    height: 100%;
+    top: 12px;
+}
+
+/* Remove the vertical line for the last child of a parent item */
+li.parent:last-child::after {
+    content: none;
+}
+
+/* Styles for <details> elements in the tree */
+details {
+    margin: 0 auto;
+    max-height: 18px;
+    transition: max-height 1s linear;
+}
+
+/* Expand the <details> when open */
+details[open] {
+    max-height: 1000px;
+}
+
+/* Styles for the <summary> elements (the clickable part of <details>) */
+summary {
+    display: block;
+    position: relative;
+    cursor: pointer;
+}
+
+/* Expand/collapse button styles */
+summary::before {
+    content: '+';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    top: 0;
+    left: -22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #fff;
+    background-color: blueviolet;
+    border-radius: 50%;
+}
+
+/* Change the button content and color when the details are open */
+details[open] > summary::before {
+    content: '-';
+    background-color: #4b7bec;
+}
+
+/* Padding for nested <ul> inside <details> */
+details > ul {
+    padding-left: 15px;
+}
+
+/* Apply line color for all nested list items */
+ul li::before,
+ul li::after {
+    background-color: #979797;
+}
+
+/* Custom styles for the 'sirius-checkbox' element */
+sirius-checkbox {
+    display: inline-block;
+}

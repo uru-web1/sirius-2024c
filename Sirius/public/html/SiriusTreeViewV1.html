@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree View UI</title>
+    <link rel="stylesheet" href="../css/Sirius.css">
+    <script defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusLabel.js" type="module"></script>
+    <script defer src="../js/SiriusTreeViewV1.js" type="module"></script>
+    <script defer src="../js/SiriusCheckbox.js" type="module"></script>
+    <script defer src="../js/SiriusIcon.js" type="module"></script>
+</head>
+<body>
+
+    <sirius-treeview id="1"> 
+        
+        <tree-item summary-content="l">
+            <p>hola</p>
+            <sirius-checkbox data-children='checkbox-2,checkbox-3,checkbox-4' label-caption='The last of us' id='checkbox-1' icon-height=10px icon-width=10px></sirius-checkbox>
+            <sirius-checkbox label-caption='The last of us' id=checkbox-2 icon-height=10px icon-width=10px></sirius-checkbox>
+            <sirius-checkbox label-caption='The last of us' id='checkbox-3' icon-height=10px icon-width=10px></sirius-checkbox>
+            <sirius-checkbox data-children='checkbox-8,checkbox-9' label-caption='The last of us' id=checkbox-4 icon-height=10px icon-width=10px></sirius-checkbox>
+            <tree-item summary-content="l">
+                <p>hola</p>
+                <sirius-checkbox label-caption='The last of us' id=checkbox-8 icon-height=10px icon-width=10px></sirius-checkbox>
+                <sirius-checkbox label-caption='The last of us' id=checkbox-9 icon-height=10px icon-width=10px></sirius-checkbox>
+            </tree-item>
+        </tree-item>
+    </sirius-treeview>
+
+    
+    
+
+    
+</body>
+</html>

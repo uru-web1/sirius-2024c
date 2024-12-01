@@ -4,7 +4,7 @@ export const SIRIUS_MENU_BAR = {
     NAME: "SiriusMenuBar",
     TAG: "sirius-menu-bar",
     ATTRIBUTES: {
-        ITEMS: { NAME: "items", DEFAULT: [], TYPE: "array" },
+        ITEMS: { NAME: "items", DEFAULT: [], TYPE: "array" }, // Aseguramos que ITEMS esté definido
         ID: { NAME: "id", DEFAULT: null, TYPE: "string" }
     },
     CLASSES: {
@@ -17,84 +17,120 @@ export const SIRIUS_MENU_BAR = {
 };
 
 export class SiriusMenuBar extends SiriusElement {
-    constructor(props = {}) {
-        // Validar y asignar un ID si no se proporciona
-        if (!props.id) {
-            props.id = `sirius-menu-${Math.random().toString(36).substr(2, 9)}`;
+    #menuContainer = null;
+
+    constructor(properties = {}) {
+        // Verificar que los atributos están correctamente definidos
+        if (!SIRIUS_MENU_BAR.ATTRIBUTES || !SIRIUS_MENU_BAR.ATTRIBUTES.ITEMS) {
+            throw new Error("SIRIUS_MENU_BAR.ATTRIBUTES.ITEMS is not defined");
         }
 
-        // Llama al constructor de la clase base SiriusElement
-        super(props, SIRIUS_MENU_BAR.NAME);
+        // Asignar un ID único si no se proporciona
+        if (!properties.id) {
+            properties.id = `sirius-menu-bar-${Math.random().toString(36).substr(2, 9)}`;
+        }
 
-        // Inicializar los atributos
+        super(properties, SIRIUS_MENU_BAR.NAME);
+
+        // Inicializar los atributos con validación de ITEMS
         this._attributes = {
             ...SIRIUS_MENU_BAR.ATTRIBUTES,
-            ...props,
-            items: this.#parseItems(props.items || this.getAttribute(SIRIUS_MENU_BAR.ATTRIBUTES.ITEMS.NAME) || [])
+            ...properties,
+            items: this.#parseItems(
+                properties.items || this.getAttribute(SIRIUS_MENU_BAR.ATTRIBUTES.ITEMS.NAME) || []
+            )
         };
+
+        // Construcción del componente
+        this.#build().then();
     }
 
-    #parseItems(items) {
-        if (typeof items === 'string') {
-            try {
-                return JSON.parse(items);
-            } catch (e) {
-                console.error("Error parsing items:", e);
-                return [];
-            }
-        }
-        return Array.isArray(items) ? items : [];
-    }
+    async #build() {
+        // Carga y adopta estilos
+        await this._loadAndAdoptStyles();
 
-    async connectedCallback() {
-        await this._loadElementStyles();
-        this.render();
+        // Genera la plantilla del menú
+        const menuTemplate = this.#getTemplate();
+
+        // Renderiza el menú
+        this.shadowRoot.innerHTML = "";
+        this.shadowRoot.appendChild(menuTemplate);
+
+        // Asocia los eventos
         this.#attachEventListeners();
+
+        // Evento de inicialización
         this.dispatchBuiltEvent();
     }
 
-    render() {
-        const template = this.#getTemplate();
-        this.shadowRoot.innerHTML = template;
-    }
-
     #getTemplate() {
-        const items = this._attributes.items;
-        return `<div class="${SIRIUS_MENU_BAR.CLASSES.MENU}">
-                    ${items.map(item => this.#getMenuItemTemplate(item)).join("")}
-                </div>`;
+        const menuContainer = document.createElement("div");
+        menuContainer.classList.add(SIRIUS_MENU_BAR.CLASSES.MENU);
+
+        const items = this.#parseItems(this._attributes.items || []);
+        items.forEach((item) => {
+            const menuItem = this.#createMenuItem(item);
+            menuContainer.appendChild(menuItem);
+        });
+
+        this.#menuContainer = menuContainer;
+        return menuContainer;
     }
 
-    #getMenuItemTemplate(item) {
-        const hasSubmenu = Array.isArray(item.submenu) && item.submenu.length > 0;
-        const submenuHTML = hasSubmenu ? this.#getSubMenuTemplate(item.submenu) : "";
-        const submenuClass = hasSubmenu ? SIRIUS_MENU_BAR.CLASSES.HAS_SUBMENU : "";
+    #createMenuItem(item) {
+        const menuItem = document.createElement("div");
+        menuItem.classList.add(SIRIUS_MENU_BAR.CLASSES.MENU_ITEM);
 
-        return `
-            <div class="${SIRIUS_MENU_BAR.CLASSES.MENU_ITEM} ${submenuClass}">
-                <span>${item.label}</span>
-                ${submenuHTML}
-            </div>`;
+        const label = document.createElement("span");
+        label.textContent = item.label;
+        menuItem.appendChild(label);
+
+        if (Array.isArray(item.submenu) && item.submenu.length > 0) {
+            menuItem.classList.add(SIRIUS_MENU_BAR.CLASSES.HAS_SUBMENU);
+
+            const submenu = document.createElement("div");
+            submenu.classList.add(SIRIUS_MENU_BAR.CLASSES.SUBMENU);
+
+            item.submenu.forEach((subItem) => {
+                const submenuItem = this.#createMenuItem(subItem);
+                submenu.appendChild(submenuItem);
+            });
+
+            menuItem.appendChild(submenu);
+        }
+
+        return menuItem;
     }
 
-    #getSubMenuTemplate(submenuItems) {
-        return `<div class="${SIRIUS_MENU_BAR.CLASSES.SUBMENU}">
-                    ${submenuItems.map(subitem => this.#getMenuItemTemplate(subitem)).join("")}
-                </div>`;
+    #parseItems(items) {
+        try {
+            return typeof items === "string" ? JSON.parse(items) : items || [];
+        } catch (e) {
+            console.error("Error parsing items:", e);
+            return [];
+        }
     }
 
     #attachEventListeners() {
-        const menuItems = this.shadowRoot.querySelectorAll(`.${SIRIUS_MENU_BAR.CLASSES.HAS_SUBMENU}`);
-        menuItems.forEach(menuItem => {
-            const submenu = menuItem.querySelector(`.${SIRIUS_MENU_BAR.CLASSES.SUBMENU}`);
-            menuItem.addEventListener('mouseenter', () => {
+        const menuItems = this.#menuContainer.querySelectorAll(
+            `.${SIRIUS_MENU_BAR.CLASSES.HAS_SUBMENU}`
+        );
+
+        menuItems.forEach((menuItem) => {
+            const submenu = menuItem.querySelector(
+                `.${SIRIUS_MENU_BAR.CLASSES.SUBMENU}`
+            );
+
+            menuItem.addEventListener("mouseenter", () => {
                 submenu.classList.add(SIRIUS_MENU_BAR.CLASSES.ACTIVE);
             });
-            menuItem.addEventListener('mouseleave', () => {
+
+            menuItem.addEventListener("mouseleave", () => {
                 submenu.classList.remove(SIRIUS_MENU_BAR.CLASSES.ACTIVE);
             });
         });
     }
 }
 
+// Registro del elemento personalizado
 customElements.define(SIRIUS_MENU_BAR.TAG, SiriusMenuBar);
