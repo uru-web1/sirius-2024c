@@ -81,7 +81,7 @@ body {
 .radio-container {
     display: flex;
     align-items: center;
-    background-color: rgb(235, 214, 217);
+    background-color: rgba(238, 231, 232, 0.726);
     border: 2px solid rgba(0, 0, 255, 0);
     border-radius: 8px;
     padding: 5px 10px;
@@ -98,7 +98,7 @@ body {
 
 /* Hover para el contenedor del radio */
 .radio-container:hover {
-    background-color: rgb(231, 191, 197);
+    background-color: rgba(202, 194, 195, 0.685);
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
