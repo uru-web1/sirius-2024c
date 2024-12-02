@@ -63,8 +63,8 @@ export class SiriusRadio extends SiriusElement {
         });
     }
 
+    
     async connectedCallback() {
-        // Verifica que shadowRoot se haya creado correctamente
         if (!this.shadowRoot) {
             console.error('Shadow root not initialized');
             return;
@@ -75,7 +75,7 @@ export class SiriusRadio extends SiriusElement {
         this.shadowRoot.appendChild(this._templateContent);
 
         await this.loadStyles();
-        // Manejo de eventosa
+
         const input = this.shadowRoot.querySelector('input[type="radio"]');
         if (input) {
             input.addEventListener('click', () => this.toggleRadio());
@@ -86,6 +86,7 @@ export class SiriusRadio extends SiriusElement {
             svgContainer.addEventListener('click', () => this.toggleRadio());
         }
 
+        this._registerToGroup();
         this.dispatchBuiltEvent();
     }
 
@@ -101,6 +102,14 @@ export class SiriusRadio extends SiriusElement {
         }
     }
 
+    _registerToGroup() {
+        const groupName = this._attributes.group;
+        if (!SiriusRadio.radioGroups[groupName]) {
+            SiriusRadio.radioGroups[groupName] = [];
+        }
+        SiriusRadio.radioGroups[groupName].push(this);
+    }
+
     toggleRadio() {
         const input = this.shadowRoot.querySelector(`#${this._attributes.id}-input`);
         if (input) {
@@ -109,7 +118,6 @@ export class SiriusRadio extends SiriusElement {
             this._attributes.checked = input.checked;
             this.updateSVG();
 
-            // Si el radio se selecciona, deseleccionar otros en el mismo grupo
             if (this._attributes.checked) {
                 SiriusRadio.deselectOtherRadios(this._attributes.group, this);
             }
