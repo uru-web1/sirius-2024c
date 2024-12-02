@@ -1,16 +1,12 @@
 import {SIRIUS_TYPES, SiriusElement} from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
+import {SIRIUS_ICON_ATTRIBUTES, SiriusIcon} from "./SiriusIcon.js";
 
 /** Sirius Dialog constants */
 export const SIRIUS_DIALOG = deepFreeze({
     NAME: "SiriusDialog",
     TAG: "sirius-dialog",
-    ATTRIBUTES: {
-		TITLE: {NAME: "title", DEFAULT: "Sirius Window", TYPE: SIRIUS_TYPES.STRING},
-		WIDTH: {NAME: "width", DEFAULT: 600, TYPE: SIRIUS_TYPES.NUMBER },
-		HEIGHT: {NAME: "height", DEFAULT: 600, TYPE: SIRIUS_TYPES.NUMBER },
-		CONTENT: {NAME: "content", DEFAULT: null, TYPE: SIRIUS_TYPES.OBJECT },
-    },
+
     CLASSES: {
         TITLE_BAR: 'dialog-title-bar',
         WINDOW_CLOSE: 'dialog-window-close',
@@ -20,42 +16,105 @@ export const SIRIUS_DIALOG = deepFreeze({
     }
 });
 
+export const SIRIUS_DIALOG_ATTRIBUTES = deepFreeze({
+          TITLE: "title",
+          WIDTH: "width",
+          HEIGHT: "height",
+})
+
+export const SIRIUS_DIALOG_ATTRIBUTES_DEFAULT = deepFreeze({
+          [SIRIUS_DIALOG_ATTRIBUTES.TITLE]:"Sirius Window",
+          [SIRIUS_DIALOG_ATTRIBUTES.WIDTH]:"600",
+          [SIRIUS_DIALOG_ATTRIBUTES.HEIGHT]:"600",
+})
 /** Sirius class that represents a dialog component */
 export class SiriusDialog extends SiriusElement {
     /**
      * Create a Sirius dialog element
      * @param {Object} props - The properties of the Sirius dialog
      */
+    #dialogElement = null;
+    #content = null
     constructor(props) {
-        super(props, SIRIUS_DIALOG.NAME);
-
+	    super(props, SIRIUS_DIALOG.NAME);
+	    props = props || {}
+	    this.#content = "content" in props ? props.content : null 
+	    if (typeof this.#content == "string") {
+		   let tmp = document.createElement("p")
+		   tmp.textContent = this.#content
+		   this.#content = tmp
+	    }
+		delete props.content
+		let children = [...this.children]
+		if (!this.#content && children.length != 0) {
+			while(this.firstChild)
+				this.firstChild.remove()
+			this.#content = document.createElement("div")
+      
+			for (let c of children)
+				this.#content.appendChild(c)
+		}
+		
         // Load Sirius dialog HTML attributes
         this._loadAttributes({
-            htmlAttributes: SIRIUS_DIALOG.ATTRIBUTES,
-            properties: props
+            instanceProperties: props,
+            attributes: SIRIUS_DIALOG_ATTRIBUTES,
+            attributesDefault: SIRIUS_DIALOG_ATTRIBUTES_DEFAULT,
         });
     }
+    
 
     /** Get the template for the Sirius dialog
      * @returns {string} - Template
      */
     #getTemplate() {
+	    const iconId = this._getDerivedId("icon");
         return `<div class="${SIRIUS_DIALOG.CLASSES.CONTAINER}">
                     <div class="${SIRIUS_DIALOG.CLASSES.TITLE_BAR}">
-                        <div class="${SIRIUS_DIALOG.CLASSES.TITLE_TEXT}">${this._attributes[SIRIUS_DIALOG.ATTRIBUTES.TITLE.NAME]}</div>
-                        <img class="${SIRIUS_DIALOG.CLASSES.WINDOW_CLOSE}" src=../img/x.svg />
+                        <div class="${SIRIUS_DIALOG.CLASSES.TITLE_TEXT}">${this.getAttribute(SIRIUS_DIALOG_ATTRIBUTES.TITLE)}</div>
+                        <sirius-icon icon="close" id="${iconId}" class="${SIRIUS_DIALOG.CLASSES.WINDOW_CLOSE}">
                     </div>
                     <div class="${SIRIUS_DIALOG.CLASSES.WINDOW_CONTENT}">
-                    	<slot name=content>CONTENT</slot>
+                    	<slot name=content></slot>
                     </div>
                 </div>`;
     }
+    // insert new elements in the place of the slot element
+    async setContent(content) {
+        let content_container = this.#dialogElement.getElementsByClassName(SIRIUS_DIALOG.CLASSES.WINDOW_CONTENT)[0]; 
+        if (content) {
+	        this.#content = content
+	        if (typeof content == "string") {
+		        this.#content = document.createElement("p");
+		        this.#content.textContent = content;
+            // content_container.onclick = (e)=>{
+            //   e.stopImmediatePropagation();
+            //   e.preventDefault();
+            // }
+	        }
+			while(content_container.firstChild)
+				content_container.firstChild.remove()
+	        content_container.appendChild(this.#content);
+        }
+        else {
+	        this.#content = null
+	        content_container.firstChild.remove()
+	        let slot = document.createElement("slot")
+	        slot.setAttribute("name", "content")
+	        content_container.appendChild(slot)
+        }
+    }
+    getContent() { return this.#content }
 
     /** Lifecycle method called when the component is connected to the DOM
      */
     async connectedCallback() {
+        // Call the parent connectedCallback
+        await super.connectedCallback();
+        
+	    
         // Create the CSS style sheets and add them to the shadow DOM
-        await this._loadElementStyles();
+        await this._loadAndAdoptStyles();
 
         // Get HTML inner content
         const innerHTML = this.#getTemplate();
@@ -64,20 +123,13 @@ export class SiriusDialog extends SiriusElement {
         await this._createTemplate(innerHTML);
 
         // Add dialog to the shadow DOM
-        this.containerElement = this._templateContent.firstChild;
+        this.#dialogElement = this._templateContent.firstChild;
         
         // Get the created elements to add and manage events
-        let title_bar = this.containerElement.getElementsByClassName(SIRIUS_DIALOG.CLASSES.TITLE_BAR)[0];
-        let close = this.containerElement.getElementsByClassName(SIRIUS_DIALOG.CLASSES.WINDOW_CLOSE)[0];
-        let content = this.containerElement.getElementsByClassName(SIRIUS_DIALOG.CLASSES.WINDOW_CONTENT)[0];
-        
-        // insert new elements in the place of the slot element
-		    let content_prop = this._attributes[SIRIUS_DIALOG.ATTRIBUTES.CONTENT.NAME];
-        if (content_prop) {
-	        let slot = content.querySelector('[name="content"]');
-	        content.insertBefore(content_prop, slot);
-	        slot.remove();
-        }
+        let title_bar = this.#dialogElement.getElementsByClassName(SIRIUS_DIALOG.CLASSES.TITLE_BAR)[0];
+        let close = this.#dialogElement.getElementsByClassName(SIRIUS_DIALOG.CLASSES.WINDOW_CLOSE)[0];
+        let content = this.#dialogElement.getElementsByClassName(SIRIUS_DIALOG.CLASSES.WINDOW_CONTENT)[0];
+        this.setContent(this.#content) 
         
         // close window
         close.onclick = () => this.remove();
@@ -112,22 +164,22 @@ export class SiriusDialog extends SiriusElement {
 	     }
        // make the title or header the part of the element that can be dragged
         Drag(title_bar, (x,y) => {
-          this.containerElement.style.left = (this.containerElement.offsetLeft - x) + "px";
-          this.containerElement.style.top = (this.containerElement.offsetTop - y) + "px";
+          this.#dialogElement.style.left = (this.#dialogElement.offsetLeft - x) + "px";
+          this.#dialogElement.style.top = (this.#dialogElement.offsetTop - y) + "px";
         });
 
         // make the window resizeable
-         Drag(this.containerElement, (x, y) => {
-           this.containerElement.style.width = (this.containerElement.offsetWidth - x) + "px";
-           this.containerElement.style.height = (this.containerElement.offsetHeight - y) + "px";
-         });
+        //  Drag(this.#dialogElement, (x, y) => {
+        //    this.#dialogElement.style.width = (this.#dialogElement.offsetWidth - x) + "px";
+        //    this.#dialogElement.style.height = (this.#dialogElement.offsetHeight - y) + "px";
+        //  });
 
          // give size to element
-       this.containerElement.style.width = this._attributes[SIRIUS_DIALOG.ATTRIBUTES.WIDTH.NAME] + "px";
-       this.containerElement.style.height = this._attributes[SIRIUS_DIALOG.ATTRIBUTES.HEIGHT.NAME] + "px";
+       this.#dialogElement.style.width = this.getAttribute(SIRIUS_DIALOG_ATTRIBUTES.WIDTH) + "px";
+       this.#dialogElement.style.height = this.getAttribute(SIRIUS_DIALOG_ATTRIBUTES.HEIGHT) + "px";
 
 
-        this.shadowRoot.appendChild(this.containerElement);
+        this.shadowRoot.appendChild(this.#dialogElement);
 
         // Dispatch the built event
         this.dispatchBuiltEvent();

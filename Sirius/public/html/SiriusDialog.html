@@ -8,29 +8,109 @@
     <script defer src="../js/SiriusDialog.js" type="module"></script>
 </head>
 <body>
+<script defer src="../js/SiriusTreeViewV2.js" type="module"></script>
+<script defer src="../js/SiriusCheckbox.js" type="module"></script>
+<script defer src="../js/SiriusLabel.js" type="module"></script>
+<script defer src="../js/SiriusIcon.js" type="module"></script>
 <script type="module">
     import sirius from '../js/Sirius.js';
-    import {SIRIUS_DIALOG, SiriusDialog} from '../js/SiriusDialog.js';
-    import {SIRIUS_ELEMENT} from "../js/SiriusElement.js";
+    import {SIRIUS_DIALOG, SIRIUS_DIALOG_ATTRIBUTES, SiriusDialog} from '../js/SiriusDialog.js';
+    import {SiriusListBox, SIRIUS_LIST_BOX_ATTRIBUTES} from '../js/SiriusListBox.js';
+    import {SIRIUS_ELEMENT, SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
 
     // Get the attributes keys
-    const id = SIRIUS_ELEMENT.ATTRIBUTES.ID.NAME;
-    const title = SIRIUS_DIALOG.ATTRIBUTES.TITLE.NAME;
-    const content = SIRIUS_DIALOG.ATTRIBUTES.CONTENT.NAME;
-    let text = document.createElement("span");
-    text.textContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    const id = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
+    const title = SIRIUS_DIALOG_ATTRIBUTES.TITLE;
+    const itemsKey = SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS;
+    const backgroundKey = SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR;
+    const checkboxColorKey = SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR;
+    
 
     sirius.onLoaded = async () => {
+        const listBox2 = new SiriusListBox({
+                [id]: 'listbox-2',
+                [itemsKey]:`[
+                    { "id": "item-1", "label": "Item 1"},
+                    { "id": "item-2", "label": "Item 2"},
+                    { "id": "item-3", "label": "Item 3"}]
+                `,
+                [backgroundKey]: 'lightblue',
+                [checkboxColorKey]: 'blue'
+                
+            });
+
+            const listBox1 = new SiriusListBox({
+                [id]: 'listbox-1',
+                [itemsKey]:`[
+                    { "id": "item-1", "label": "Item 1"},
+                    { "id": "item-2", "label": "Item 2"},
+                    { "id": "item-3", "label": "Item 3"}
+                ]
+                `,
+                [backgroundKey]: 'lightgrey',
+                [checkboxColorKey]: 'white',
+                
+            });
+            
+            let text = document.createElement("div");
+            text.appendChild(listBox1);
+            text.appendChild(listBox2);
+
         const siriusDialog1 = new SiriusDialog({
             [id]: 'dialog-1',
             [title]: 'DIALOG EXAMPLE',
-            [content]: text
+            content: text
         });
-        siriusDialog1.addToBody()
+        siriusDialog1.addToBody();
     };
-
 </script>
-
-<sirius-dialog id="dialog-3" title="SECOND DIALOG"></sirius-dialog>
+<script>
+    function doThing() {
+	    let dialog = document.getElementById("dialog-1")
+        dialog.setContent("content");
+    }
+    function Clear() {
+	    let dialog = document.getElementById("dialog-1")
+	    dialog.setContent(null)
+    }
+    function Idk(){
+        let cont = document.createElement("p");
+        cont.textContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+	    let tar = document.getElementById("dialog-3")
+        tar.setContent(cont);
+    }
+    function logged(){
+        alert("You are logged")
+    }
+    function cancel(){
+        alert("You have canceled")
+    }
+    function breakp(){
+        console.log("idk");
+    }
+</script>
+<sirius-dialog id="dialog-3" title="SECOND DIALOG">
+  
+<div class="lgn-cont">
+    <sirius-icon icon="home" height="120px" width="120px" id="idk"></sirius-icon> 
+    <div class="us-cont">
+        <label for="us">Username</label>
+        <input type="text" placeholder="Enter Username" name="us" oninput="breakp()">
+    </div>
+    <div class="us-cont"> 
+        <label for="pass">Password</label>
+        <input type="password" placeholder="Enter Password" name="pass">
+    </div>
+    <div class="btn-cont">
+        <button class="login-btn" onclick="logged()">Login</button>
+        <button class="login-btn"onclick="cancel()">Cancel</button>
+    </div>
+    <a href="">Forgot password?</a>
+</div>
+    <button onclick="Idk()">Change content</button>
+</sirius-dialog>
+<button onclick="doThing()">Do Thing</button>
+<button onclick="Clear()">Clear</button>
+<input type="text">
 </body>
 </html>
