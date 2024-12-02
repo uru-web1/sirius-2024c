@@ -26,78 +26,61 @@ export const SIRIUS_DATA_GRID = deepFreeze({
 });
 
 export class SiriusDataGrid extends SiriusElement {
-    #data = [];
-    #columns = [];
-    #rowsPerPage = 5;
-    #currentPage = 1;
-
-    constructor(properties = {}) {
-        if (!properties.id) {
-            properties.id = `sirius-data-grid-${Math.random().toString(36).substr(2, 9)}`;
+    constructor(props = {}) {
+        if (!props.id) {
+            props.id = `sirius-data-grid-${Math.random().toString(36).substr(2, 9)}`;
         }
+        super(props, SIRIUS_DATA_GRID.NAME);
 
-        super(properties, SIRIUS_DATA_GRID.NAME);
-
-        this.#columns = this.#parseColumns(properties.columns || this.getAttribute(SIRIUS_DATA_GRID.ATTRIBUTES.COLUMNS.NAME));
-        this.#data = this.#parseData(properties.data || this.getAttribute(SIRIUS_DATA_GRID.ATTRIBUTES.DATA.NAME));
-        this.#rowsPerPage = properties["rows-per-page"] || SIRIUS_DATA_GRID.ATTRIBUTES.ROWS_PER_PAGE.DEFAULT;
-
-        this.#build().then();
+        this.columns = this.#parseColumns(props.columns || this.getAttribute("columns"));
+        this.data = this.#parseData(props.data || this.getAttribute("data"));
+        this.rowsPerPage = props["rows-per-page"] || SIRIUS_DATA_GRID.ATTRIBUTES.ROWS_PER_PAGE.DEFAULT;
+        this.currentPage = 1;
     }
 
-    async #build() {
-        await this._loadAndAdoptStyles();
+    connectedCallback() {
+        if (!this.shadowRoot) {
+            this.attachShadow({ mode: "open" });
+        }
+        this._loadElementStyles(); // Cargar estilos externos
+        this.render(); // Renderizar el componente
+    }
 
-        const gridTemplate = this.#getTemplate();
-        this.shadowRoot.innerHTML = "";
-        this.shadowRoot.appendChild(gridTemplate);
-
+    render() {
+        const template = this.#getTemplate();
+        this.shadowRoot.innerHTML += template;
         this.#initializeElements();
         this.#createHeader();
         this.#createBody();
         this.#updatePagination();
+    }
 
-        this.dispatchBuiltEvent();
+    _loadElementStyles() {
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = "../css/SiriusDataGrid.css"; 
+        this.shadowRoot.appendChild(link);
     }
 
     #getTemplate() {
-        const container = document.createElement("div");
-        container.classList.add(SIRIUS_DATA_GRID.CLASSES.CONTAINER);
-
-        const toolbar = document.createElement("div");
-        toolbar.classList.add(SIRIUS_DATA_GRID.CLASSES.TOOLBAR);
-        toolbar.innerHTML = `
-            <button class="${SIRIUS_DATA_GRID.CLASSES.BUTTON}" id="add-row">+</button>
-            <button class="${SIRIUS_DATA_GRID.CLASSES.BUTTON}" id="delete-rows">🗑️</button>
-        `;
-
-        const table = document.createElement("table");
-        table.classList.add(SIRIUS_DATA_GRID.CLASSES.TABLE);
-
-        const header = document.createElement("thead");
-        header.classList.add(SIRIUS_DATA_GRID.CLASSES.HEADER);
-
-        const body = document.createElement("tbody");
-        body.classList.add(SIRIUS_DATA_GRID.CLASSES.BODY);
-
-        table.appendChild(header);
-        table.appendChild(body);
-
-        const pagination = document.createElement("div");
-        pagination.classList.add(SIRIUS_DATA_GRID.CLASSES.PAGINATION);
-        pagination.innerHTML = `
-            <button id="first-page" class="pagination-button">⏮</button>
-            <button id="prev-page" class="pagination-button">◀</button>
-            <span id="page-info"></span>
-            <button id="next-page" class="pagination-button">▶</button>
-            <button id="last-page" class="pagination-button">⏭</button>
-        `;
-
-        container.appendChild(toolbar);
-        container.appendChild(table);
-        container.appendChild(pagination);
-
-        return container;
+        return `
+            <div class="${SIRIUS_DATA_GRID.CLASSES.CONTAINER}">
+                <div class="${SIRIUS_DATA_GRID.CLASSES.TOOLBAR}">
+                    <button class="${SIRIUS_DATA_GRID.CLASSES.BUTTON}" id="add-row">+</button>
+                    <button class="${SIRIUS_DATA_GRID.CLASSES.BUTTON}" id="delete-rows">🗑️</button>
+                </div>
+                <table class="${SIRIUS_DATA_GRID.CLASSES.TABLE}">
+                    <thead class="${SIRIUS_DATA_GRID.CLASSES.HEADER}"></thead>
+                    <tbody class="${SIRIUS_DATA_GRID.CLASSES.BODY}"></tbody>
+                </table>
+                <div class="${SIRIUS_DATA_GRID.CLASSES.PAGINATION}">
+                    <button id="first-page" class="pagination-button">⏮</button>
+                    <button id="prev-page" class="pagination-button">◀</button>
+                    <span id="page-info"></span>
+                    <button id="next-page" class="pagination-button">▶</button>
+                    <button id="last-page" class="pagination-button">⏭</button>
+                </div>
+            </div>`;
     }
 
     #initializeElements() {
@@ -108,7 +91,6 @@ export class SiriusDataGrid extends SiriusElement {
 
         this.shadowRoot.getElementById("add-row").addEventListener("click", () => this.addRow());
         this.shadowRoot.getElementById("delete-rows").addEventListener("click", () => this.deleteSelectedRows());
-
         this.shadowRoot.getElementById("first-page").addEventListener("click", () => this.#goToFirstPage());
         this.shadowRoot.getElementById("prev-page").addEventListener("click", () => this.#goToPreviousPage());
         this.shadowRoot.getElementById("next-page").addEventListener("click", () => this.#goToNextPage());
@@ -117,81 +99,51 @@ export class SiriusDataGrid extends SiriusElement {
 
     #createHeader() {
         const headerRow = document.createElement("tr");
-        headerRow.innerHTML = `<th><input type="checkbox" class="${SIRIUS_DATA_GRID.CLASSES.SELECT_ALL}" id="select-all"></th>`;
-        this.#columns.forEach(column => {
+        headerRow.innerHTML = `
+            <th>
+                <input type="checkbox" class="${SIRIUS_DATA_GRID.CLASSES.SELECT_ALL}" id="select-all">
+            </th>`;
+        this.columns.forEach(column => {
             const th = document.createElement("th");
             th.innerText = column.label;
             headerRow.appendChild(th);
         });
         this.header.appendChild(headerRow);
 
-        this.shadowRoot.getElementById("select-all").addEventListener("change", (e) => this.#toggleSelectAll(e.target.checked));
+        this.shadowRoot.getElementById("select-all").addEventListener("change", (e) => {
+            this.#toggleSelectAll(e.target.checked);
+        });
     }
 
     #createBody() {
         this.body.innerHTML = "";
-        const startIndex = (this.#currentPage - 1) * this.#rowsPerPage;
-        const endIndex = Math.min(startIndex + this.#rowsPerPage, this.#data.length);
-        const pageData = this.#data.slice(startIndex, endIndex);
+        const startIndex = (this.currentPage - 1) * this.rowsPerPage;
+        const endIndex = Math.min(startIndex + this.rowsPerPage, this.data.length);
+        const pageData = this.data.slice(startIndex, endIndex);
 
         pageData.forEach((row, rowIndex) => {
             const tr = document.createElement("tr");
             tr.classList.add(SIRIUS_DATA_GRID.CLASSES.ROW);
 
             const checkboxCell = document.createElement("td");
-            checkboxCell.innerHTML = `<input type="checkbox" class="${SIRIUS_DATA_GRID.CLASSES.CHECKBOX}">`;
+            checkboxCell.innerHTML = `
+                <input type="checkbox" class="${SIRIUS_DATA_GRID.CLASSES.CHECKBOX}">
+            `;
             tr.appendChild(checkboxCell);
 
-            this.#columns.forEach(column => {
+            this.columns.forEach(column => {
                 const td = document.createElement("td");
                 td.classList.add(SIRIUS_DATA_GRID.CLASSES.CELL, SIRIUS_DATA_GRID.CLASSES.EDITABLE_CELL);
                 td.contentEditable = true;
                 td.innerText = row[column.field];
                 td.addEventListener("blur", (e) => {
-                    const newValue = e.target.innerText.trim();
-                    e.target.innerText = newValue;
-                    this.#data[startIndex + rowIndex][column.field] = newValue;
+                    this.data[startIndex + rowIndex][column.field] = e.target.innerText;
                 });
                 tr.appendChild(td);
             });
 
             this.body.appendChild(tr);
         });
-    }
-
-    #updatePagination() {
-        const totalPages = Math.ceil(this.#data.length / this.#rowsPerPage);
-        const pageInfo = this.shadowRoot.getElementById("page-info");
-        pageInfo.innerText = `Page ${this.#currentPage} of ${totalPages}`;
-    }
-
-    #goToFirstPage() {
-        this.#currentPage = 1;
-        this.#createBody();
-        this.#updatePagination();
-    }
-
-    #goToPreviousPage() {
-        if (this.#currentPage > 1) {
-            this.#currentPage--;
-            this.#createBody();
-            this.#updatePagination();
-        }
-    }
-
-    #goToNextPage() {
-        const totalPages = Math.ceil(this.#data.length / this.#rowsPerPage);
-        if (this.#currentPage < totalPages) {
-            this.#currentPage++;
-            this.#createBody();
-            this.#updatePagination();
-        }
-    }
-
-    #goToLastPage() {
-        this.#currentPage = Math.ceil(this.#data.length / this.#rowsPerPage);
-        this.#createBody();
-        this.#updatePagination();
     }
 
     #toggleSelectAll(isChecked) {
@@ -201,43 +153,78 @@ export class SiriusDataGrid extends SiriusElement {
         });
     }
 
-    addRow() {
-        const newRow = {};
-        this.#columns.forEach(column => {
-            newRow[column.field] = "";
+    deleteSelectedRows() {
+        const checkboxes = this.body.querySelectorAll(`.${SIRIUS_DATA_GRID.CLASSES.CHECKBOX}`);
+        const rowsToDelete = [];
+    
+        // Recolectar los índices de las filas seleccionadas
+        checkboxes.forEach((checkbox, index) => {
+            if (checkbox.checked) {
+                rowsToDelete.push(index + (this.currentPage - 1) * this.rowsPerPage);
+            }
         });
-        this.#data.push(newRow);
+    
+        // Eliminar las filas en orden inverso para evitar problemas de reindexación
+        rowsToDelete.reverse().forEach(index => {
+            this.data.splice(index, 1);
+        });
+    
+        // Actualizar el cuerpo de la tabla y la paginación
         this.#createBody();
         this.#updatePagination();
     }
 
-    deleteSelectedRows() {
-        const checkboxes = this.body.querySelectorAll(`.${SIRIUS_DATA_GRID.CLASSES.CHECKBOX}`);
-        const rowsToDelete = [];
-
-        checkboxes.forEach((checkbox, index) => {
-            if (checkbox.checked) {
-                const actualIndex = (this.#currentPage - 1) * this.#rowsPerPage + index; // Índice real en los datos
-                rowsToDelete.push(actualIndex);
-            }
+    addRow() {
+        const newRow = {};
+        this.columns.forEach(column => {
+            newRow[column.field] = "";
         });
+        this.data.push(newRow);
+        this.#createBody();
+        this.#updatePagination();
+    }
 
-        // Eliminar filas en orden descendente para evitar que los índices cambien
-        rowsToDelete.sort((a, b) => b - a).forEach(index => {
-            this.#data.splice(index, 1);
-        });
+    #updatePagination() {
+        const totalPages = Math.ceil(this.data.length / this.rowsPerPage);
+        const pageInfo = this.shadowRoot.getElementById("page-info");
+        pageInfo.innerText = `Page ${this.currentPage} of ${totalPages}`;
+    }
 
-        // Reconstruir el cuerpo de la tabla y actualizar la paginación
+    #goToFirstPage() {
+        this.currentPage = 1;
+        this.#createBody();
+        this.#updatePagination();
+    }
+
+    #goToPreviousPage() {
+        if (this.currentPage > 1) {
+            this.currentPage--;
+            this.#createBody();
+            this.#updatePagination();
+        }
+    }
+
+    #goToNextPage() {
+        const totalPages = Math.ceil(this.data.length / this.rowsPerPage);
+        if (this.currentPage < totalPages) {
+            this.currentPage++;
+            this.#createBody();
+            this.#updatePagination();
+        }
+    }
+
+    #goToLastPage() {
+        this.currentPage = Math.ceil(this.data.length / this.rowsPerPage);
         this.#createBody();
         this.#updatePagination();
     }
 
     #parseColumns(columns) {
-        return typeof columns === "string" ? JSON.parse(columns) : columns || [];
+        return typeof columns === "string" ? JSON.parse(columns) : columns;
     }
 
     #parseData(data) {
-        return typeof data === "string" ? JSON.parse(data) : data || [];
+        return typeof data === "string" ? JSON.parse(data) : data;
     }
 }
 
