@@ -1,4 +1,5 @@
 import { SiriusElement } from "./SiriusElement.js";
+import { SIRIUS_SVG_ICONS } from "./SiriusSvg.js";
 import deepFreeze from "./utils/deep-freeze.js";
 
 export const SIRIUS_DATA_GRID = deepFreeze({
@@ -60,25 +61,35 @@ export class SiriusDataGrid extends SiriusElement {
         link.rel = "stylesheet";
         link.href = "../css/SiriusDataGrid.css";
         this.shadowRoot.appendChild(link);
+
+        const svgStyles = document.createElement("link");
+        svgStyles.rel = "stylesheet";
+        svgStyles.href = "../css/SiriusSvg.css";
+        this.shadowRoot.appendChild(svgStyles);
+
+        const iconStyles = document.createElement("link");
+        iconStyles.rel = "stylesheet";
+        iconStyles.href = "../css/SiriusIcon.css";
+        this.shadowRoot.appendChild(iconStyles);
     }
 
     #getTemplate() {
         return `
             <div class="${SIRIUS_DATA_GRID.CLASSES.CONTAINER}">
                 <div class="${SIRIUS_DATA_GRID.CLASSES.TOOLBAR}">
-                    <button class="${SIRIUS_DATA_GRID.CLASSES.BUTTON}" id="add-row">+</button>
-                    <button class="${SIRIUS_DATA_GRID.CLASSES.BUTTON}" id="delete-rows">🗑️</button>
+                    <sirius-svg icon="${SIRIUS_SVG_ICONS.ADD}" width="24" height="24" class="${SIRIUS_DATA_GRID.CLASSES.BUTTON}" id="add-row"></sirius-svg>
+                    <sirius-svg icon="${SIRIUS_SVG_ICONS.DELETE}" width="24" height="24" class="${SIRIUS_DATA_GRID.CLASSES.BUTTON}" id="delete-rows"></sirius-svg>
                 </div>
                 <table class="${SIRIUS_DATA_GRID.CLASSES.TABLE}">
                     <thead class="${SIRIUS_DATA_GRID.CLASSES.HEADER}"></thead>
                     <tbody class="${SIRIUS_DATA_GRID.CLASSES.BODY}"></tbody>
                 </table>
                 <div class="${SIRIUS_DATA_GRID.CLASSES.PAGINATION}">
-                    <button id="first-page" class="pagination-button">⏮</button>
-                    <button id="prev-page" class="pagination-button">◀</button>
+                    <sirius-svg icon="${SIRIUS_SVG_ICONS.ARROW_DOUBLE_LEFT}" width="24" height="24" id="first-page" class="pagination-button"></sirius-svg>
+                    <sirius-svg icon="${SIRIUS_SVG_ICONS.ARROW_LEFT}" width="24" height="24" id="prev-page" class="pagination-button"></sirius-svg>
                     <span id="page-info"></span>
-                    <button id="next-page" class="pagination-button">▶</button>
-                    <button id="last-page" class="pagination-button">⏭</button>
+                    <sirius-svg icon="${SIRIUS_SVG_ICONS.ARROW_RIGHT}" width="24" height="24" id="next-page" class="pagination-button"></sirius-svg>
+                    <sirius-svg icon="${SIRIUS_SVG_ICONS.ARROW_DOUBLE_RIGHT}" width="24" height="24" id="last-page" class="pagination-button"></sirius-svg>
                 </div>
             </div>`;
     }
@@ -156,24 +167,20 @@ export class SiriusDataGrid extends SiriusElement {
     deleteSelectedRows() {
         const checkboxes = this.body.querySelectorAll(`.${SIRIUS_DATA_GRID.CLASSES.CHECKBOX}`);
         const rowsToDelete = [];
-    
-        // Recolectar los índices de las filas seleccionadas
+
         checkboxes.forEach((checkbox, index) => {
             if (checkbox.checked) {
                 rowsToDelete.push(index + (this.currentPage - 1) * this.rowsPerPage);
             }
         });
-    
-        // Eliminar las filas en orden inverso para evitar problemas de reindexación
+
         rowsToDelete.reverse().forEach(index => {
             this.data.splice(index, 1);
         });
-    
-        // Actualizar el cuerpo de la tabla y la paginación
+
         this.#createBody();
         this.#updatePagination();
     }
-    
 
     addRow() {
         const newRow = {};

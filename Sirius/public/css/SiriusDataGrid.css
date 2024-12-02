@@ -4,7 +4,7 @@ body {
     justify-content: center;
     height: 100vh;
     margin: 0;
-    background-color: #f0f0f5; 
+    background-color: #f0f0f5;
 }
 
 .data-grid-container {
@@ -15,7 +15,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     max-width: 90%;
     margin: 0 auto;
-    width: 800px; 
+    width: 800px;
 }
 
 .toolbar {
@@ -25,27 +25,94 @@ body {
 }
 
 .button {
-    background-color:  #a9b4c0;
+    background-color: #a9b4c0;
     border: none;
-    color: white;
-    padding: 8px 12px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
     margin-left: 8px;
 }
 
-.button:hover {
+.button::before {
+    font-size: 18px;
+    color: white;
+}
+
+#add-row::before {
+    content: '+';
+}
+
+#delete-rows::before {
+    content: '\1F5D1';
+}
+
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+    gap: 8px;
+}
+
+.pagination-button {
+    background-color: #a9b4c0;
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    outline: none;
+}
+
+.pagination-button:focus {
+    outline: none;
+    box-shadow: none;
     background-color: #a9b4c0;
 }
 
-/* Estilos de la tabla */
+.pagination-button:active {
+    outline: none;
+    box-shadow: none;
+    background-color: #87929e;
+}
+
+.pagination-button:hover {
+    background-color: #97a4b0;
+}
+
+.pagination-button:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+
+
+#first-page::before {
+    content: '\23EA';
+}
+
+#prev-page::before {
+    content: '\2B05';
+}
+
+#next-page::before {
+    content: '\27A1';
+}
+
+#last-page::before {
+    content: '\23E9';
+}
+
 .data-grid {
     width: 100%;
     border-collapse: collapse;
@@ -68,14 +135,12 @@ body {
     background-color: #ffffff;
 }
 
-/* Estilo para las celdas editables */
 .editable-cell {
     cursor: text;
     background-color: #f9f9f9;
     border-radius: 4px;
 }
 
-/* Estilo de los checkboxes */
 .select-all-checkbox, .row-checkbox {
     cursor: pointer;
     width: 18px;
@@ -83,15 +148,6 @@ body {
     accent-color: #a9b4c0;
 }
 
-/* Estilo de la paginación */
-.pagination {
-    margin-top: 15px;
-    text-align: center;
-    font-size: 16px;
-    color: #666;
-}
-
-/* Estilos para filas seleccionadas */
 .data-grid .data-row-selected {
     background-color: #e6f0ff;
 }
@@ -100,50 +156,28 @@ body {
     background-color: #d4e6ff;
 }
 
-/* Hover en filas de la tabla */
 .data-grid tr:hover td {
     background-color: #f5f5f7;
 }
 
-/* Responsive: Ajusta la tabla en pantallas pequeñas */
 @media (max-width: 768px) {
     .data-grid-container {
         padding: 12px;
         width: 100%;
     }
-    
-    .button {
+
+    .button, .pagination-button {
         width: 32px;
         height: 32px;
-        padding: 6px;
         font-size: 14px;
     }
-    
+
     .data-grid th, .data-grid td {
         padding: 10px;
         font-size: 14px;
     }
-    
+
     .pagination {
         font-size: 14px;
     }
-}
-.pagination {
-    margin-top: 15px;
-    text-align: center;
-}
-
-.pagination-button {
-    background-color:  #a9b4c0;
-    color: white;
-    border: none;
-    padding: 8px;
-    margin: 5px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.pagination-button:hover {
-    background-color:  #a9b4c0;
 }
