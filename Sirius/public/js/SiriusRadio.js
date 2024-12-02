@@ -1,15 +1,16 @@
 import { SIRIUS_TYPES, SiriusElement } from "./SiriusElement.js";
 import deepFreeze from "./utils/deep-freeze.js";
+
 // Definición de constantes para el radio
-// Definición de constantes para el radio 
 export const SIRIUS_RADIO = deepFreeze({
     NAME: "SiriusRadio",
     TAG: "sirius-radio",
     ATTRIBUTES: {
-        LABEL: { NAME: "label", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING },
-        CHECKED: { NAME: "checked", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN },
-        DISABLED: { NAME: "disabled", DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN },
-        GROUP: { NAME: "group", DEFAULT: "", TYPE: SIRIUS_TYPES.STRING },
+        ID: { NAME: 'id' },
+        LABEL: { NAME: 'label', DEFAULT: 'Default Label', TYPE: SIRIUS_TYPES.STRING },
+        CHECKED: { NAME: 'checked', DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN },
+        DISABLED: { NAME: 'disabled', DEFAULT: false, TYPE: SIRIUS_TYPES.BOOLEAN },
+        GROUP: { NAME: 'group', DEFAULT: 'default-group', TYPE: SIRIUS_TYPES.STRING },
     },
     CLASSES: {
         CONTAINER: 'radio-container',
@@ -19,13 +20,18 @@ export const SIRIUS_RADIO = deepFreeze({
     }
 });
 
-// Clase para el elemento SiriusRadio
 export class SiriusRadio extends SiriusElement {
-        // Registro de los radios por grupo
-        static radioGroups = {};
+    static radioGroups = {};
 
     constructor(props) {
         super(props, SIRIUS_RADIO.NAME);
+    
+        if (!SIRIUS_RADIO || !SIRIUS_RADIO.ATTRIBUTES) {
+            console.error('SIRIUS_RADIO or SIRIUS_RADIO.ATTRIBUTES is undefined');
+            throw new Error('SIRIUS_RADIO.ATTRIBUTES is not defined');
+        }
+    
+        // Inicializar _attributes como antes
         this._attributes = {
             id: props.id || `sirius-radio-${Math.random().toString(36).substr(2, 9)}`,
             label: props.label || SIRIUS_RADIO.ATTRIBUTES.LABEL.DEFAULT,
@@ -33,32 +39,66 @@ export class SiriusRadio extends SiriusElement {
             disabled: props.disabled !== undefined ? props.disabled : SIRIUS_RADIO.ATTRIBUTES.DISABLED.DEFAULT,
             group: props.group || SIRIUS_RADIO.ATTRIBUTES.GROUP.DEFAULT,
         };
-
-        // Agregar este radio al grupo correspondiente
-        if (!SiriusRadio.radioGroups[this._attributes.group]) {
-            SiriusRadio.radioGroups[this._attributes.group] = [];
-        }
-        SiriusRadio.radioGroups[this._attributes.group].push(this);
-
+    
+        // Verificar que attributes y attributesDefault estén definidos
+         // Verificar y asignar valores de attributes y attributesDefault
+         let attributes = SIRIUS_RADIO.ATTRIBUTES || {};
+         let attributesDefault = SIRIUS_RADIO.ATTRIBUTES || {};
+ 
+         // Si attributes o attributesDefault son inválidos, asignar objetos vacíos
+         if (typeof attributes !== 'object') {
+             console.warn('Invalid attributes detected, defaulting to empty object.');
+             attributes = {};
+         }
+ 
+         if (typeof attributesDefault !== 'object') {
+             console.warn('Invalid attributesDefault detected, defaulting to empty object.');
+             attributesDefault = {};
+         }
+ 
         this._loadAttributes({
-            htmlAttributes: SIRIUS_RADIO.ATTRIBUTES,
-            properties: props
+            instanceProperties: props,
+            attributes: attributes,
+            attributesDefault: attributesDefault
         });
     }
 
     async connectedCallback() {
-        // Cargar estilos y crear plantilla
-        await this._loadElementStyles('./SiriusRadio');
+        // Verifica que shadowRoot se haya creado correctamente
+        if (!this.shadowRoot) {
+            console.error('Shadow root not initialized');
+            return;
+        }
+
         const innerHTML = this.#getTemplate();
         await this._createTemplate(innerHTML);
         this.shadowRoot.appendChild(this._templateContent);
 
+        await this.loadStyles();
         // Manejo de eventos
         const input = this.shadowRoot.querySelector('input[type="radio"]');
-        input?.addEventListener('click', () => this.toggleRadio());
-        this.shadowRoot.querySelector('.radio-svg')?.addEventListener('click', () => this.toggleRadio());
+        if (input) {
+            input.addEventListener('click', () => this.toggleRadio());
+        }
+
+        const svgContainer = this.shadowRoot.querySelector('.radio-svg');
+        if (svgContainer) {
+            svgContainer.addEventListener('click', () => this.toggleRadio());
+        }
 
         this.dispatchBuiltEvent();
+    }
+
+    async loadStyles() {
+        try {
+            const response = await fetch('../css/SiriusRadio.css'); 
+            const css = await response.text();
+            const styleElement = document.createElement('style');
+            styleElement.textContent = css;
+            this.shadowRoot.appendChild(styleElement);
+        } catch (error) {
+            console.error('Error loading styles:', error);
+        }
     }
 
     toggleRadio() {
@@ -79,11 +119,13 @@ export class SiriusRadio extends SiriusElement {
 
     static deselectOtherRadios(groupName, selectedRadio) {
         const radiosInGroup = SiriusRadio.radioGroups[groupName];
-        radiosInGroup.forEach((radio) => {
-            if (radio !== selectedRadio) {
-                radio.deselectRadio();
-            }
-        });
+        if (radiosInGroup) {
+            radiosInGroup.forEach((radio) => {
+                if (radio !== selectedRadio) {
+                    radio.deselectRadio();
+                }
+            });
+        }
     }
 
     deselectRadio() {
@@ -97,7 +139,9 @@ export class SiriusRadio extends SiriusElement {
 
     updateSVG() {
         const svgContainer = this.shadowRoot.querySelector('.radio-svg');
-        svgContainer.innerHTML = this.#getSVG();
+        if (svgContainer) {
+            svgContainer.innerHTML = this.#getSVG();
+        }
     }
 
     #getSVG() {
@@ -113,6 +157,7 @@ export class SiriusRadio extends SiriusElement {
     get isSelected() {
         return this._attributes[SIRIUS_RADIO.ATTRIBUTES.CHECKED.NAME];
     }
+
     #getTemplate() {
         return `
             <div class="${SIRIUS_RADIO.CLASSES.CONTAINER}">
