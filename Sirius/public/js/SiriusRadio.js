@@ -75,7 +75,7 @@ export class SiriusRadio extends SiriusElement {
         this.shadowRoot.appendChild(this._templateContent);
 
         await this.loadStyles();
-        // Manejo de eventos
+        // Manejo de eventosa
         const input = this.shadowRoot.querySelector('input[type="radio"]');
         if (input) {
             input.addEventListener('click', () => this.toggleRadio());
