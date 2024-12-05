@@ -4,39 +4,63 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>SiriusExchangeList Example</title>
+    <script defer src="../js/SiriusExchangeList.js" type="module"></script>
+    <script defer src="../js/SiriusCheckbox.js" type="module"></script>
+    <script defer src="../js/SiriusLabel.js" type="module"></script>
     <script defer src="../js/Sirius.js" type="module"></script>
+    <script defer src="../js/SiriusListBoxV2.js" type="module"></script>
 
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .exchange-list-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+    </style>
 </head>
 <body>
+<sirius-exchange-list id="exchange-list-1">
 
-<script type="module">
-    import sirius from '../js/Sirius.js';
-    import {SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES, SIRIUS_ELEMENT_ATTRIBUTES} from "../js/SiriusElement.js";
-    import SiriusListBoxV1, {SIRIUS_LIST_BOX_ATTRIBUTES} from "../js/SiriusListBoxV1.js";
+        <sirius-list-box slot="listbox-left" id="list-box-1" styles='font-family: Arial'>
+            <sirius-checkbox slot="head" id="head-1" icon-width="15px" icon-height="15px">
+                <sirius-label slot="label" id="head-1__label" caption="Head"></sirius-label>
+            </sirius-checkbox>
+            <sirius-checkbox slot="items" id="item-1" icon-width="15px" icon-height="15px">
+                <sirius-label slot="label" id="item-1__label" caption="Item 1"></sirius-label>
+            </sirius-checkbox>
+            <sirius-checkbox slot="items" id="item-2" icon-width="15px" icon-height="15px">
+                <sirius-label slot="label" id="item-2__label" caption="Item 2"></sirius-label>
+            </sirius-checkbox>
+            <sirius-checkbox slot="items" id="item-3" icon-width="15px" icon-height="15px">
+                <sirius-label slot="label" id="item-3__label" caption="Item 3"></sirius-label>
+            </sirius-checkbox>
+        </sirius-list-box>
 
-    sirius.onLoaded = async () => {
-        const idKey = SIRIUS_ELEMENT_REQUIRED_ATTRIBUTES.ID;
-        const itemsKey = SIRIUS_LIST_BOX_ATTRIBUTES.ITEMS;
-        const headKey = SIRIUS_LIST_BOX_ATTRIBUTES.HEAD;
-        const backgroundKey = SIRIUS_LIST_BOX_ATTRIBUTES.BACKGROUND_COLOR;
-        const checkboxColorKey = SIRIUS_LIST_BOX_ATTRIBUTES.CHECKBOX_COLOR;
-        const styleKey = SIRIUS_ELEMENT_ATTRIBUTES.STYLE;
+        <sirius-list-box slot="listbox-right" id="list-box-2"  styles="font-family: Arial">
+            <sirius-checkbox slot="head" id="head-2" icon-width="15px" icon-height="15px">
+                <sirius-label slot="label" id="head-2__label" caption="Head"></sirius-label>
+            </sirius-checkbox>
+            <sirius-checkbox slot="items" id="item-4" icon-width="15px" icon-height="15px">
+                <sirius-label slot="label" id="item-4__label" caption="Item 1"></sirius-label>
+            </sirius-checkbox>
+            <sirius-checkbox slot="items" id="item-5" icon-width="15px" icon-height="15px">
+                <sirius-label slot="label" id="item-5__label" caption="Item 2"></sirius-label>
+            </sirius-checkbox>
+            <sirius-checkbox  slot="items" id="item-6" icon-width="15px" icon-height="15px">
+                <sirius-label slot="label" id="item-6__label" caption="Item 3"></sirius-label>
+            </sirius-checkbox>
+        </sirius-list-box>
 
-        // Create a new ListBox
-        const listBox1 = new SiriusListBoxV1({
-            [idKey]: 'listbox-1',
-            [itemsKey]: `[
-                    { "id": "item_1", "label": "Item 1"},
-                    { "id": "item_2", "label": "Item 2"},
-                    { "id": "item_3", "label": "Item 3"}
-                ]
-                `,
-            [backgroundKey]: 'rgb(205,207,214)',
-            [checkboxColorKey]: 'black',
+</sirius-exchange-list>   
 
-        });
-
-    };
-</script>
 </body>
 </html>

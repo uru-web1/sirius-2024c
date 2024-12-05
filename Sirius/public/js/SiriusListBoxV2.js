@@ -196,7 +196,7 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
      * @returns {SiriusControlElement[]} - Checked items
      */
     get checkedItems() {
-        return this.checkedChildrenElements;
+        return this.itemsElements.filter(item => item.isChecked);
     }
 
     /** Get head container padding attribute
