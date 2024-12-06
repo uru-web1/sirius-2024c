@@ -108,12 +108,20 @@ export default class SiriusControlElement extends SiriusElement {
         // Remove the current children elements
         if (this.#childrenFlag) {
             this.#childrenFlag = false;
-            this._children = []
-        } else if (this.children)
-            this._removeAllChildren();
+
+            // Remove the children elements that are not in the new children elements
+            const elementsToRemove = this.children.filter(child => !elements.includes(child));
+            elementsToRemove.forEach((child, index) => {
+                if(child.parentId!=="")
+                    this._removeChild(child)
+                else
+                    this.children.splice(index,  1)
+            });
+        }
 
         // Set the children elements
-        this._addChildren(elements);
+        const elementsToAdd = elements.filter(child => !this.children.includes(child));
+        this._addChildren(elementsToAdd);
     }
 
     /** Get parent ID attribute
@@ -224,6 +232,9 @@ export default class SiriusControlElement extends SiriusElement {
         this.onBuilt = () => {
             this._parent = parent;
             parent.onBuilt = () => parent.children.push(this);
+
+            // Update the status attribute
+            this._checkChildrenStatus();
         }
     }
 
@@ -235,8 +246,17 @@ export default class SiriusControlElement extends SiriusElement {
             return
         }
 
-        this._parent.children = this._parent.children.filter(child => child !== this);
-        this._parent = null;
+        // Remove the parent element
+        this._parent.children.forEach((child, index)=>{
+            if (child === this)
+                this._parent.children.splice(index,  1)
+        })
+
+        // Update the status attribute
+        this._checkChildrenStatus();
+
+        // Set the parent element as null
+        this._parent = null
     }
 
     /** Add child element
@@ -282,11 +302,6 @@ export default class SiriusControlElement extends SiriusElement {
      */
     _removeChildren(children) {
         if (children) children.forEach(child => child.parentId = "")
-    }
-
-    /** Remove all children elements */
-    _removeAllChildren() {
-        this.children.forEach(child => child.parentId = "")
     }
 
     /** Check if the element is checked

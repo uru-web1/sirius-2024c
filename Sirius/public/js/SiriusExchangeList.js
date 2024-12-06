@@ -144,11 +144,11 @@ export default class SiriusExchangeList extends SiriusElement {
 
             const checkedItems = fromListBox.checkedItems;
 
-            // // Remove checked items from the source list box
-            // fromListBox.removeItems(...checkedItems);
+            // Remove checked items from the source list box
+            fromListBox.removeItems(...checkedItems);
 
-            // // Add checked items to the destination list box
-            // toListBox.addItems(...checkedItems);
+            // Add checked items to the destination list box
+            toListBox.addItems(...checkedItems);
             
         }
     }

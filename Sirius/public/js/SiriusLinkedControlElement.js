@@ -1,5 +1,6 @@
 import deepFreeze from "./utils/deep-freeze.js";
 import SiriusControlElement, {
+    SIRIUS_CONTROL_ELEMENT_ATTRIBUTES,
     SIRIUS_CONTROL_ELEMENT_PROPERTIES,
     SIRIUS_CONTROL_ELEMENT_STATUS
 } from "./SiriusControlElement.js";
@@ -28,9 +29,7 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
 
     // Linked elements
     _linkedParent = null;
-    #linkedParentFlag = false;
     _linkedChildren = [];
-    #linkedChildrenFlag = false;
 
     // Observers
     _elementObserver = null;
@@ -44,20 +43,6 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
     constructor(properties, parentProperty = SIRIUS_LINKED_CONTROL_ELEMENT_PROPERTIES.PARENT, childrenProperty = SIRIUS_CONTROL_ELEMENT_PROPERTIES.CHILDREN) {
         // Overwrite the children property when calling the parent constructor
         super({...properties, children: []});
-
-        // Check if the properties contains the children
-        const children = properties?.[childrenProperty];
-        if (children) {
-            this._linkedChildren = children;
-            this.#linkedChildrenFlag = true;
-        }
-
-        // Check if the properties contains the parent
-        const parent = properties?.[parentProperty];
-        if (parent) {
-            this._linkedParent = parent;
-            this.#linkedParentFlag = true;
-        }
 
         // Build the SiriusLinkedControlElement
         this.#build(properties).then();
@@ -110,16 +95,10 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
 
         this.onBuilt = () => {
             // Check if the linked parent element is the same
-            if (!this.#linkedParentFlag && this.linkedParent === element) return;
+            if (this._linkedParent!==null&&this._linkedParent === element) return;
 
             // Remove the current parent element
-            if (!this.#linkedParentFlag) {
-                if (this.linkedParent)
-                    this._removeLinkedParent();
-            } else {
-                this.#linkedParentFlag = false;
-                this._linkedParent = null;
-            }
+            if (this._linkedParent) this._removeLinkedParent();
 
             // Add the parent element
             this._addLinkedParent(element);
@@ -140,17 +119,11 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
         if (!elements) return;
 
         this.onBuilt = () => {
-            // Check if the linked children elements are the same
-            if (!this.#linkedChildrenFlag && this.linkedChildren === elements) return;
+            // Check if the linked parent element is set
+            if (this._linkedParent===null) return;
 
             // Remove the current children elements
-            if (!this.#linkedChildrenFlag) {
-                if (this.linkedChildren)
-                    this._removeAllLinkedChildren();
-            } else {
-                this.#linkedChildrenFlag = false;
-                this._linkedChildren = [];
-            }
+            if (this._linkedChildren) this._removeAllLinkedChildren();
 
             // Set the children elements
             this._addLinkedChildren(elements);
@@ -290,7 +263,7 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
                 return
 
             // Add the linked parent element to the linked parent slot element
-            if (!this._linkedParentSlotElement.contains(element)) {
+            if (!this._linkedParentSlotElement.assignedElements().includes(element)) {
                 element.setAttribute('slot', this._linkedParentSlotElement.name);
                 this.appendChild(element);
             }
@@ -319,8 +292,8 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
             return;
 
         // Remove the current linked parent from the linked parent slot element
-        if (this._linkedParentSlotElement.contains(this.linkedParent))
-            this._linkedParentSlotElement.removeChild(this.linkedParent);
+        if (this._linkedParentSlotElement.assignedElements().includes(this.linkedParent))
+            this.linkedParent.remove();
     }
 
     /** Check if an element is a valid linked child element
@@ -378,8 +351,8 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
                 return
 
             // Add the linked child element to the linked children slot element
-            if (!this._linkedChildrenSlotElement.contains(element)) {
-                element.setAttribute('slot', this._linkedChildrenSlotElement.name);
+            if (!this._linkedChildrenSlotElement.assignedElements().includes(element)) {
+                element.setAttribute("slot", this._linkedChildrenSlotElement.name)
                 this.appendChild(element);
             }
         }
@@ -404,7 +377,7 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
 
             // Remove the parent ID and the slot name
             child.parentId = "";
-            child.slot = ""
+            child.removeAttribute("slot")
         }
     }
 
@@ -419,8 +392,8 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
             return
 
         // Remove the linked child element from the linked children slot element
-        if (this._linkedChildrenSlotElement.contains(element))
-            this._linkedChildrenSlotElement.removeChild(element);
+        if (this._linkedChildrenSlotElement.assignedElements().includes(element))
+            element.remove()
     }
 
     /** Remove linked child element by ID
