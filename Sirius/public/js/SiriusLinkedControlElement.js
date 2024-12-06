@@ -363,9 +363,11 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
             if (!this._checkLinkedChildrenSlotElement())
                 return
 
+            // Set parent element ID
+            element.parentId =  this.linkedParent.id
+
             // Add the linked child element to the linked children slot element
             if (!this._linkedChildrenSlotElement.assignedElements().includes(element)){
-                element.parentId = this.linkedParent.id
                 element.slot= this._linkedChildrenSlotElement.name;
                 this.appendChild(element)
             }
@@ -390,8 +392,10 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
             this._linkedChildren = this.linkedChildren.filter(child => child.id !== child.id);
 
             // Remove the parent ID and the slot name
-            child.parentId = "";
-            child.slot = ""
+            if(this._linkedChildrenSlotElement.assignedElements().includes(child)) {
+                child.parentId = "";
+                child.slot = ""
+            }
         }
     }
 
