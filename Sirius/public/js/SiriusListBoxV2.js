@@ -134,10 +134,6 @@ export default class SiriusListBoxV2 extends SiriusLinkedControlElement {
         // Set up the element observer
         this._setElementObserver();
 
-        // Set the properties
-        this.linkedParent = this._linkedParent;
-        this.linkedChildren = this._linkedChildren
-
         // Dispatch the built event
         this._dispatchBuiltEvent();
     }

@@ -42,7 +42,16 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
      */
     constructor(properties, parentProperty = SIRIUS_LINKED_CONTROL_ELEMENT_PROPERTIES.PARENT, childrenProperty = SIRIUS_CONTROL_ELEMENT_PROPERTIES.CHILDREN) {
         // Overwrite the children property when calling the parent constructor
+
         super({...properties, children: []});
+
+         // Check if the properties contains the children
+        const children = properties?.[childrenProperty];
+        if (children) this.linkedChildren = children;
+
+        // Check if the properties contains the parent
+        const parent = properties?.[parentProperty];
+        if (parent) this.linkedParent = parent;
 
         // Build the SiriusLinkedControlElement
         this.#build(properties).then();
@@ -95,7 +104,7 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
 
         this.onBuilt = () => {
             // Check if the linked parent element is the same
-            if (this._linkedParent!==null&&this._linkedParent === element) return;
+            if (this._linkedParent === element) return;
 
             // Remove the current parent element
             if (this._linkedParent) this._removeLinkedParent();
@@ -119,11 +128,15 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
         if (!elements) return;
 
         this.onBuilt = () => {
+            // Set the new linked children elements
+            const oldLinkedChildren = this._linkedChildren
+            this._linkedChildren = elements
+
             // Check if the linked parent element is set
-            if (this._linkedParent===null) return;
+            if (this.linkedParent===null) return;
 
             // Remove the current children elements
-            if (this._linkedChildren) this._removeAllLinkedChildren();
+            if (oldLinkedChildren) this._removeAllLinkedChildren();
 
             // Set the children elements
             this._addLinkedChildren(elements);
@@ -235,7 +248,7 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
                 parent.parentId = this.id
 
                 // Set the parent ID for the linked children elements
-                this.linkedChildren.forEach(child => child.parentId = parent.id);
+                this.linkedChildren.forEach(child => this._addLinkedChild(child));
             }
         }
     }
@@ -351,9 +364,10 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
                 return
 
             // Add the linked child element to the linked children slot element
-            if (!this._linkedChildrenSlotElement.assignedElements().includes(element)) {
-                element.setAttribute("slot", this._linkedChildrenSlotElement.name)
-                this.appendChild(element);
+            if (!this._linkedChildrenSlotElement.assignedElements().includes(element)){
+                element.parentId = this.linkedParent.id
+                element.slot= this._linkedChildrenSlotElement.name;
+                this.appendChild(element)
             }
         }
     }
@@ -377,7 +391,7 @@ export default class SiriusLinkedControlElement extends SiriusControlElement {
 
             // Remove the parent ID and the slot name
             child.parentId = "";
-            child.removeAttribute("slot")
+            child.slot = ""
         }
     }
 
